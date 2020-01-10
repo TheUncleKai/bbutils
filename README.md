@@ -1,2 +1,2 @@
 # bblogging
-Small but hopefully flexible logging module in python
+Small collection of stuff for all my other python projects (including logging).
