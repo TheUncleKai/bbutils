@@ -25,8 +25,6 @@ __all__ = [
     "get_attribute"
 ]
 
-import easyb
-
 
 def check_dict(checkdict: dict, keylist: list) -> bool:
     """Checks a dict for a list of keys.
@@ -83,13 +81,11 @@ def get_attribute(path: str, classname: str) -> Union[Any, None]:
     try:
         m = __import__(path, globals(), locals(), fromlist)
     except ImportError:
-        easyb.log.error("Unable to find module path: {0:s}".format(path))
-        return None
+        raise ImportError("Unable to find module path: {0:s}".format(path))
 
     try:
         c = getattr(m, classname)
     except AttributeError:
-        easyb.log.error("Unable to get module attribute: {0:s} with {1:s}".format(path, classname))
-        return None
+        raise ImportError("Unable to get module attribute: {0:s} with {1:s}".format(path, classname))
 
     return c

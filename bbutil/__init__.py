@@ -23,7 +23,7 @@ import time
 from typing import List, Dict
 from threading import Thread
 
-from bblog.types import Message, Timer, Progress, Writer
+from bbutil.types import Message, Timer, Progress, Writer
 
 __all__ = [
     "types",
