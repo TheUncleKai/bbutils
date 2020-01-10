@@ -15,12 +15,18 @@
 #
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
+
+import abc
+from abc import ABCMeta
+from typing import List
+
 from datetime import datetime
 
 __all__ = [
     "Message",
     "Timer",
-    "Progress"
+    "Progress",
+    "Writer"
 ]
 
 
@@ -139,3 +145,31 @@ class Progress(object):
         _message = Message(level="PROGRESS", limit=self._limit, counter=self._counter, value=self._value)
         self._append(_message)
         return
+
+
+class Writer(metaclass=ABCMeta):
+
+    def __init__(self, name: str, index: List[str]):
+        self.id = name
+        self.index = index
+        return
+
+    @abc.abstractmethod
+    def setup(self, **kwargs):
+        return
+
+    @abc.abstractmethod
+    def write(self, item: Message):
+        return
+
+    @abc.abstractmethod
+    def clear(self) -> bool:  # pragma: no cover
+        return True
+
+    @abc.abstractmethod
+    def open(self) -> bool:  # pragma: no cover
+        return True
+
+    @abc.abstractmethod
+    def close(self) -> bool:  # pragma: no cover
+        return True

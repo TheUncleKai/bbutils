@@ -23,7 +23,7 @@ import time
 from typing import List, Dict
 from threading import Thread
 
-from bblog.types import Message, Timer, Progress
+from bblog.types import Message, Timer, Progress, Writer
 
 __all__ = [
     "types",
@@ -92,18 +92,30 @@ class Logging(object):
         self._timer_counter: int = 0
 
         self._buffer: List[Message] = []
-        self._interval = 0.1
-        self._active = False
+        self._interval: float = 0.1
+        self._active: bool = False
         self._index: Dict[int, List[str]] = {}
+        self._thread: bool = False
+        self._writer: List[Writer] = []
         return
 
-    def _process(self, message: Message):
+    def __del__(self):
+        self.close()
+        return
+
+    def _process(self, item: Message):
+        for writer in self._writer:
+            if (item.level not in writer.index) and (item.raw is False):
+                continue
+            writer.write(item)
         return
 
     def _run(self):
 
         while True:
+            self._thread = True
             if self._active is False:
+                self._thread = False
                 break
 
             time.sleep(self._interval)
@@ -114,6 +126,10 @@ class Logging(object):
 
             _message = self._buffer.pop(0)
             self._process(_message)
+        return
+
+    def register(self, writer: Writer):
+        self._writer.append(writer)
         return
 
     def append(self, item: Message):
@@ -151,6 +167,14 @@ class Logging(object):
         if len(self._index) == 0:
             self._index = _index
 
+        if self._thread is True:
+            return True
+
+        for item in self._writer:
+            check = item.open()
+            if check is False:
+                return False
+
         self._active = True
         thread = Thread(target=self._run)
         thread.start()
@@ -158,6 +182,21 @@ class Logging(object):
 
     def close(self) -> bool:
         self._active = False
+
+        if self._thread is False:
+            return True
+
+        while True:
+
+            if self._thread is False:
+                break
+            time.sleep(0.01)
+
+        for item in self._writer:
+            check = item.close()
+            if check is False:
+                return False
+
         return True
 
     def inform(self, tag: str, content: str):
