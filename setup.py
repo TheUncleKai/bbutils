@@ -17,17 +17,17 @@
 #
 
 from setuptools import setup, find_packages
-import easyb
+import bblog
 
 packages = find_packages(where=".")
 
 setup(
-    name=easyb.__name__,
-    license=easyb.__license__,
-    version=easyb.__version__,
-    description=easyb.__description__,
-    author=easyb.__author__,
-    author_email=easyb.__email__,
+    name=bblog.__name__,
+    license=bblog.__license__,
+    version=bblog.__version__,
+    description=bblog.__description__,
+    author=bblog.__author__,
+    author_email=bblog.__email__,
     include_package_data=True,
     scripts=[
         'easyb-tool.py',
@@ -41,8 +41,6 @@ setup(
         'Programming Language :: Python :: 3.7'
     ],
     install_requires=[
-        'colorama',
-        "pyserial"
+        'colorama'
     ]
 )
-
