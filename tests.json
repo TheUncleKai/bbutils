@@ -10,7 +10,12 @@
                 "test_register",
                 "test_open_01",
                 "test_open_02",
-                "test_open_03"
+                "test_open_03",
+                "test_open_04",
+                "test_open_05",
+                "test_close_01",
+                "test_close_02",
+                "test_close_03"
             ]
         }
     ]

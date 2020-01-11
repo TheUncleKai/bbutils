@@ -36,6 +36,7 @@ class TestWriter(Writer):
         self.seperator: str = "|"
         self.lines: List[str] = []
         self.fail_open = False
+        self.fail_close = False
         return
 
     def setup(self, **kwargs):
@@ -56,7 +57,10 @@ class TestWriter(Writer):
         return True
 
     def close(self) -> bool:
-        pass
+        if self.fail_close is True:
+            print("{0:s}: Closing failed!".format(self.id))
+            return False
+        return True
 
     def clear(self) -> bool:
         print("CLEAR")
@@ -202,4 +206,109 @@ class TestLogging(unittest.TestCase):
         self.assertFalse(check)
 
         log.close()
+        return
+
+    def test_open_04(self):
+
+        _index = {
+            0: ["INFORM", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"],
+            1: ["INFORM", "DEBUG1", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"],
+        }
+
+        log = bbutil.logging.Logging()
+        writer = TestWriter()
+
+        log.setup(app="TEST", level=1, index=_index, use_thread=True)
+        log.register(writer)
+
+        check = log.open()
+
+        self.assertTrue(check)
+
+        log.close()
+        return
+
+    def test_open_05(self):
+
+        _index = {
+            0: ["INFORM", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"],
+            1: ["INFORM", "DEBUG1", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"],
+        }
+
+        log = bbutil.logging.Logging()
+        writer = TestWriter()
+
+        log.setup(app="TEST", level=1, index=_index, use_thread=True)
+        log.register(writer)
+
+        check1 = log.open()
+        check2 = log.open()
+
+        self.assertTrue(check1)
+        self.assertFalse(check2)
+
+        log.close()
+        return
+
+    def test_close_01(self):
+
+        _index = {
+            0: ["INFORM", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"],
+            1: ["INFORM", "DEBUG1", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"],
+        }
+
+        log = bbutil.logging.Logging()
+        writer = TestWriter()
+
+        log.setup(app="TEST", level=1, index=_index)
+        log.register(writer)
+
+        check1 = log.open()
+        self.assertTrue(check1)
+
+        check2 = log.close()
+        self.assertTrue(check2)
+        return
+
+    def test_close_02(self):
+
+        _index = {
+            0: ["INFORM", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"],
+            1: ["INFORM", "DEBUG1", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"],
+        }
+
+        log = bbutil.logging.Logging()
+        writer = TestWriter()
+        writer.fail_close = True
+
+        log.setup(app="TEST", level=1, index=_index)
+        log.register(writer)
+
+        check1 = log.open()
+        self.assertTrue(check1)
+
+        check2 = log.close()
+        self.assertFalse(check2)
+        return
+
+    def test_close_03(self):
+
+        _index = {
+            0: ["INFORM", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"],
+            1: ["INFORM", "DEBUG1", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"],
+        }
+
+        log = bbutil.logging.Logging()
+        writer = TestWriter()
+
+        log.setup(app="TEST", level=1, index=_index, use_thread=True)
+        log.register(writer)
+
+        check1 = log.open()
+        self.assertTrue(check1)
+        self.assertTrue(log.state.thread_active)
+
+        check2 = log.close()
+        self.assertTrue(check2)
+        self.assertFalse(log.state.thread_active)
         return

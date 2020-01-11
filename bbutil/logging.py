@@ -58,7 +58,6 @@ class Logging(object):
         return
 
     def __del__(self):
-        self.close()
         return
 
     def _process(self, item: Message):
@@ -136,12 +135,13 @@ class Logging(object):
         return
 
     def open(self) -> bool:
+        if (self.state.use_thread is True) and (self.state.thread_active is True):
+            print("A logging thread is already running!")
+            return False
+
         length = len(self._index)
         if length == 0:
             self._index = _index
-
-        if (self.state.use_thread is True) and (self.state.thread_active is True):
-            return True
 
         if len(self._writer) == 0:
             print("Not output writer selected!")
@@ -152,6 +152,8 @@ class Logging(object):
             if check is False:
                 return False
 
+        self.state.open = True
+
         if self.state.use_thread is True:
             thread = Thread(target=self._run)
             thread.start()
@@ -160,9 +162,6 @@ class Logging(object):
     def _close_thread(self):
         if self.state.use_thread is False:
             return
-
-        if self.state.thread_active is False:
-            return True
 
         # wait for thread to close
         while True:
@@ -176,6 +175,7 @@ class Logging(object):
 
         self._close_thread()
         for item in self._writer:
+            print("Close")
             check = item.close()
             if check is False:
                 return False
