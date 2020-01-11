@@ -17,63 +17,22 @@
 #
 
 import sys
-import traceback
 import time
-
-from typing import List, Dict
+import traceback
 from threading import Thread
+from typing import List, Dict
 
-from bblog.types import Message, Timer, Progress, Writer
+import bbutil.logging.writer
+
+from bbutil.logging.types import Timer, Message, Writer, Progress
+from bbutil.utils import get_attribute
 
 __all__ = [
+    "writer",
     "types",
-    "utils",
 
     "Logging"
 ]
-
-
-#: package name
-__name__ = "bblogging"
-
-#: package author
-__author__ = "Kai Raphahn"
-
-#: email of package maintainer
-__email__ = "kai.raphahn@laburec.de"
-
-#: copyright year
-__year__ = 2020
-
-#: package copyright
-__copyright__ = "Copyright (C) {0:d}, {1:s} <{2:s}>".format(__year__, __author__, __email__)
-
-#: package description
-__description__ = "Python tools for EASYBus Sensor modules from GMH Messtechnik GmbH"
-
-#: package license
-__license__ = "Apache License, Version 2.0"
-
-#: package credits
-__credits__ = [__author__]
-
-#: version milestone
-__milestone__ = 0
-
-#: version major
-__major__ = 0
-
-#: version minor
-__minor__ = 1
-
-#: version patch
-__patch__ = 0
-
-#: package version
-__version__ = "{0:d}.{1:d}.{2:d}.{3:d}".format(__milestone__, __major__, __minor__, __patch__)
-
-#: package maintainer
-__maintainer__ = __author__
 
 _index = {
     0: ["INFORM", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"],
@@ -81,6 +40,16 @@ _index = {
     2: ["INFORM", "DEBUG1", "DEBUG1", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"],
     3: ["INFORM", "DEBUG1", "DEBUG2", "DEBUG3", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"]
 }
+
+
+class LogState(object):
+
+    def __init__(self):
+        self.close: bool = False
+        self.open: bool = False
+        self.use_thread: bool = False
+        self.thread_active: bool = False
+        return
 
 
 class Logging(object):
@@ -92,30 +61,53 @@ class Logging(object):
         self._timer_counter: int = 0
 
         self._buffer: List[Message] = []
-        self._interval: float = 0.1
-        self._active: bool = False
+        self._interval: float = 0.01
         self._index: Dict[int, List[str]] = {}
-        self._thread: bool = False
         self._writer: List[Writer] = []
+
+        self.state: LogState = LogState()
         return
 
     def __del__(self):
-        self.close()
         return
 
-    def _process(self, item: Message):
-        for writer in self._writer:
-            if (item.level not in writer.index) and (item.raw is False):
+    @staticmethod
+    def get_writer(name: str) -> Writer:
+        c = None
+
+        for item in bbutil.logging.writer.__all__:
+
+            if item != name:
                 continue
-            writer.write(item)
+
+            path = "bbutil.logging.writer.{0:s}".format(item)
+            classname = get_attribute(path, "classname")
+            c = get_attribute(path, classname)
+
+        if c is None:
+            raise ImportError("Unable to find writer: {0:s}".format(name))
+
+        _writer = c()
+        return _writer
+
+    def _process(self, item: Message):
+        for _writer in self._writer:
+            if (item.level not in _writer.index) and (item.raw is False):
+                continue
+            _writer.write(item)
         return
 
     def _run(self):
+        self.state.thread_active = True
 
         while True:
+            item_counter = len(self._buffer)
+
             self._thread = True
-            if self._active is False:
-                self._thread = False
+
+            # only quit when buffer is empty
+            if (self.state.close is True) and (item_counter == 0):
+                self.state.thread_active = False
                 break
 
             time.sleep(self._interval)
@@ -128,8 +120,8 @@ class Logging(object):
             self._process(_message)
         return
 
-    def register(self, writer: Writer):
-        self._writer.append(writer)
+    def register(self, write: Writer):
+        self._writer.append(write)
         return
 
     def append(self, item: Message):
@@ -138,11 +130,16 @@ class Logging(object):
 
         level_list = self._index[self._level]
 
-        if item.level not in level_list:
+        if (item.level not in level_list) and (item.raw is False):
             return
 
         item.app = self._app
-        self._buffer.append(item)
+
+        # select output method: if threaded use buffer for output, if not print directly
+        if self.state.use_thread is True:
+            self._buffer.append(item)
+        else:
+            self._process(item)
         return
 
     def setup(self, **kwargs):
@@ -161,82 +158,103 @@ class Logging(object):
         item = kwargs.get("index", None)
         if item is not None:
             self._index = item
+
+        item = kwargs.get("use_thread", None)
+        if item is not None:
+            self.state.use_thread = item
         return
 
     def open(self) -> bool:
-        if len(self._index) == 0:
+        if (self.state.use_thread is True) and (self.state.thread_active is True):
+            print("A logging thread is already running!")
+            return False
+
+        length = len(self._index)
+        if length == 0:
             self._index = _index
 
-        if self._thread is True:
-            return True
+        if len(self._writer) == 0:
+            print("Not output writer selected!")
+            return False
 
         for item in self._writer:
             check = item.open()
             if check is False:
                 return False
 
-        self._active = True
-        thread = Thread(target=self._run)
-        thread.start()
+        self.state.open = True
+
+        if self.state.use_thread is True:
+            thread = Thread(target=self._run)
+            thread.start()
         return True
 
-    def close(self) -> bool:
-        self._active = False
+    def _close_thread(self):
+        if self.state.use_thread is False:
+            return
 
-        if self._thread is False:
-            return True
-
+        # wait for thread to close
         while True:
-
-            if self._thread is False:
+            if self.state.thread_active is False:
                 break
             time.sleep(0.01)
+        return
 
+    def close(self) -> bool:
+        self.state.close = True
+
+        self._close_thread()
         for item in self._writer:
+            print("Close")
             check = item.close()
             if check is False:
                 return False
 
         return True
 
+    def raw(self, content: str):
+        _message = Message(content=content, raw=True)
+        self.append(_message)
+        return
+
     def inform(self, tag: str, content: str):
         _message = Message(tag=tag, content=content, level="INFORM")
-        self._buffer.append(_message)
+        self.append(_message)
         return
 
     def warn(self, tag: str, content: str):
         _message = Message(tag=tag, content=content, level="WARN")
-        self._buffer.append(_message)
+        self.append(_message)
         return
 
     def debug1(self, tag: str, content: str):
         _message = Message(tag=tag, content=content, level="DEBUG1")
-        self._buffer.append(_message)
+        self.append(_message)
         return
 
     def debug2(self, tag: str, content: str):
         _message = Message(tag=tag, content=content, level="DEBUG2")
-        self._buffer.append(_message)
+        self.append(_message)
         return
 
     def debug3(self, tag: str, content: str):
         _message = Message(tag=tag, content=content, level="DEBUG3")
-        self._buffer.append(_message)
+        self.append(_message)
         return
 
     def error(self, content: str):
         _message = Message(content=content, level="ERROR")
-        self._buffer.append(_message)
+        self.append(_message)
         return
 
     def exception(self, e: Exception):
         content = "An exception of type {0} occurred.".format(type(e).__name__)
         _message = Message(content=content, level="EXCEPTION")
-        self._buffer.append(_message)
+        self.append(_message)
 
         content = "Arguments:\n{0!r}".format(e.args)
         _message = Message(content=content, level="EXCEPTION")
-        self._buffer.append(_message)
+        self.append(_message)
         return
 
     def traceback(self):
@@ -249,7 +267,7 @@ class Logging(object):
         lines = traceback.format_tb(tb)
         for line in lines:
             _message = Message(content=line, raw=True)
-            self._buffer.append(_message)
+            self.append(_message)
         return
 
     def progress(self, limit: int, interval: int = 0) -> Progress:

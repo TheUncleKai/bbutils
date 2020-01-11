@@ -16,6 +16,11 @@
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
 
+from typing import Union
+
+from bbutil.utils import get_attribute
+from bbutil.logging.types import Writer
+
 __all__ = [
-    "logging"
+    "console",
 ]

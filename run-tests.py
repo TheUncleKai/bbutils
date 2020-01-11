@@ -19,12 +19,15 @@
 import coverage
 
 cov = coverage.Coverage()
+cov.start()
 
-import easyb
+from bbutil.logging import Logging
+from bbutil.logging.writer.console import ConsoleWriter
+
 from typing import List
 from optparse import OptionParser
 
-from easyb.utils import check_dict, openjson
+from bbutil.utils import check_dict, openjson
 
 import os
 import sys
@@ -36,18 +39,23 @@ from unittest.signals import registerResult
 import unittest.result as result
 
 
+log: Logging = Logging()
+
+
 class Module(object):
 
-    id = ""
-    path = ""
-    classname = ""
-    tests = []
+    def __init__(self):
+        self.id: str = ""
+        self.path: str = ""
+        self.classname: str = ""
+        self.tests: List[str] = []
+        return
 
     def load(self, data: dict) -> bool:
 
         check = check_dict(data, ["id", "path", "classname", "tests"])
         if check is False:
-            easyb.log.error("Module config not complete!")
+            log.error("Module config not complete!")
             return False
 
         self.id = data["id"]
@@ -107,33 +115,33 @@ class TextTestResult(result.TestResult):
 
     def addSuccess(self, test):
         super(TextTestResult, self).addSuccess(test)
-        easyb.log.inform("OK", self.current_test)
+        log.inform("OK", self.current_test)
         return
 
     def addError(self, test, err):
         super(TextTestResult, self).addError(test, err)
-        easyb.log.warn("ERROR", self.current_test)
+        log.warn("ERROR", self.current_test)
         return
 
     def addFailure(self, test, err):
         super(TextTestResult, self).addFailure(test, err)
-        easyb.log.warn("FAIL", self.current_test)
+        log.warn("FAIL", self.current_test)
         return
 
     def addSkip(self, test, reason):
         super(TextTestResult, self).addSkip(test, reason)
         content = "skipped {0!r}".format(reason)
-        easyb.log.warn(self.current_test, content)
+        log.warn(self.current_test, content)
         return
 
     def addExpectedFailure(self, test, err):
         super(TextTestResult, self).addExpectedFailure(test, err)
-        easyb.log.warn(self.current_test, "expected failure")
+        log.warn(self.current_test, "expected failure")
         return
 
     def addUnexpectedSuccess(self, test):
         super(TextTestResult, self).addUnexpectedSuccess(test)
-        easyb.log.warn(self.current_test, "unexpected success")
+        log.warn(self.current_test, "unexpected success")
         return
 
     # noinspection PyPep8Naming
@@ -144,11 +152,11 @@ class TextTestResult(result.TestResult):
 
     def _print_error_list(self, flavour, errors):
         for test, err in errors:
-            easyb.log.error(flavour)
-            easyb.log.raw(self.separator1 + "\n")
-            easyb.log.raw(self._get_description(test) + "\n")
-            easyb.log.raw(self.separator2 + "\n")
-            easyb.log.raw("%s" % err)
+            log.error(flavour)
+            log.raw(self.separator1 + "\n")
+            log.raw(self._get_description(test) + "\n")
+            log.raw(self.separator2 + "\n")
+            log.raw("%s" % err)
         return
 
 
@@ -209,7 +217,7 @@ class TextTestRunner(object):
                 # only when self.warnings is None.
                 if self.warnings in ['default', 'always']:
                     warnings.filterwarnings('module', category=DeprecationWarning,
-                                            message='Please use assert\w+ instead.')
+                                            message='Please use assert instead.')
             start_time = time.time()
             start_test_run = getattr(test_result, 'startTestRun', None)
             if start_test_run is not None:
@@ -228,7 +236,7 @@ class TextTestRunner(object):
         run = test_result.testsRun
 
         logline = "Ran %d test%s in %.3fs" % (run, run != 1 and "s" or "", time_taken)
-        easyb.log.inform("RUNNER", logline)
+        log.inform("RUNNER", logline)
 
         expected_fails = unexpected_successes = skipped = 0
         try:
@@ -244,11 +252,11 @@ class TextTestRunner(object):
         if not test_result.wasSuccessful():
             failed, errored = len(test_result.failures), len(test_result.errors)
             if failed:
-                easyb.log.warn("FAILURES", str(failed))
+                log.warn("FAILURES", str(failed))
             if errored:
-                easyb.log.warn("ERRORS", str(errored))
+                log.warn("ERRORS", str(errored))
         else:
-            easyb.log.inform("RUNNER", "OK")
+            log.inform("RUNNER", "OK")
 
         if skipped:
             infos.append("skipped=%d" % skipped)
@@ -261,7 +269,7 @@ class TextTestRunner(object):
 
         if infos:
             logline = " (%s)" % (", ".join(infos),)
-            easyb.log.raw(logline)
+            log.raw(logline)
         return test_result
 
 
@@ -278,11 +286,12 @@ class TestTask(object):
                                default="tests.json")
         self.parser.add_option("-m", "--module", help="run test module", metavar="MODULE", type="string", default="")
         self.parser.add_option("-t", "--test", help="run test", metavar="TEST", type="string", default="")
+        self.parser.add_option("-l", "--list", help="list tests", action="store_true", default=False)
 
         self._suite = None
         """test suite"""
 
-        self._modules = []
+        self._modules: List[Module] = []
         """stores test config."""
         return
 
@@ -305,7 +314,7 @@ class TestTask(object):
         """
 
         if os.path.exists(filename) is False:
-            easyb.log.error("File not found: " + filename)
+            log.error("File not found: " + filename)
             return False
 
         data = openjson(filename)
@@ -313,7 +322,7 @@ class TestTask(object):
         check = check_dict(data, ["modules"])
 
         if check is False:
-            easyb.log.error("Config is invalid!")
+            log.error("Config is invalid!")
             return False
 
         for item in data["modules"]:
@@ -330,11 +339,20 @@ class TestTask(object):
                 self._modules.append(module)
 
         if len(self.modules) == 0:
-            easyb.log.error("No tests configured!")
+            log.error("No tests configured!")
             return False
 
-        easyb.log.inform("TESTS", "Number of modules: " + str(len(self._modules)))
+        log.inform("TESTS", "Number of modules: " + str(len(self._modules)))
         return True
+
+    def _print_config(self):
+
+        for module in self._modules:
+            log.inform("Module", module.id)
+
+            for test in module.tests:
+                log.inform("Test", test)
+        return
 
     def prepare(self) -> bool:
         """Start and prepare the test task.
@@ -346,7 +364,7 @@ class TestTask(object):
         (options, args) = self.parser.parse_args()
 
         if options is None:
-            easyb.log.error("Unable to parse options!")
+            log.error("Unable to parse options!")
             return False
 
         self.options = options
@@ -357,11 +375,15 @@ class TestTask(object):
         if check is False:
             return False
 
+        if self.options.list is True:
+            self._print_config()
+            return True
+
         self._suite = unittest.TestSuite()
         count = 0
 
         for module in self.modules:
-            easyb.log.inform("RUN", module.id)
+            log.inform("RUN", module.id)
 
             fromlist = [module.classname]
             m = __import__(module.path, globals(), locals(), fromlist)
@@ -377,9 +399,9 @@ class TestTask(object):
                     count += 1
 
         if count == 0:
-            easyb.log.error("No tests to run!")
+            log.error("No tests to run!")
             return False
-        easyb.log.inform("TESTS", "Tests to run: " + str(count))
+        log.inform("TESTS", "Tests to run: " + str(count))
         return True
 
     def run(self) -> bool:
@@ -388,28 +410,41 @@ class TestTask(object):
         :returns: True if successfull, otherwise False.
         :rtype: bool
         """
+        if self.options.list is True:
+            return True
+
         runner = TextTestRunner(verbosity=2)
 
         runner.run(self.suite)
         return True
 
 
+def do_exit(return_value: int):
+    log.close()
+    sys.exit(return_value)
+
+
 if __name__ == '__main__':
 
-    cov.start()
-    easyb.log.open(level=2, name="run-test")
+    log.setup(app="run-tests", level=2)
+
+    console = log.get_writer("console")
+    console.setup(text_space=15, error_index=["ERROR", "EXCEPTION"])
+    log.register(console)
+
+    if log.open() is False:
+        do_exit(1)
 
     main = TestTask()
 
     if main.prepare() is False:
-        sys.exit(1)
+        do_exit(1)
 
     if main.run() is False:
-        sys.exit(1)
+        do_exit(1)
 
     cov.stop()
     cov.save()
 
     cov.html_report()
-
-    sys.exit(0)
+    do_exit(0)

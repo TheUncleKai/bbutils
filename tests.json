@@ -1,10 +1,133 @@
 {
     "modules": [
         {
-            "id": "Device",
-            "path": "tests.device",
-            "classname": "TestControl",
+            "id": "Logging",
+            "path": "tests.logging.logging",
+            "classname": "TestLogging",
             "tests": [
+                "test_constructor",
+                "test_setup",
+                "test_register",
+                "test_open_01",
+                "test_open_02",
+                "test_open_03",
+                "test_open_04",
+                "test_open_05",
+                "test_close_01",
+                "test_close_02",
+                "test_close_03",
+                "test_output_01",
+                "test_output_02",
+                "test_output_03",
+                "test_output_04",
+                "test_output_05",
+                "test_inform",
+                "test_warn",
+                "test_debug1",
+                "test_debug2",
+                "test_debug3",
+                "test_error",
+                "test_exception",
+                "test_traceback",
+                "test_progress",
+                "test_timer",
+                "test_raw",
+                "test_get_writer_01",
+                "test_get_writer_02"
+            ]
+        },
+        {
+            "id": "Logging.Types.Message",
+            "path": "tests.logging.types",
+            "classname": "TestMessage",
+            "tests": [
+                "test_constructor_01",
+                "test_constructor_02"
+            ]
+        },
+        {
+            "id": "Logging.Types.Timer",
+            "path": "tests.logging.types",
+            "classname": "TestTimer",
+            "tests": [
+                "test_constructor",
+                "test_stop"
+            ]
+        },
+        {
+            "id": "Logging.Types.Progress",
+            "path": "tests.logging.types",
+            "classname": "TestProgress",
+            "tests": [
+                "test_constructor",
+                "test_inc_01",
+                "test_inc_02",
+                "test_inc_03",
+                "test_dec_01",
+                "test_dec_02"
+            ]
+        },
+        {
+            "id": "Logging.Writer.Console",
+            "path": "tests.logging.console",
+            "classname": "TestConsoleWriter",
+            "tests": [
+                "test_constructor",
+                "test_setup",
+                "test_add_style",
+                "test_open",
+                "test_write_01",
+                "test_write_02",
+                "test_write_03",
+                "test_write_04",
+                "test_write_05",
+                "test_write_06",
+                "test_clear_01",
+                "test_clear_02"
+            ]
+        },
+        {
+            "id": "Utils",
+            "path": "tests.utils",
+            "classname": "TestUtils",
+            "tests": [
+                "test_check_dict_1",
+                "test_check_dict_2",
+                "test_check_object_1",
+                "test_check_object_2",
+                "test_check_object_3",
+                "test_execute_01",
+                "test_execute_02",
+                "test_execute_03",
+                "test_execute_04",
+                "test_execute_05",
+                "test_full_path",
+                "test_get_attribute_01",
+                "test_get_attribute_02",
+                "test_get_attribute_03"
+            ]
+        },
+        {
+            "id": "Data",
+            "path": "tests.data",
+            "classname": "TestData",
+            "tests": [
+                "test_constructor_01",
+                "test_constructor_02",
+                "test_constructor_03"
+            ]
+        },
+        {
+            "id": "Data.Convert",
+            "path": "tests.data",
+            "classname": "TestConvert",
+            "tests": [
+                "test_constructor",
+                "test_parse_01",
+                "test_parse_02",
+                "test_parse_03",
+                "test_parse_04",
+                "test_parse_05"
             ]
         }
     ]
