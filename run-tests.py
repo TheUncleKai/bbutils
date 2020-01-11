@@ -19,9 +19,10 @@
 import coverage
 
 cov = coverage.Coverage()
+cov.start()
 
 from bbutil.logging import Logging
-from bbutil.writer import ConsoleWriter
+from bbutil.writer.console import ConsoleWriter
 
 from typing import List
 from optparse import OptionParser
@@ -424,7 +425,6 @@ def do_exit(return_value: int):
 
 if __name__ == '__main__':
 
-    cov.start()
     log.setup(app="run-tests", level=2)
 
     console = ConsoleWriter()

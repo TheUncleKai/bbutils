@@ -31,6 +31,16 @@ _index = {
 }
 
 
+class LogState(object):
+
+    def __init__(self):
+        self.close: bool = False
+        self.open: bool = False
+        self.use_thread: bool = False
+        self.thread_active: bool = False
+        return
+
+
 class Logging(object):
 
     def __init__(self):
@@ -41,10 +51,10 @@ class Logging(object):
 
         self._buffer: List[Message] = []
         self._interval: float = 0.01
-        self._active: bool = False
         self._index: Dict[int, List[str]] = {}
-        self._thread: bool = False
         self._writer: List[Writer] = []
+
+        self.state: LogState = LogState()
         return
 
     def __del__(self):
@@ -59,6 +69,7 @@ class Logging(object):
         return
 
     def _run(self):
+        self.state.thread_active = True
 
         while True:
             item_counter = len(self._buffer)
@@ -66,8 +77,8 @@ class Logging(object):
             self._thread = True
 
             # only quit when buffer is empty
-            if (self._active is False) and (item_counter == 0):
-                self._thread = False
+            if (self.state.close is True) and (item_counter == 0):
+                self.state.thread_active = False
                 break
 
             time.sleep(self._interval)
@@ -94,7 +105,12 @@ class Logging(object):
             return
 
         item.app = self._app
-        self._buffer.append(item)
+
+        # select output method: if threaded use buffer for output, if not print directly
+        if self.state.use_thread is True:
+            self._buffer.append(item)
+        else:
+            self._process(item)
         return
 
     def setup(self, **kwargs):
@@ -113,6 +129,10 @@ class Logging(object):
         item = kwargs.get("index", None)
         if item is not None:
             self._index = item
+
+        item = kwargs.get("use_thread", None)
+        if item is not None:
+            self.state.use_thread = item
         return
 
     def open(self) -> bool:
@@ -120,31 +140,41 @@ class Logging(object):
         if length == 0:
             self._index = _index
 
-        if self._thread is True:
+        if (self.state.use_thread is True) and (self.state.thread_active is True):
             return True
+
+        if len(self._writer) == 0:
+            print("Not output writer selected!")
+            return False
 
         for item in self._writer:
             check = item.open()
             if check is False:
                 return False
 
-        self._active = True
-        thread = Thread(target=self._run)
-        thread.start()
+        if self.state.use_thread is True:
+            thread = Thread(target=self._run)
+            thread.start()
         return True
 
-    def close(self) -> bool:
-        self._active = False
+    def _close_thread(self):
+        if self.state.use_thread is False:
+            return
 
-        if self._thread is False:
+        if self.state.thread_active is False:
             return True
 
+        # wait for thread to close
         while True:
-
-            if self._thread is False:
+            if self.state.thread_active is False:
                 break
             time.sleep(0.01)
+        return
 
+    def close(self) -> bool:
+        self.state.close = True
+
+        self._close_thread()
         for item in self._writer:
             check = item.close()
             if check is False:

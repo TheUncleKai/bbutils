@@ -16,18 +16,12 @@
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
 
-from bbutil.logging import Logging
-from bbutil.writer import ConsoleWriter
-
 __all__ = [
     "writer",
 
     "logging",
     "types",
-    "utils",
-
-    "Logging",
-    "ConsoleWriter"
+    "utils"
 ]
 
 

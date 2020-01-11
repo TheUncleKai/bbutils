@@ -5,7 +5,12 @@
             "path": "tests.logging.logging",
             "classname": "TestLogging",
             "tests": [
-                "test_constructor"
+                "test_constructor",
+                "test_setup",
+                "test_register",
+                "test_open_01",
+                "test_open_02",
+                "test_open_03"
             ]
         }
     ]
