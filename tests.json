@@ -66,6 +66,14 @@
                 "test_dec_01",
                 "test_dec_02"
             ]
+        },
+        {
+            "id": "Logging.Writer.Console",
+            "path": "tests.logging.console",
+            "classname": "TestConsoleWriter",
+            "tests": [
+                "test_constructor"
+            ]
         }
     ]
 }
