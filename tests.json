@@ -35,6 +35,24 @@
                 "test_get_writer_01",
                 "test_get_writer_02"
             ]
+        },
+        {
+            "id": "Logging.Types.Message",
+            "path": "tests.logging.types",
+            "classname": "TestMessage",
+            "tests": [
+                "test_constructor_01",
+                "test_constructor_02"
+            ]
+        },
+        {
+            "id": "Logging.Types.Timer",
+            "path": "tests.logging.types",
+            "classname": "TestTimer",
+            "tests": [
+                "test_constructor",
+                "test_stop"
+            ]
         }
     ]
 }
