@@ -112,9 +112,13 @@ class ConsoleWriter(Writer):
         if item is not None:
             self.error_index = item
 
+        item = kwargs.get("bar_len", None)
+        if item is not None:
+            self.bar_len = item
         return
 
-    def add_style(self, style: Style):
+    def add_style(self, name: str, text: str, foreground: str, background: str):
+        style = Style(name, text, foreground, background)
         self.styles[style.name] = style
         return
 
@@ -127,8 +131,8 @@ class ConsoleWriter(Writer):
 
         return True
 
-    def close(self) -> bool:
-        pass
+    def close(self) -> bool:  # pragma: no cover
+        return True
 
     def clear(self) -> bool:
         filler = ' ' * self.length
@@ -151,9 +155,7 @@ class ConsoleWriter(Writer):
             return
 
         if item.raw is True:
-            content = self._create_raw(item, item.content)
-            fallback = self._create_raw(item, "Unable to log content due de- or encoding error!")
-            self._write(error, content, fallback)
+            self._write(error, item.content, "Unable to log content due de- or encoding error!")
         else:
             content = self._create_color(item, item.content)
             fallback = self._create_color(item, "Unable to log content due de- or encoding error!")
@@ -173,7 +175,7 @@ class ConsoleWriter(Writer):
         bars = '=' * filled_len
         filler = '-' * (self.bar_len - filled_len)
 
-        content = " [{0:s}{1:s}] {2:d}% ({3:d}/{4:d})".format(bars, filler, percents, item.progress.counter,
+        content = " [{0:s}{1:s}] {2:.1f}% ({3:d}/{4:d})".format(bars, filler, percents, item.progress.counter,
                                                               item.progress.limit)
 
         if len(content) > self.line_width:
@@ -193,16 +195,6 @@ class ConsoleWriter(Writer):
         if item.progress.finished is True:
             self.clear()
         return
-
-    def _create_raw(self, item: Message, text: str) -> str:
-        appname = "{0:s} ".format(item.app).ljust(self.text_space)
-
-        if item.tag == "":
-            content = "{0:s} {1:s}".format(appname, text)
-        else:
-            tag = item.tag.ljust(self.text_space)
-            content = "{0:s} {1:s}{2:s} {3:s}".format(appname, tag, self.seperator, text)
-        return content
 
     def _create_color(self, item: Message, text: str) -> str:
         appname = "{0:s} ".format(item.app).ljust(self.text_space)

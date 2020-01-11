@@ -72,7 +72,16 @@
             "path": "tests.logging.console",
             "classname": "TestConsoleWriter",
             "tests": [
-                "test_constructor"
+                "test_constructor",
+                "test_setup",
+                "test_add_style",
+                "test_open",
+                "test_write_01",
+                "test_write_02",
+                "test_write_03",
+                "test_write_04",
+                "test_write_05",
+                "test_write_06"
             ]
         }
     ]
