@@ -94,7 +94,7 @@ class Progress(object):
         self.value: float = 0.0
         self.finished: bool = False
         self.interval: int = interval
-        self.interval_counter: int = 10
+        self.interval_counter: int = 0
         self.append = append_callback
         return
 
@@ -117,19 +117,22 @@ class Progress(object):
 
         self._recalc()
 
-        _message = Message(level="PROGRESS", limit=self.limit, counter=self.counter, value=self.value)
+        if self.interval_counter != 0:
+            return
+
+        _message = Message(level="PROGRESS", progress=self)
         self.append(_message)
         return
 
     def dec(self):
-        self.counter += 1
+        self.counter -= 1
 
         self._recalc()
 
         if self.interval_counter != 0:
             return
 
-        _message = Message(level="PROGRESS", limit=self.limit, counter=self.counter, value=self.value)
+        _message = Message(level="PROGRESS", progress=self)
         self.append(_message)
         return
 
@@ -142,11 +145,11 @@ class Writer(metaclass=ABCMeta):
         return
 
     @abc.abstractmethod
-    def setup(self, **kwargs):
+    def setup(self, **kwargs):  # pragma: no cover
         return
 
     @abc.abstractmethod
-    def write(self, item: Message):
+    def write(self, item: Message):  # pragma: no cover
         return
 
     @abc.abstractmethod

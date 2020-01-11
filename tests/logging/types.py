@@ -101,3 +101,102 @@ class TestTimer(unittest.TestCase):
         self.assertNotEqual(callback.item.content, "")
         self.assertEqual(callback.item.level, "TIMER")
         return
+
+
+class TestProgress(unittest.TestCase):
+
+    def setUp(self):
+        return
+
+    def tearDown(self):
+        return
+
+    def test_constructor(self):
+        callback = Callback()
+
+        item = Progress(100, 10, callback.append)
+
+        self.assertIsNotNone(item)
+        self.assertEqual(item.limit, 100)
+        self.assertEqual(item.counter, 0)
+        self.assertEqual(item.finished, False)
+        self.assertEqual(item.interval, 10)
+        self.assertEqual(item.interval_counter, 0)
+        self.assertIsNotNone(item.append)
+        return
+
+    def test_inc_01(self):
+        callback = Callback()
+
+        item = Progress(100, 0, callback.append)
+        item.inc()
+
+        message = callback.item
+
+        self.assertIsNotNone(message)
+        self.assertIs(message.progress, item)
+        self.assertEqual(message.level, "PROGRESS")
+        return
+
+    def test_inc_02(self):
+        callback = Callback()
+
+        item = Progress(100, 2, callback.append)
+
+        item.inc()
+        message1 = callback.item
+
+        item.inc()
+        message2 = callback.item
+
+        self.assertIsNotNone(callback.item)
+
+        self.assertIsNone(message1)
+
+        self.assertIsNotNone(message2)
+        self.assertIs(message2.progress, item)
+        self.assertEqual(message2.level, "PROGRESS")
+        return
+
+    def test_inc_03(self):
+        callback = Callback()
+
+        item = Progress(100, 0, callback.append)
+        item.counter = 99
+        item.inc()
+
+        message = callback.item
+
+        self.assertIsNotNone(message)
+        self.assertIs(message.progress, item)
+        self.assertEqual(message.level, "PROGRESS")
+        self.assertTrue(item.finished)
+        return
+
+    def test_dec_01(self):
+        callback = Callback()
+
+        item = Progress(100, 0, callback.append)
+        item.counter = 1
+        item.dec()
+
+        message = callback.item
+
+        self.assertIsNotNone(message)
+        self.assertIs(message.progress, item)
+        self.assertEqual(message.level, "PROGRESS")
+        self.assertEqual(item.counter, 0)
+        return
+
+    def test_dec_02(self):
+        callback = Callback()
+
+        item = Progress(100, 10, callback.append)
+        item.counter = 1
+        item.dec()
+
+        message = callback.item
+
+        self.assertIsNone(message)
+        self.assertEqual(item.counter, 0)
+        return

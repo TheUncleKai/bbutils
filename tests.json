@@ -53,6 +53,19 @@
                 "test_constructor",
                 "test_stop"
             ]
+        },
+        {
+            "id": "Logging.Types.Progress",
+            "path": "tests.logging.types",
+            "classname": "TestProgress",
+            "tests": [
+                "test_constructor",
+                "test_inc_01",
+                "test_inc_02",
+                "test_inc_03",
+                "test_dec_01",
+                "test_dec_02"
+            ]
         }
     ]
 }
