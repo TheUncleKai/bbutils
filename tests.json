@@ -15,7 +15,17 @@
                 "test_open_05",
                 "test_close_01",
                 "test_close_02",
-                "test_close_03"
+                "test_close_03",
+                "test_output_01",
+                "test_output_02",
+                "test_output_03",
+                "test_output_04",
+                "test_output_05",
+                "test_inform",
+                "test_warn",
+                "test_debug1",
+                "test_debug2",
+                "test_debug3"
             ]
         }
     ]

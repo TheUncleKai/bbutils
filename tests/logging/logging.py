@@ -16,8 +16,9 @@
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
 
-
+import time
 import unittest
+
 from typing import List
 
 import bbutil.logging
@@ -25,18 +26,19 @@ import bbutil.types
 
 from bbutil.types import Message, Writer
 
+_default_index = ["INFORM", "DEBUG1", "DEBUG2", "DEBUG3", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"]
+
 
 class TestWriter(Writer):
 
-    def __init__(self):
-        _index = ["INFORM", "DEBUG1", "DEBUG2", "DEBUG3", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"]
-        Writer.__init__(self, "TEST", _index)
-
+    def __init__(self, index: list):
+        Writer.__init__(self, "TEST", index)
         self.text_space: int = 15
         self.seperator: str = "|"
         self.lines: List[str] = []
         self.fail_open = False
         self.fail_close = False
+        self.buffer: List[Message] = []
         return
 
     def setup(self, **kwargs):
@@ -67,6 +69,7 @@ class TestWriter(Writer):
         return True
 
     def write(self, item: Message):
+        self.buffer.append(item)
         if item.tag == "":
             line = "{0:s} {1:s}: {2:s}".format(item.app, item.level, item.content)
             self.lines.append(line)
@@ -141,7 +144,7 @@ class TestLogging(unittest.TestCase):
         }
 
         log = bbutil.logging.Logging()
-        writer = TestWriter()
+        writer = TestWriter(_default_index)
 
         log.setup(app="TEST", level=1, index=_index)
         log.register(writer)
@@ -159,7 +162,7 @@ class TestLogging(unittest.TestCase):
         }
 
         log = bbutil.logging.Logging()
-        writer = TestWriter()
+        writer = TestWriter(_default_index)
 
         log.setup(app="TEST", level=1, index=_index)
         log.register(writer)
@@ -195,7 +198,7 @@ class TestLogging(unittest.TestCase):
         }
 
         log = bbutil.logging.Logging()
-        writer = TestWriter()
+        writer = TestWriter(_default_index)
         writer.fail_open = True
 
         log.setup(app="TEST", level=1, index=_index)
@@ -216,7 +219,7 @@ class TestLogging(unittest.TestCase):
         }
 
         log = bbutil.logging.Logging()
-        writer = TestWriter()
+        writer = TestWriter(_default_index)
 
         log.setup(app="TEST", level=1, index=_index, use_thread=True)
         log.register(writer)
@@ -236,7 +239,7 @@ class TestLogging(unittest.TestCase):
         }
 
         log = bbutil.logging.Logging()
-        writer = TestWriter()
+        writer = TestWriter(_default_index)
 
         log.setup(app="TEST", level=1, index=_index, use_thread=True)
         log.register(writer)
@@ -258,7 +261,7 @@ class TestLogging(unittest.TestCase):
         }
 
         log = bbutil.logging.Logging()
-        writer = TestWriter()
+        writer = TestWriter(_default_index)
 
         log.setup(app="TEST", level=1, index=_index)
         log.register(writer)
@@ -278,7 +281,7 @@ class TestLogging(unittest.TestCase):
         }
 
         log = bbutil.logging.Logging()
-        writer = TestWriter()
+        writer = TestWriter(_default_index)
         writer.fail_close = True
 
         log.setup(app="TEST", level=1, index=_index)
@@ -299,7 +302,7 @@ class TestLogging(unittest.TestCase):
         }
 
         log = bbutil.logging.Logging()
-        writer = TestWriter()
+        writer = TestWriter(_default_index)
 
         log.setup(app="TEST", level=1, index=_index, use_thread=True)
         log.register(writer)
@@ -311,4 +314,249 @@ class TestLogging(unittest.TestCase):
         check2 = log.close()
         self.assertTrue(check2)
         self.assertFalse(log.state.thread_active)
+        return
+
+    def test_output_01(self):
+
+        _index = {
+            0: ["INFORM", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"],
+            1: ["INFORM", "DEBUG1", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"],
+        }
+
+        log = bbutil.logging.Logging()
+        writer = TestWriter(_default_index)
+
+        log.setup(app="TEST", level=1, index=_index, use_thread=False)
+        log.register(writer)
+
+        log.open()
+
+        log.inform("TEST1", "BLA")
+
+        test_string = "TEST INFORM TEST1: BLA"
+        self.assertEqual(len(writer.lines), 1)
+        self.assertEqual(writer.lines[0], test_string)
+        log.close()
+        return
+
+    def test_output_02(self):
+
+        _index = {
+            0: ["INFORM", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"],
+            1: ["DEBUG1", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"],
+        }
+
+        log = bbutil.logging.Logging()
+        writer = TestWriter(_default_index)
+
+        log.setup(app="TEST", level=1, index=_index, use_thread=False)
+        log.register(writer)
+
+        log.open()
+
+        log.inform("TEST1", "BLA")
+
+        test_string = "TEST INFORM TEST1: BLA"
+        self.assertEqual(len(writer.lines), 0)
+        log.close()
+        return
+
+    def test_output_03(self):
+
+        _index = {
+            0: ["INFORM", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"],
+            1: ["DEBUG1", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"],
+        }
+
+        log = bbutil.logging.Logging()
+        writer = TestWriter(_default_index)
+
+        log.setup(app="TEST", level=2, index=_index, use_thread=False)
+        log.register(writer)
+
+        log.open()
+
+        log.inform("TEST1", "BLA")
+
+        test_string = "TEST INFORM TEST1: BLA"
+        self.assertEqual(len(writer.lines), 0)
+        log.close()
+        return
+
+    def test_output_04(self):
+
+        _index = {
+            0: ["INFORM", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"],
+            1: ["INFORM", "DEBUG1", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"],
+        }
+
+        log = bbutil.logging.Logging()
+        writer = TestWriter(["DEBUG1", "DEBUG2", "DEBUG3", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"])
+
+        log.setup(app="TEST", level=1, index=_index, use_thread=False)
+        log.register(writer)
+
+        log.open()
+
+        log.inform("TEST1", "BLA")
+        self.assertEqual(len(writer.lines), 0)
+        log.close()
+        return
+
+    def test_output_05(self):
+
+        _index = {
+            0: ["INFORM", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"],
+            1: ["INFORM", "DEBUG1", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"],
+        }
+
+        log = bbutil.logging.Logging()
+        writer = TestWriter(_default_index)
+
+        log.setup(app="TEST", level=1, index=_index, use_thread=True)
+        log.register(writer)
+
+        log.open()
+
+        log.inform("TEST1", "BLA")
+
+        time.sleep(0.1)
+
+        test_string = "TEST INFORM TEST1: BLA"
+        self.assertEqual(len(writer.lines), 1)
+        self.assertEqual(writer.lines[0], test_string)
+        log.close()
+        return
+
+    def test_inform(self):
+
+        _index = {
+            0: ["INFORM", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"],
+            1: ["INFORM", "DEBUG1", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"],
+        }
+
+        log = bbutil.logging.Logging()
+        writer = TestWriter(_default_index)
+
+        log.setup(app="TEST", level=1, index=_index, use_thread=True)
+        log.register(writer)
+
+        log.open()
+
+        log.inform("TEST1", "BLA")
+        time.sleep(0.1)
+        log.close()
+
+        item = writer.buffer[0]
+
+        self.assertEqual(item.app, "TEST")
+        self.assertEqual(item.level, "INFORM")
+        self.assertEqual(item.tag, "TEST1")
+        self.assertEqual(item.content, "BLA")
+        return
+
+    def test_warn(self):
+
+        _index = {
+            0: ["INFORM", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"],
+            1: ["INFORM", "DEBUG1", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"],
+        }
+
+        log = bbutil.logging.Logging()
+        writer = TestWriter(_default_index)
+
+        log.setup(app="TEST", level=1, index=_index, use_thread=True)
+        log.register(writer)
+
+        log.open()
+
+        log.warn("TEST1", "BLA")
+        time.sleep(0.1)
+        log.close()
+
+        item = writer.buffer[0]
+
+        self.assertEqual(item.app, "TEST")
+        self.assertEqual(item.level, "WARN")
+        self.assertEqual(item.tag, "TEST1")
+        self.assertEqual(item.content, "BLA")
+        return
+
+    def test_debug1(self):
+
+        _index = {
+            0: ["INFORM", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"],
+            1: ["INFORM", "DEBUG1", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"],
+        }
+
+        log = bbutil.logging.Logging()
+        writer = TestWriter(_default_index)
+
+        log.setup(app="TEST", level=1, index=_index, use_thread=True)
+        log.register(writer)
+
+        log.open()
+
+        log.debug1("TEST1", "BLA")
+        time.sleep(0.1)
+        log.close()
+
+        item = writer.buffer[0]
+
+        self.assertEqual(item.app, "TEST")
+        self.assertEqual(item.level, "DEBUG1")
+        self.assertEqual(item.tag, "TEST1")
+        self.assertEqual(item.content, "BLA")
+        return
+
+    def test_debug2(self):
+
+        _index = {
+            2: ["DEBUG2"],
+        }
+
+        log = bbutil.logging.Logging()
+        writer = TestWriter(_default_index)
+
+        log.setup(app="TEST", level=2, index=_index, use_thread=True)
+        log.register(writer)
+
+        log.open()
+
+        log.debug2("TEST1", "BLA")
+        time.sleep(0.1)
+        log.close()
+
+        item = writer.buffer[0]
+
+        self.assertEqual(item.app, "TEST")
+        self.assertEqual(item.level, "DEBUG2")
+        self.assertEqual(item.tag, "TEST1")
+        self.assertEqual(item.content, "BLA")
+        return
+
+    def test_debug3(self):
+
+        _index = {
+            3: ["DEBUG3"],
+        }
+
+        log = bbutil.logging.Logging()
+        writer = TestWriter(_default_index)
+
+        log.setup(app="TEST", level=3, index=_index, use_thread=True)
+        log.register(writer)
+
+        log.open()
+
+        log.debug3("TEST1", "BLA")
+        time.sleep(0.1)
+        log.close()
+
+        item = writer.buffer[0]
+
+        self.assertEqual(item.app, "TEST")
+        self.assertEqual(item.level, "DEBUG3")
+        self.assertEqual(item.tag, "TEST1")
+        self.assertEqual(item.content, "BLA")
         return

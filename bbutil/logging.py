@@ -194,7 +194,7 @@ class Logging(object):
 
     def warn(self, tag: str, content: str):
         _message = Message(tag=tag, content=content, level="WARN")
-        self._buffer.append(_message)
+        self.append(_message)
         return
 
     def debug1(self, tag: str, content: str):
@@ -209,7 +209,7 @@ class Logging(object):
 
     def debug3(self, tag: str, content: str):
         _message = Message(tag=tag, content=content, level="DEBUG3")
-        self._buffer.append(_message)
+        self.append(_message)
         return
 
     def error(self, content: str):
