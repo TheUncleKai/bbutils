@@ -25,7 +25,10 @@
                 "test_warn",
                 "test_debug1",
                 "test_debug2",
-                "test_debug3"
+                "test_debug3",
+                "test_error",
+                "test_exception",
+                "test_traceback"
             ]
         }
     ]

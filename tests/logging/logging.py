@@ -18,6 +18,7 @@
 
 import time
 import unittest
+import sys
 
 from typing import List
 
@@ -70,6 +71,11 @@ class TestWriter(Writer):
 
     def write(self, item: Message):
         self.buffer.append(item)
+
+        if item.raw is True:
+            sys.stdout.write(item.content)
+            return
+
         if item.tag == "":
             line = "{0:s} {1:s}: {2:s}".format(item.app, item.level, item.content)
             self.lines.append(line)
@@ -356,7 +362,6 @@ class TestLogging(unittest.TestCase):
 
         log.inform("TEST1", "BLA")
 
-        test_string = "TEST INFORM TEST1: BLA"
         self.assertEqual(len(writer.lines), 0)
         log.close()
         return
@@ -378,7 +383,6 @@ class TestLogging(unittest.TestCase):
 
         log.inform("TEST1", "BLA")
 
-        test_string = "TEST INFORM TEST1: BLA"
         self.assertEqual(len(writer.lines), 0)
         log.close()
         return
@@ -559,4 +563,93 @@ class TestLogging(unittest.TestCase):
         self.assertEqual(item.level, "DEBUG3")
         self.assertEqual(item.tag, "TEST1")
         self.assertEqual(item.content, "BLA")
+        return
+
+    def test_error(self):
+
+        _index = {
+            0: ["ERROR"],
+        }
+
+        log = bbutil.logging.Logging()
+        writer = TestWriter(_default_index)
+
+        log.setup(app="TEST", level=0, index=_index, use_thread=True)
+        log.register(writer)
+
+        log.open()
+
+        log.error("BLA")
+        time.sleep(0.1)
+        log.close()
+
+        item = writer.buffer[0]
+
+        self.assertEqual(item.app, "TEST")
+        self.assertEqual(item.level, "ERROR")
+        self.assertEqual(item.tag, "")
+        self.assertEqual(item.content, "BLA")
+        return
+
+    def test_exception(self):
+
+        _index = {
+            0: ["EXCEPTION"],
+        }
+
+        log = bbutil.logging.Logging()
+        writer = TestWriter(_default_index)
+
+        log.setup(app="TEST", level=0, index=_index, use_thread=True)
+        log.register(writer)
+
+        log.open()
+
+        e = OSError(2, 'No such file or directory', 'foo')
+
+        log.exception(e)
+        time.sleep(0.1)
+        log.close()
+
+        self.assertEqual(len(writer.buffer), 2)
+
+        item1 = writer.buffer[0]
+        item2 = writer.buffer[1]
+
+        self.assertEqual(item1.app, "TEST")
+        self.assertEqual(item1.level, "EXCEPTION")
+        self.assertEqual(item1.tag, "")
+        self.assertEqual(item1.content, "An exception of type FileNotFoundError occurred.")
+
+        self.assertEqual(item2.app, "TEST")
+        self.assertEqual(item2.level, "EXCEPTION")
+        self.assertEqual(item2.tag, "")
+        return
+
+    def test_traceback(self):
+
+        _index = {
+            0: ["EXCEPTION", "ERROR"],
+        }
+
+        log = bbutil.logging.Logging()
+        writer = TestWriter(_default_index)
+
+        log.setup(app="TEST", level=0, index=_index, use_thread=False)
+        log.register(writer)
+
+        log.open()
+
+        try:
+            _ = 10 / 0
+        except ZeroDivisionError:
+            log.traceback()
+
+        log.close()
+
+        length = len(writer.buffer)
+        self.assertEqual(length, 4)
+        self.assertEqual(writer.buffer[0].content, "Uncaught exception")
+        self.assertEqual(writer.buffer[1].content, "Type:  <class 'ZeroDivisionError'>")
+        self.assertEqual(writer.buffer[2].content, "Value: division by zero")
         return
