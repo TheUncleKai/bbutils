@@ -116,6 +116,19 @@
                 "test_constructor_02",
                 "test_constructor_03"
             ]
+        },
+        {
+            "id": "Data.Convert",
+            "path": "tests.data",
+            "classname": "TestConvert",
+            "tests": [
+                "test_constructor",
+                "test_parse_01",
+                "test_parse_02",
+                "test_parse_03",
+                "test_parse_04",
+                "test_parse_05"
+            ]
         }
     ]
 }
