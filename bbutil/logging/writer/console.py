@@ -164,10 +164,7 @@ class ConsoleWriter(Writer):
 
     def _write_progress(self, item: Message):
         self.use_error = False
-        if item.progress.limit == 0:
-            value = self.bar_len
-        else:
-            value = self.bar_len * item.progress.counter / float(item.progress.limit)
+        value = self.bar_len * item.progress.counter / float(item.progress.limit)
 
         filled_len = int(round(value))
         percents = round(item.progress.value, 1)
@@ -176,7 +173,7 @@ class ConsoleWriter(Writer):
         filler = '-' * (self.bar_len - filled_len)
 
         content = " [{0:s}{1:s}] {2:.1f}% ({3:d}/{4:d})".format(bars, filler, percents, item.progress.counter,
-                                                              item.progress.limit)
+                                                                item.progress.limit)
 
         if len(content) > self.line_width:
             return

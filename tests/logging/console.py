@@ -240,3 +240,48 @@ class TestConsoleWriter(unittest.TestCase):
         self.assertEqual(count, 0)
         self.assertFalse(write_called)
         return
+
+    def test_clear_01(self):
+
+        message = Message(app="TEST", content="This is a test!", raw=True)
+
+        item = ConsoleWriter()
+        item.open()
+        item.stdout = SysWrite()
+
+        item.write(message)
+        item.clear()
+
+        count = item.stdout.write.call_count
+        write_called = item.stdout.write.called
+        call = item.stdout.write.call_args_list[1]
+        (args, kwargs) = call
+        data = args[0]
+
+        self.assertTrue(write_called)
+        self.assertIn('\r', data)
+        self.assertEqual(count, 2)
+        return
+
+    def test_clear_02(self):
+
+        message = Message(app="TEST", content="This is a test!", level="ERROR")
+
+        item = ConsoleWriter()
+        item.setup(error_index=["ERROR"])
+        item.open()
+        item.stderr = SysWrite()
+
+        item.write(message)
+        item.clear()
+
+        count = item.stderr.write.call_count
+        write_called = item.stderr.write.called
+        call = item.stderr.write.call_args_list[1]
+        (args, kwargs) = call
+        data = args[0]
+
+        self.assertTrue(write_called)
+        self.assertIn('\r', data)
+        self.assertEqual(count, 2)
+        return
