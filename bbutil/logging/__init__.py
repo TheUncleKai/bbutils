@@ -15,13 +15,24 @@
 #
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
+
 import sys
 import time
 import traceback
 from threading import Thread
 from typing import List, Dict
 
-from bbutil.types import Timer, Message, Writer, Progress
+import bbutil.logging.writer
+
+from bbutil.logging.types import Timer, Message, Writer, Progress
+from bbutil.utils import get_attribute
+
+__all__ = [
+    "writer",
+    "types",
+
+    "Logging"
+]
 
 _index = {
     0: ["INFORM", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"],
@@ -60,11 +71,30 @@ class Logging(object):
     def __del__(self):
         return
 
-    def _process(self, item: Message):
-        for writer in self._writer:
-            if (item.level not in writer.index) and (item.raw is False):
+    @staticmethod
+    def get_writer(name: str) -> Writer:
+        c = None
+
+        for item in bbutil.logging.writer.__all__:
+
+            if item != name:
                 continue
-            writer.write(item)
+
+            path = "bbutil.logging.writer.{0:s}".format(item)
+            classname = get_attribute(path, "classname")
+            c = get_attribute(path, classname)
+
+        if c is None:
+            raise ImportError("Unable to find writer: {0:s}".format(name))
+
+        _writer = c()
+        return _writer
+
+    def _process(self, item: Message):
+        for _writer in self._writer:
+            if (item.level not in _writer.index) and (item.raw is False):
+                continue
+            _writer.write(item)
         return
 
     def _run(self):
@@ -90,8 +120,8 @@ class Logging(object):
             self._process(_message)
         return
 
-    def register(self, writer: Writer):
-        self._writer.append(writer)
+    def register(self, write: Writer):
+        self._writer.append(write)
         return
 
     def append(self, item: Message):

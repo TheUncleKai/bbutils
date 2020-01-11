@@ -22,7 +22,7 @@ cov = coverage.Coverage()
 cov.start()
 
 from bbutil.logging import Logging
-from bbutil.writer.console import ConsoleWriter
+from bbutil.logging.writer.console import ConsoleWriter
 
 from typing import List
 from optparse import OptionParser
@@ -40,6 +40,7 @@ import unittest.result as result
 
 
 log: Logging = Logging()
+
 
 class Module(object):
 
@@ -427,7 +428,7 @@ if __name__ == '__main__':
 
     log.setup(app="run-tests", level=2)
 
-    console = ConsoleWriter()
+    console = log.get_writer("console")
     console.setup(text_space=15, error_index=["ERROR", "EXCEPTION"])
     log.register(console)
 

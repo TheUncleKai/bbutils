@@ -31,7 +31,9 @@
                 "test_traceback",
                 "test_progress",
                 "test_timer",
-                "test_raw"
+                "test_raw",
+                "test_get_writer_01",
+                "test_get_writer_02"
             ]
         }
     ]

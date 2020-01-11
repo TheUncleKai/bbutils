@@ -23,9 +23,8 @@ import sys
 from typing import List
 
 import bbutil.logging
-import bbutil.types
 
-from bbutil.types import Message, Writer
+from bbutil.logging.types import Message, Writer
 
 _default_index = ["INFORM", "DEBUG1", "DEBUG2", "DEBUG3", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"]
 
@@ -703,4 +702,18 @@ class TestLogging(unittest.TestCase):
         length = len(writer.buffer)
         self.assertEqual(length, 1)
         self.assertEqual(writer.buffer[0].content, "this is pure")
+        return
+
+    def test_get_writer_01(self):
+
+        log = bbutil.logging.Logging()
+        item = log.get_writer("console")
+
+        self.assertIsNotNone(item)
+        return
+
+    def test_get_writer_02(self):
+
+        log = bbutil.logging.Logging()
+        self.assertRaises(ImportError, log.get_writer, "xconsole")
         return

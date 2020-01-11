@@ -22,7 +22,7 @@ import platform
 
 from typing import Dict, TextIO, List
 
-from bbutil.types import Writer, Message
+from bbutil.logging.types import Writer, Message
 from bbutil.utils import get_terminal_size
 
 __all__ = [
@@ -32,7 +32,7 @@ __all__ = [
 
 colorama.init()
 
-writer = "Console"
+classname = "ConsoleWriter"
 RESET_ALL = colorama.Style.RESET_ALL
 
 
@@ -81,7 +81,7 @@ _schemes = {
 class ConsoleWriter(Writer):
 
     def __init__(self):
-        Writer.__init__(self, "CONSOLE", _index)
+        Writer.__init__(self, "Console", _index)
 
         self.styles: Dict[str, Style] = _schemes
         self.encoding: str = ""
