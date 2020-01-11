@@ -17,6 +17,7 @@
 #
 
 __all__ = [
+    "data",
     "logging",
     "utils"
 ]

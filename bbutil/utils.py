@@ -16,11 +16,11 @@
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
 
+import subprocess
 import os
 import platform
 import json
-from typing import Union, Any
-from typing import Tuple
+from typing import Union, Any, Tuple
 
 __all__ = [
     "check_dict",
@@ -31,17 +31,6 @@ __all__ = [
 
 
 def check_dict(checkdict: dict, keylist: list) -> bool:
-    """Checks a dict for a list of keys.
-
-    :param checkdict: dictionary to check.
-    :type checkdict: dict
-
-    :param keylist: list with keys to check for.
-    :type keylist: list
-
-    :returns: True if all keys are present, otherwise False.
-    :rtype: bool
-    """
     ret = True
     list_keys = list(checkdict)
 
@@ -52,34 +41,32 @@ def check_dict(checkdict: dict, keylist: list) -> bool:
     return ret
 
 
+def check_object(checkobject: Any, keylist: list) -> bool:
+    ret = True
+
+    if checkobject is None:
+        return False
+
+    for key in keylist:
+        if hasattr(checkobject, key) is False:
+            ret = False
+
+    return ret
+
+
 def openjson(filename: str) -> Union[dict, None]:
-    """opens a json file and performs some checks.
-
-    :param filename: json filename.
-    :type filename: str
-
-    :returns: json instance if successfull, otherwise None.
-    :rtype: json, None
-    """
-
     f = open(filename, mode='r', encoding="utf-8")
     data = json.load(f)
     f.close()
     return data
 
 
+def full_path(pathname: str) -> str:
+    filename = os.path.abspath(os.path.normpath(pathname))
+    return filename
+
+
 def get_attribute(path: str, classname: str) -> Union[Any, None]:
-    """Load module attribute from given path.
-
-    :param path: module path.
-    :type path: str
-
-    :param classname: class name.
-    :type classname: str
-
-    :return: attribute or None.
-    """
-
     fromlist = [classname]
 
     try:
@@ -118,6 +105,7 @@ def _get_terminal_size_windows() -> Tuple[int, int]:  # pragma: no cover
     return 80, 25
 
 
+# noinspection PyBroadException
 def _get_terminal_size_tput() -> Tuple[int, int]:  # pragma: no cover
     """get terminal width
     src: http://stackoverflow.com/questions/263890/how-do-i-find-the-width-height-of-a-terminal-window
@@ -190,3 +178,36 @@ def get_terminal_size() -> Tuple[int, int]:  # pragma: no cover
     if tuple_xy is None:
         tuple_xy = (0, 0)
     return tuple_xy
+
+
+def execute(name: str, command: list, data: list = None, callback: Any = None) -> Tuple[bool, int]:
+    try:
+        proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    except Exception as e:
+        if callback is not None:
+            callback.exception(e)
+            callback.traceback()
+        return False, 0
+
+    for _line in proc.stdout:
+        line = _line.decode('utf-8')
+
+        line = line.replace("\r\n", "")
+        line = line.replace("\n", "")
+
+        if data is not None:
+            data.append(line)
+
+        if callback is None:
+            continue
+
+        callback.inform(name, line)
+
+    proc.wait()
+
+    returncode = proc.returncode
+
+    if callback is not None:
+        callback.inform(name, str(proc.returncode))
+
+    return True, returncode
