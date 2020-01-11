@@ -22,13 +22,15 @@ __all__ = [
 
 
 class Data(object):
-    """Represents a basic data row."""
 
     def __init__(self, **kwargs):
 
         self._id = kwargs.get("id", "")
         keys = kwargs.get("keys", None)
         values = kwargs.get("values", None)
+
+        if (keys is None) or (values is None):
+            return
 
         for (key, value) in zip(keys, values):
             self.__dict__[key] = value
