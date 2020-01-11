@@ -30,11 +30,10 @@ __all__ = [
     "Style"
 ]
 
+colorama.init()
+
 writer = "Console"
 RESET_ALL = colorama.Style.RESET_ALL
-
-
-_index = ["INFORM", "DEBUG1", "DEBUG2", "DEBUG3", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"]
 
 
 class Style(object):
@@ -50,9 +49,6 @@ class Style(object):
     def scheme(self) -> str:
         scheme = ""
 
-        if (self.text == "") or (self.foreground == "") or (self.background == ""):
-            return scheme
-
         scheme += self._get_colorama(colorama.Style, self.text)
         scheme += self._get_colorama(colorama.Fore, self.foreground)
         scheme += self._get_colorama(colorama.Back, self.background)
@@ -63,9 +59,23 @@ class Style(object):
         try:
             ret = getattr(attribute, name)
         except AttributeError:
-            ret = None
+            ret = ""
 
         return ret
+
+
+_index = ["INFORM", "DEBUG1", "DEBUG2", "DEBUG3", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"]
+
+_schemes = {
+    "INFORM": Style("INFORM", "BRIGHT", "GREEN", ""),
+    "DEBUG1": Style("DEBUG1", "", "WHITE", "BLACK"),
+    "DEBUG2": Style("DEBUG2", "DIM", "CYAN", "BLACK"),
+    "DEBUG3": Style("DEBUG3", "BRIGHT", "BLACK", "BLACK"),
+    "WARN": Style("INFORM", "BRIGHT", "MAGENTA", ""),
+    "ERROR": Style("ERROR", "BRIGHT", "RED", ""),
+    "EXCEPTION": Style("EXCEPTION", "BRIGHT", "RED", ""),
+    "TIMER": Style("TIMER", "BRIGHT", "YELLOW", "")
+}
 
 
 class Console(Writer):
@@ -73,7 +83,7 @@ class Console(Writer):
     def __init__(self):
         Writer.__init__(self, "CONSOLE", _index)
 
-        self.styles: Dict[str, Style] = {}
+        self.styles: Dict[str, Style] = _schemes
         self.encoding: str = ""
         self.text_space: int = 15
         self.seperator: str = "|"
@@ -109,8 +119,6 @@ class Console(Writer):
         return
 
     def open(self) -> bool:
-        colorama.init()
-
         self.encoding = self.stdout.encoding
         os_name = platform.system()
         if self.encoding is None:  # pragma: no cover

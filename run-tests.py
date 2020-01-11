@@ -21,6 +21,7 @@ import coverage
 cov = coverage.Coverage()
 
 from bbutil.logging import Logging
+from bbutil.writer.console import Console
 
 from typing import List
 from optparse import OptionParser
@@ -41,10 +42,12 @@ log: Logging = Logging()
 
 class Module(object):
 
-    id = ""
-    path = ""
-    classname = ""
-    tests = []
+    def __init__(self):
+        self.id: str = ""
+        self.path: str = ""
+        self.classname: str = ""
+        self.tests: List[str] = []
+        return
 
     def load(self, data: dict) -> bool:
 
@@ -281,11 +284,12 @@ class TestTask(object):
                                default="tests.json")
         self.parser.add_option("-m", "--module", help="run test module", metavar="MODULE", type="string", default="")
         self.parser.add_option("-t", "--test", help="run test", metavar="TEST", type="string", default="")
+        self.parser.add_option("-l", "--list", help="list tests", action="store_true", default=False)
 
         self._suite = None
         """test suite"""
 
-        self._modules = []
+        self._modules: List[Module] = []
         """stores test config."""
         return
 
@@ -339,6 +343,15 @@ class TestTask(object):
         log.inform("TESTS", "Number of modules: " + str(len(self._modules)))
         return True
 
+    def _print_config(self):
+
+        for module in self._modules:
+            log.inform("Module", module.id)
+
+            for test in module.tests:
+                log.inform("Test", test)
+        return
+
     def prepare(self) -> bool:
         """Start and prepare the test task.
 
@@ -359,6 +372,10 @@ class TestTask(object):
         check = self._load_config(filename)
         if check is False:
             return False
+
+        if self.options.list is True:
+            self._print_config()
+            return True
 
         self._suite = unittest.TestSuite()
         count = 0
@@ -391,6 +408,9 @@ class TestTask(object):
         :returns: True if successfull, otherwise False.
         :rtype: bool
         """
+        if self.options.list is True:
+            return True
+
         runner = TextTestRunner(verbosity=2)
 
         runner.run(self.suite)
@@ -402,12 +422,21 @@ if __name__ == '__main__':
     cov.start()
     log.setup(app="run-tests", level=2)
 
+    console = Console()
+    console.setup(text_space=15, error_index=["ERROR", "EXCEPTION"])
+    log.register(console)
+
+    if log.open() is False:
+        sys.exit(1)
+
     main = TestTask()
 
     if main.prepare() is False:
+        log.close()
         sys.exit(1)
 
     if main.run() is False:
+        log.close()
         sys.exit(1)
 
     cov.stop()
@@ -415,4 +444,5 @@ if __name__ == '__main__':
 
     cov.html_report()
 
+    log.close()
     sys.exit(0)

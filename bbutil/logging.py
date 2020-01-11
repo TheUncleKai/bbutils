@@ -112,7 +112,8 @@ class Logging(object):
         return
 
     def open(self) -> bool:
-        if len(self._index) == 0:
+        length = len(self._index)
+        if length == 0:
             self._index = _index
 
         if self._thread is True:
@@ -149,12 +150,12 @@ class Logging(object):
 
     def raw(self, content: str):
         _message = Message(content=content, raw=True)
-        self._buffer.append(_message)
+        self.append(_message)
         return
 
     def inform(self, tag: str, content: str):
         _message = Message(tag=tag, content=content, level="INFORM")
-        self._buffer.append(_message)
+        self.append(_message)
         return
 
     def warn(self, tag: str, content: str):
@@ -164,12 +165,12 @@ class Logging(object):
 
     def debug1(self, tag: str, content: str):
         _message = Message(tag=tag, content=content, level="DEBUG1")
-        self._buffer.append(_message)
+        self.append(_message)
         return
 
     def debug2(self, tag: str, content: str):
         _message = Message(tag=tag, content=content, level="DEBUG2")
-        self._buffer.append(_message)
+        self.append(_message)
         return
 
     def debug3(self, tag: str, content: str):
@@ -179,17 +180,17 @@ class Logging(object):
 
     def error(self, content: str):
         _message = Message(content=content, level="ERROR")
-        self._buffer.append(_message)
+        self.append(_message)
         return
 
     def exception(self, e: Exception):
         content = "An exception of type {0} occurred.".format(type(e).__name__)
         _message = Message(content=content, level="EXCEPTION")
-        self._buffer.append(_message)
+        self.append(_message)
 
         content = "Arguments:\n{0!r}".format(e.args)
         _message = Message(content=content, level="EXCEPTION")
-        self._buffer.append(_message)
+        self.append(_message)
         return
 
     def traceback(self):
@@ -202,7 +203,7 @@ class Logging(object):
         lines = traceback.format_tb(tb)
         for line in lines:
             _message = Message(content=line, raw=True)
-            self._buffer.append(_message)
+            self.append(_message)
         return
 
     def progress(self, limit: int, interval: int = 0) -> Progress:
