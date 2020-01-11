@@ -653,3 +653,54 @@ class TestLogging(unittest.TestCase):
         self.assertEqual(writer.buffer[1].content, "Type:  <class 'ZeroDivisionError'>")
         self.assertEqual(writer.buffer[2].content, "Value: division by zero")
         return
+
+    def test_progress(self):
+
+        _index = {
+            0: ["PROGRESS"],
+        }
+
+        log = bbutil.logging.Logging()
+
+        log.setup(app="TEST", level=0, index=_index, use_thread=False)
+
+        progress = log.progress(100)
+        self.assertIsNotNone(progress)
+        return
+
+    def test_timer(self):
+
+        _index = {
+            0: ["PROGRESS"],
+        }
+
+        log = bbutil.logging.Logging()
+
+        log.setup(app="TEST", level=0, index=_index, use_thread=False)
+
+        timer = log.timer("Time to stop")
+        self.assertIsNotNone(timer)
+        return
+
+    def test_raw(self):
+
+        _index = {
+            0: ["EXCEPTION", "ERROR"],
+        }
+
+        log = bbutil.logging.Logging()
+        writer = TestWriter(_default_index)
+
+        log.setup(app="TEST", level=0, index=_index, use_thread=False)
+        log.register(writer)
+
+        log.open()
+
+        log.raw("this is pure")
+
+        log.close()
+
+        length = len(writer.buffer)
+        self.assertEqual(length, 1)
+        self.assertEqual(writer.buffer[0].content, "this is pure")
+        return

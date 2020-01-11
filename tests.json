@@ -28,7 +28,10 @@
                 "test_debug3",
                 "test_error",
                 "test_exception",
-                "test_traceback"
+                "test_traceback",
+                "test_progress",
+                "test_timer",
+                "test_raw"
             ]
         }
     ]
