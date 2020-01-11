@@ -1,10 +1,11 @@
 {
     "modules": [
         {
-            "id": "Device",
-            "path": "tests.device",
-            "classname": "TestControl",
+            "id": "Logging",
+            "path": "tests.logging.logging",
+            "classname": "TestLogging",
             "tests": [
+                "test_constructor"
             ]
         }
     ]

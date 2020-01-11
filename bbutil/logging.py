@@ -40,7 +40,7 @@ class Logging(object):
         self._timer_counter: int = 0
 
         self._buffer: List[Message] = []
-        self._interval: float = 0.1
+        self._interval: float = 0.01
         self._active: bool = False
         self._index: Dict[int, List[str]] = {}
         self._thread: bool = False
@@ -61,8 +61,12 @@ class Logging(object):
     def _run(self):
 
         while True:
+            item_counter = len(self._buffer)
+
             self._thread = True
-            if self._active is False:
+
+            # only quit when buffer is empty
+            if (self._active is False) and (item_counter == 0):
                 self._thread = False
                 break
 

@@ -17,22 +17,22 @@
 #
 
 from setuptools import setup, find_packages
-import bblog
+import bbutil
 
 packages = find_packages(where=".")
 
 setup(
-    name=bblog.__name__,
-    license=bblog.__license__,
-    version=bblog.__version__,
-    description=bblog.__description__,
-    author=bblog.__author__,
-    author_email=bblog.__email__,
+    name=bbutil.__name__,
+    license=bbutil.__license__,
+    version=bbutil.__version__,
+    description=bbutil.__description__,
+    author=bbutil.__author__,
+    author_email=bbutil.__email__,
     include_package_data=True,
     scripts=[
-        'easyb-tool.py',
+        'run-tests.py',
     ],
-    url='https://github.com/TheUncleKai/pyeasyb',
+    url='https://github.com/TheUncleKai/bbutils',
     packages=packages,
     classifiers=[
         'Intended Audience :: Developers',

@@ -16,15 +16,21 @@
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
 
-from bbutil.writer.console import ConsoleWriter
 
-__all__ = [
-    "console",
-    "writer",
+import os
+import unittest
+import time
 
-    "ConsoleWriter"
-]
+from bbutil.logging import Logging
 
-writer = [
-    ConsoleWriter
-]
+
+class TestLogging(unittest.TestCase):
+
+    def setUp(self):
+        return
+
+    def tearDown(self):
+        return
+
+    def test_constructor(self):
+        return

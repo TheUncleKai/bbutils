@@ -21,7 +21,7 @@ import coverage
 cov = coverage.Coverage()
 
 from bbutil.logging import Logging
-from bbutil.writer.console import Console
+from bbutil.writer import ConsoleWriter
 
 from typing import List
 from optparse import OptionParser
@@ -417,32 +417,33 @@ class TestTask(object):
         return True
 
 
+def do_exit(return_value: int):
+    log.close()
+    sys.exit(return_value)
+
+
 if __name__ == '__main__':
 
     cov.start()
     log.setup(app="run-tests", level=2)
 
-    console = Console()
+    console = ConsoleWriter()
     console.setup(text_space=15, error_index=["ERROR", "EXCEPTION"])
     log.register(console)
 
     if log.open() is False:
-        sys.exit(1)
+        do_exit(1)
 
     main = TestTask()
 
     if main.prepare() is False:
-        log.close()
-        sys.exit(1)
+        do_exit(1)
 
     if main.run() is False:
-        log.close()
-        sys.exit(1)
+        do_exit(1)
 
     cov.stop()
     cov.save()
 
     cov.html_report()
-
-    log.close()
-    sys.exit(0)
+    do_exit(0)

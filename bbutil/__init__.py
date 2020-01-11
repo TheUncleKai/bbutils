@@ -16,17 +16,23 @@
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
 
+from bbutil.logging import Logging
+from bbutil.writer import ConsoleWriter
+
 __all__ = [
     "writer",
 
     "logging",
     "types",
-    "utils"
+    "utils",
+
+    "Logging",
+    "ConsoleWriter"
 ]
 
 
 #: package name
-__name__ = "bblogging"
+__name__ = "bbutils"
 
 #: package author
 __author__ = "Kai Raphahn"

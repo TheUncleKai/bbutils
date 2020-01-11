@@ -26,7 +26,7 @@ from bbutil.types import Writer, Message
 from bbutil.utils import get_terminal_size
 
 __all__ = [
-    "Console",
+    "ConsoleWriter",
     "Style"
 ]
 
@@ -78,7 +78,7 @@ _schemes = {
 }
 
 
-class Console(Writer):
+class ConsoleWriter(Writer):
 
     def __init__(self):
         Writer.__init__(self, "CONSOLE", _index)
