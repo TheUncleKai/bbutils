@@ -171,10 +171,11 @@ class ConsoleWriter(Writer):
         filler = '-' * (self.bar_len - filled_len)
 
         percents = "{0:.1f}%".format(round(item.progress.value, 1)).rjust(6, ' ')
-        counter = "{0:d}".format(item.progress.counter).rjust(item.progress.length, '0')
 
-        content = " [{0:s}{1:s}] {2:s} ({3:s}/{4:d})".format(bars, filler, percents, counter,
-                                                             item.progress.limit)
+        limit = 3 + (item.progress.length * 2)
+        counter = "({0:d}/{1:d})".format(item.progress.counter, item.progress.limit).rjust(limit)
+
+        content = " [{0:s}{1:s}] {2:s} {3:s}".format(bars, filler, percents, counter)
 
         if len(content) > self.line_width:
             return

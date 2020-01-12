@@ -46,6 +46,8 @@ if __name__ == '__main__':
     # switch logging on
     log.open()
 
+    ## Normal output
+
     # example 1, this will be shown with every log level
     log.inform("EXAMPLE", "example 1, this will be shown with every log level")
 
@@ -79,12 +81,15 @@ if __name__ == '__main__':
     except ZeroDivisionError:
         log.traceback()
 
+    # progress meter
+
     # show a progress meter via console
     # first parameter: limit of the counter
     # second parameter: update interval
-    log.inform("PROGRESS", "We count from 0 to 10000 in 10 interval")
+    # the update interval is there to prevent flickering, it also reduces the load
+    log.inform("PROGRESS", "count from 0 to 1000 in 10 interval, set the value via set()")
     count1 = 0
-    progress1 = log.progress(10000, 10)
+    progress1 = log.progress(1000, 10)
 
     while True:
         progress1.set(count1)
@@ -92,15 +97,17 @@ if __name__ == '__main__':
 
         count1 += 1
 
-        if count1 > 10000:
+        if count1 > 1000:
             break
+
+    # to remove the progress bar use clear
     log.clear()
 
     # it also can be used backwards
-    log.inform("PROGRESS", "We count from 10000 to 0 in 10 interval")
-    count2 = 10000
-    progress2 = log.progress(10000, 10)
-    progress2.counter = 10000
+    log.inform("PROGRESS", "count from 1000 to 0 in 10 interval, set the value via set()")
+    count2 = 1000
+    progress2 = log.progress(1000, 10)
+    progress2.counter = 1000
 
     while True:
         progress2.set(count2)
@@ -113,6 +120,29 @@ if __name__ == '__main__':
 
     # to remove the progress bar use clear
     log.clear()
+
+    # now we use inc instead of setting the value
+    log.inform("PROGRESS", "count from 0 to 1000 in 10 interval, set the value via inc()")
+    count3 = 0
+    progress3 = log.progress(1000, 10)
+
+    while True:
+        progress3.inc()
+        time.sleep(0.0001)
+
+        count3 += 1
+
+        if count3 > 1000:
+            break
+
+    # to remove the progress bar use clear
+    log.clear()
+
+    # Timers
+    log.inform("MEASURE", "Measure time.sleep(3)")
+    timer1 = log.timer("Measure something")
+    time.sleep(3)
+    timer1.stop()
 
     # close logging before exit
     log.close()
