@@ -39,7 +39,7 @@ __year__ = 2020
 __copyright__ = "Copyright (C) {0:d}, {1:s} <{2:s}>".format(__year__, __author__, __email__)
 
 #: package description
-__description__ = "Python tools for EASYBus Sensor modules from GMH Messtechnik GmbH"
+__description__ = "Small collection of stuff for all my other python projects (including logging)."
 
 #: package license
 __license__ = "Apache License, Version 2.0"
@@ -57,7 +57,7 @@ __major__ = 1
 __minor__ = 0
 
 #: version patch
-__patch__ = 0
+__patch__ = 2
 
 #: package version
 __version__ = "{0:d}.{1:d}.{2:d}.{3:d}".format(__milestone__, __major__, __minor__, __patch__)

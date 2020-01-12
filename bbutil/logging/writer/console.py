@@ -87,7 +87,7 @@ class ConsoleWriter(Writer):
         self.text_space: int = 15
         self.seperator: str = "|"
         self.length: int = 0
-        self.error_index: List[str] = []
+        self.error_index: List[str] = ["ERROR", "EXCEPTION"]
         self.use_error = False
         self.stdout: TextIO = sys.stdout
         self.stderr: TextIO = sys.stderr
@@ -166,13 +166,16 @@ class ConsoleWriter(Writer):
         value = self.bar_len * item.progress.counter / float(item.progress.limit)
 
         filled_len = int(round(value))
-        percents = round(item.progress.value, 1)
 
         bars = '=' * filled_len
         filler = '-' * (self.bar_len - filled_len)
 
-        content = " [{0:s}{1:s}] {2:.1f}% ({3:d}/{4:d})".format(bars, filler, percents, item.progress.counter,
-                                                                item.progress.limit)
+        percents = "{0:.1f}%".format(round(item.progress.value, 1)).rjust(6, ' ')
+
+        limit = 3 + (item.progress.length * 2)
+        counter = "({0:d}/{1:d})".format(item.progress.counter, item.progress.limit).rjust(limit)
+
+        content = " [{0:s}{1:s}] {2:s} {3:s}".format(bars, filler, percents, counter)
 
         if len(content) > self.line_width:
             return
@@ -185,11 +188,7 @@ class ConsoleWriter(Writer):
             return
 
         line = '\r' + output
-
         self.stdout.write(line)
-
-        if item.progress.finished is True:
-            self.clear()
         return
 
     def _create_color(self, item: Message, text: str) -> str:

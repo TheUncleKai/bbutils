@@ -382,6 +382,8 @@ class TestTask(object):
         self._suite = unittest.TestSuite()
         count = 0
 
+        sys.path.append(os.getcwd())
+
         for module in self.modules:
             log.inform("RUN", module.id)
 
