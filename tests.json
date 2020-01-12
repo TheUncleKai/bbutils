@@ -87,6 +87,30 @@
             ]
         },
         {
+            "id": "Logging.Writer.File",
+            "path": "tests.logging.file",
+            "classname": "TestConsoleWriter",
+            "tests": [
+                "test_constructor",
+                "test_setup_01",
+                "test_setup_02",
+                "test_setup_03",
+                "test_clear",
+                "test_open_01",
+                "test_open_02",
+                "test_open_03",
+                "test_open_04",
+                "test_close_01",
+                "test_write_01",
+                "test_write_02",
+                "test_write_03",
+                "test_write_04",
+                "test_write_05",
+                "test_write_06",
+                "test_write_07"
+            ]
+        },
+        {
             "id": "Utils",
             "path": "tests.utils",
             "classname": "TestUtils",

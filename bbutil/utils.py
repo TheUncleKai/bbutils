@@ -20,13 +20,18 @@ import subprocess
 import os
 import platform
 import json
+import struct
 from typing import Union, Any, Tuple
 
 __all__ = [
     "check_dict",
+    "check_object",
     "openjson",
+    "full_path",
     "get_attribute",
-    "get_terminal_size"
+    "get_terminal_size",
+    "print_exception",
+    "execute"
 ]
 
 
@@ -105,7 +110,6 @@ def _get_terminal_size_windows() -> Tuple[int, int]:  # pragma: no cover
     return 80, 25
 
 
-# noinspection PyBroadException
 def _get_terminal_size_tput() -> Tuple[int, int]:  # pragma: no cover
     """get terminal width
     src: http://stackoverflow.com/questions/263890/how-do-i-find-the-width-height-of-a-terminal-window
@@ -117,51 +121,47 @@ def _get_terminal_size_tput() -> Tuple[int, int]:  # pragma: no cover
         rows = int(subprocess.check_call(shlex.split('tput lines')))
         ret = (cols, rows)
         return ret
-    except:
-        pass
+    except Exception as e:
+        print_exception(e)
     return 80, 25
 
 
-# noinspection PyBroadException
-def _get_terminal_size_linux() -> Tuple[int, int]:  # pragma: no cover
-    # noinspection PyUnresolvedReferences,PyUnresolvedReferences,PyUnresolvedReferences
-    def ioctl_gwinsz(fdin):
-        try:
-            import fcntl
-            import termios
-            cr_data = struct.unpack('hh',
-                                    fcntl.ioctl(fdin, termios.TIOCGWINSZ, '1234'))
-            return cr_data
-        except:
-            pass
+# noinspection PyUnresolvedReferences
+def _ioctl_gwinsz(fdin):
+    import fcntl
+    import termios
+    cr_data = None
 
-    cr = ioctl_gwinsz(0) or ioctl_gwinsz(1) or ioctl_gwinsz(2)
+    try:
+        cr_data = struct.unpack('hh', fcntl.ioctl(fdin, termios.TIOCGWINSZ, '1234'))
+    except Exception as ex:
+        print_exception(ex)
+
+    return cr_data
+
+
+def _get_terminal_size_linux() -> Tuple[int, int]:  # pragma: no cover
+    cr = _ioctl_gwinsz(0) or _ioctl_gwinsz(1) or _ioctl_gwinsz(2)
     if not cr:
 
         try:
             fd = os.open(os.ctermid(), os.O_RDONLY)
-            cr = ioctl_gwinsz(fd)
+            cr = _ioctl_gwinsz(fd)
             os.close(fd)
-        except:
-            pass
+        except Exception as ex:
+            print_exception(ex)
+
     if not cr:
         try:
             cr = (os.environ['LINES'], os.environ['COLUMNS'])
-        except:
+        except Exception as ex:
+            print_exception(ex)
             return 80, 25
+
     return int(cr[1]), int(cr[0])
 
 
 def get_terminal_size() -> Tuple[int, int]:  # pragma: no cover
-    """ getTerminalSize()
-     - get width and height of console
-     - works on linux,os x,windows,cygwin(windows)
-     originally retrieved from:
-     http://stackoverflow.com/questions/566746/how-to-get-console-window-width-in-python
-
-     :returns: tuple with terminal size.
-     :rtype: tuple
-    """
     current_os = platform.system()
     tuple_xy = (80, 40)
     if current_os == 'Windows':
@@ -178,6 +178,14 @@ def get_terminal_size() -> Tuple[int, int]:  # pragma: no cover
     if tuple_xy is None:
         tuple_xy = (0, 0)
     return tuple_xy
+
+
+def print_exception(e: Exception):
+    message1 = "An exception of type {0:s} occurred.".format(type(e).__name__)
+    message2 = "Arguments:\n{0!r}".format(e.args)
+    print(message1)
+    print(message2)
+    return
 
 
 def execute(name: str, command: list, data: list = None, callback: Any = None) -> Tuple[bool, int]:

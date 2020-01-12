@@ -22,7 +22,7 @@ cov = coverage.Coverage()
 cov.start()
 
 from bbutil.logging import Logging
-from bbutil.logging.writer.console import ConsoleWriter
+from bbutil.utils import full_path
 
 from typing import List
 from optparse import OptionParser
@@ -429,8 +429,13 @@ if __name__ == '__main__':
     log.setup(app="run-tests", level=2)
 
     console = log.get_writer("console")
+    fileio = log.get_writer("file")
+    filename = full_path("{0:s}/run-tests.log".format(os.getcwd()))
+
     console.setup(text_space=15, error_index=["ERROR", "EXCEPTION"])
+    fileio.setup(text_space=15, error_index=["ERROR", "EXCEPTION"], filename=filename)
     log.register(console)
+    log.register(fileio)
 
     if log.open() is False:
         do_exit(1)
