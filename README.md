@@ -116,9 +116,9 @@ example         EXAMPLE        | example 1, this will be shown with every log le
 
 ### example.py
 
-see file [here](example.py)
+See file [here](https://raw.githubusercontent.com/TheUncleKai/bbutils/master/example.py)
 
-![](example.png "Example output")
+![Example output](https://raw.githubusercontent.com/TheUncleKai/bbutils/master/example.png "Example output")
 
 ```pycon
 import os
