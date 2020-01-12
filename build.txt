@@ -1,0 +1,10 @@
+To build:
+
+python setup.py sdist bdist_wheel
+
+Upload:
+
+twine upload --repository testpypi dist/*
+
+twine upload --repository pypi dist/*
+
