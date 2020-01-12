@@ -21,7 +21,7 @@ import unittest
 import unittest.mock as mock
 
 from bbutil.logging.writer.file import FileWriter
-from bbutil.logging.types import Message, Progress, Writer
+from bbutil.logging.types import Message, Writer
 
 mocked_open1 = unittest.mock.mock_open(read_data='file contents\nas needed\n')
 mocked_open2 = unittest.mock.mock_open(read_data='file contents\nas needed\n')
