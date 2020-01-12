@@ -96,6 +96,7 @@ class Progress(object):
         self.interval: int = interval
         self.interval_counter: int = 0
         self.append = append_callback
+        self.length = len(str(self.limit))
         return
 
     def _recalc(self):
@@ -110,6 +111,17 @@ class Progress(object):
 
         if self.counter == self.limit:
             self.finished = True
+        return
+
+    def set(self, value: int):
+        self.counter = value
+        self._recalc()
+
+        if self.interval_counter != 0:
+            return
+
+        _message = Message(level="PROGRESS", progress=self)
+        self.append(_message)
         return
 
     def inc(self):

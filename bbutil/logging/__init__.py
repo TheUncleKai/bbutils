@@ -205,12 +205,16 @@ class Logging(object):
 
         self._close_thread()
         for item in self._writer:
-            print("Close")
             check = item.close()
             if check is False:
                 return False
 
         return True
+
+    def clear(self):
+        for _writer in self._writer:
+            _writer.clear()
+        return
 
     def raw(self, content: str):
         _message = Message(content=content, raw=True)
