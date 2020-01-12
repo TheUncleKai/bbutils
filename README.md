@@ -118,7 +118,7 @@ example         EXAMPLE        | example 1, this will be shown with every log le
 
 see file [here](example.py)
 
-![alt text](example.png "Example output")
+![](example.png "Example output")
 
 ```pycon
 import os
