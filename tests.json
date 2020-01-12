@@ -99,7 +99,15 @@
                 "test_open_01",
                 "test_open_02",
                 "test_open_03",
-                "test_open_04"
+                "test_open_04",
+                "test_close_01",
+                "test_write_01",
+                "test_write_02",
+                "test_write_03",
+                "test_write_04",
+                "test_write_05",
+                "test_write_06",
+                "test_write_07"
             ]
         },
         {
