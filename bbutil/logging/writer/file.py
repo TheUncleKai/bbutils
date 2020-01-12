@@ -24,11 +24,16 @@ from datetime import datetime
 from bbutil.logging.types import Writer, Message
 from bbutil.utils import full_path, print_exception
 
+__all__ = [
+    "FileWriter"
+]
 
 _index = ["INFORM", "DEBUG1", "DEBUG2", "DEBUG3", "WARN", "ERROR", "EXCEPTION", "TIMER"]
 
+classname = "FileWriter"
 
-class FileChannel(Writer):
+
+class FileWriter(Writer):
 
     def __init__(self):
         Writer.__init__(self, "File", _index)
@@ -90,10 +95,14 @@ class FileChannel(Writer):
         if self.append_data is True:
             mode = 'ab'
         else:
-            mode = 'b'
+            mode = 'wb'
 
         try:
-            self.file = open(self.filename, mode=mode)
+            self.file = open(self.filename, mode)
+        except ValueError as e:
+            line = "Filename: {0:s}\nMode: {1:s}".format(self.filename, mode)
+            print(line)
+            print_exception(e)
         except OSError as e:
             print_exception(e)
             return False
@@ -129,9 +138,9 @@ class FileChannel(Writer):
         appname = "{0:s}".format(item.app).ljust(self.text_space)
 
         if item.tag == "":
-            line = "{0:s}{1:s} {2:s}: {3:s}".format(timestamp, appname, item.level, item.content)
+            line = "{0:s}{1:s} {2:s}: {3:s}\n".format(timestamp, appname, item.level, item.content)
         else:
-            line = "{0:s}{1:s} {2:s}: {3:s} - {4:s}".format(timestamp, appname, item.level, item.tag, item.content)
+            line = "{0:s}{1:s} {2:s}: {3:s} - {4:s}\n".format(timestamp, appname, item.level, item.tag, item.content)
 
         data = line.encode('latin-1', 'ignore')
 

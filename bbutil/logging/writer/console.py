@@ -26,8 +26,7 @@ from bbutil.logging.types import Writer, Message
 from bbutil.utils import get_terminal_size
 
 __all__ = [
-    "ConsoleWriter",
-    "Style"
+    "ConsoleWriter"
 ]
 
 colorama.init()
@@ -36,7 +35,7 @@ classname = "ConsoleWriter"
 RESET_ALL = colorama.Style.RESET_ALL
 
 
-class Style(object):
+class _Style(object):
 
     def __init__(self, name: str, text: str, foreground: str, background: str):
         self.name = name
@@ -67,14 +66,14 @@ class Style(object):
 _index = ["INFORM", "DEBUG1", "DEBUG2", "DEBUG3", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"]
 
 _schemes = {
-    "INFORM": Style("INFORM", "BRIGHT", "GREEN", ""),
-    "DEBUG1": Style("DEBUG1", "", "WHITE", "BLACK"),
-    "DEBUG2": Style("DEBUG2", "DIM", "CYAN", "BLACK"),
-    "DEBUG3": Style("DEBUG3", "BRIGHT", "BLACK", "BLACK"),
-    "WARN": Style("INFORM", "BRIGHT", "MAGENTA", ""),
-    "ERROR": Style("ERROR", "BRIGHT", "RED", ""),
-    "EXCEPTION": Style("EXCEPTION", "BRIGHT", "RED", ""),
-    "TIMER": Style("TIMER", "BRIGHT", "YELLOW", "")
+    "INFORM": _Style("INFORM", "BRIGHT", "GREEN", ""),
+    "DEBUG1": _Style("DEBUG1", "", "WHITE", "BLACK"),
+    "DEBUG2": _Style("DEBUG2", "DIM", "CYAN", "BLACK"),
+    "DEBUG3": _Style("DEBUG3", "BRIGHT", "BLACK", "BLACK"),
+    "WARN": _Style("INFORM", "BRIGHT", "MAGENTA", ""),
+    "ERROR": _Style("ERROR", "BRIGHT", "RED", ""),
+    "EXCEPTION": _Style("EXCEPTION", "BRIGHT", "RED", ""),
+    "TIMER": _Style("TIMER", "BRIGHT", "YELLOW", "")
 }
 
 
@@ -83,7 +82,7 @@ class ConsoleWriter(Writer):
     def __init__(self):
         Writer.__init__(self, "Console", _index)
 
-        self.styles: Dict[str, Style] = _schemes
+        self.styles: Dict[str, _Style] = _schemes
         self.encoding: str = ""
         self.text_space: int = 15
         self.seperator: str = "|"
@@ -118,7 +117,7 @@ class ConsoleWriter(Writer):
         return
 
     def add_style(self, name: str, text: str, foreground: str, background: str):
-        style = Style(name, text, foreground, background)
+        style = _Style(name, text, foreground, background)
         self.styles[style.name] = style
         return
 
