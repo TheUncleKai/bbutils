@@ -19,7 +19,10 @@
 from setuptools import setup, find_packages
 import bbutil
 
-packages = find_packages(where=".")
+with open("README.md", "r") as fh:
+    long_description = fh.read()
+
+packages = find_packages(where=".", exclude=["tests", "tests.logging"])
 
 setup(
     name=bbutil.__name__,
@@ -29,6 +32,8 @@ setup(
     author=bbutil.__author__,
     author_email=bbutil.__email__,
     include_package_data=True,
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     scripts=[
         'run-tests.py',
     ],
