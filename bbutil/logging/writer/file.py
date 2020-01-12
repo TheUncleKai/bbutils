@@ -103,6 +103,7 @@ class FileWriter(Writer):
             line = "Filename: {0:s}\nMode: {1:s}".format(self.filename, mode)
             print(line)
             print_exception(e)
+            return False
         except OSError as e:
             print_exception(e)
             return False

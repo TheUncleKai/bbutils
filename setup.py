@@ -40,10 +40,10 @@ setup(
     url='https://github.com/TheUncleKai/bbutils',
     packages=packages,
     classifiers=[
-        'Intended Audience :: Developers',
-        'Topic :: Software Development :: Development Tools',
+        'Development Status :: 4 - Beta',
         'License :: OSI Approved :: Apache Software License',
-        'Programming Language :: Python :: 3.7'
+        'Intended Audience :: Developers',
+        'Topic :: Software Development :: Libraries'
     ],
     install_requires=[
         'colorama'
