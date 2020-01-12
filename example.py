@@ -23,6 +23,8 @@ from bbutil.logging import Logging
 
 if __name__ == '__main__':
 
+    print("\n\n\n")
+
     log = Logging()
 
     # Setup the logging, appicatio name is 'example', log level is 2
@@ -45,8 +47,6 @@ if __name__ == '__main__':
 
     # switch logging on
     log.open()
-
-    ## Normal output
 
     # example 1, this will be shown with every log level
     log.inform("EXAMPLE", "example 1, this will be shown with every log level")
@@ -80,8 +80,6 @@ if __name__ == '__main__':
         _ = 1 / 0
     except ZeroDivisionError:
         log.traceback()
-
-    # progress meter
 
     # show a progress meter via console
     # first parameter: limit of the counter
@@ -146,3 +144,5 @@ if __name__ == '__main__':
 
     # close logging before exit
     log.close()
+
+    print("\n\n\n")
