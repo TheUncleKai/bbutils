@@ -5,6 +5,7 @@ python setup.py sdist bdist_wheel
 Upload:
 
 twine upload --repository testpypi dist/*
-
 twine upload --repository pypi dist/*
 
+pip install --index-url https://test.pypi.org/simple/ bbutils
+pip install bbutils
