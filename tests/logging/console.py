@@ -59,7 +59,7 @@ class TestConsoleWriter(unittest.TestCase):
         item = ConsoleWriter()
 
         self.assertEqual(len(item.styles), 8)
-        self.assertEqual(len(item.error_index), 0)
+        self.assertEqual(len(item.error_index), 2)
         self.assertEqual(item.encoding, "")
         self.assertEqual(item.text_space, 15)
         self.assertEqual(item.seperator, "|")
@@ -210,7 +210,7 @@ class TestConsoleWriter(unittest.TestCase):
         write_called = writer.stdout.write.called
         count = writer.stdout.write.call_count
         self.assertEqual(n, 100)
-        self.assertEqual(count, 101)
+        self.assertEqual(count, 100)
         self.assertTrue(write_called)
         return
 
