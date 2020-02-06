@@ -275,12 +275,14 @@ class TextTestRunner(object):
 
 class TestTask(object):
 
-    options = None
-    parser = OptionParser("usage: %prog [options]")
-
     def __init__(self):
         """The constructor.
         """
+        self.options = None
+        self.do_coverage: bool = False
+        self.test_count: int = 0
+
+        self.parser: OptionParser = OptionParser("usage: %prog [options]")
 
         self.parser.add_option("-c", "--config", help="run config file", metavar="PROFILE", type="string",
                                default="tests.json")
@@ -351,7 +353,7 @@ class TestTask(object):
             log.inform("Module", module.id)
 
             for test in module.tests:
-                log.inform("Test", test)
+                log.inform("Test", "\t" + test)
         return
 
     def prepare(self) -> bool:
@@ -369,9 +371,9 @@ class TestTask(object):
 
         self.options = options
 
-        filename = os.path.abspath(os.path.normpath(self.options.config))
+        _filename = os.path.abspath(os.path.normpath(self.options.config))
 
-        check = self._load_config(filename)
+        check = self._load_config(_filename)
         if check is False:
             return False
 
@@ -403,6 +405,7 @@ class TestTask(object):
         if count == 0:
             log.error("No tests to run!")
             return False
+        self.test_count = count
         log.inform("TESTS", "Tests to run: " + str(count))
         return True
 
@@ -415,9 +418,13 @@ class TestTask(object):
         if self.options.list is True:
             return True
 
+        if self.test_count == 0:
+            return True
+
         runner = TextTestRunner(verbosity=2)
 
         runner.run(self.suite)
+        self.do_coverage = True
         return True
 
 
@@ -450,8 +457,9 @@ if __name__ == '__main__':
     if main.run() is False:
         do_exit(1)
 
-    cov.stop()
-    cov.save()
+    if main.do_coverage is True:
+        cov.stop()
+        cov.save()
+        cov.html_report()
 
-    cov.html_report()
     do_exit(0)
