@@ -153,6 +153,14 @@
                 "test_parse_04",
                 "test_parse_05"
             ]
+        },
+        {
+            "id": "Lang",
+            "path": "tests.lang.lang",
+            "classname": "TestLang",
+            "tests": [
+                "test_constructor_01"
+            ]
         }
     ]
 }
