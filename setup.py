@@ -39,6 +39,7 @@ setup(
     ],
     url='https://github.com/TheUncleKai/bbutils',
     packages=packages,
+    python_requires='>=3.6',
     classifiers=[
         'Development Status :: 4 - Beta',
         'License :: OSI Approved :: Apache Software License',
