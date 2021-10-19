@@ -133,6 +133,10 @@ class Parser(object):
         os.environ["IGNORE_GETTEXT"] = "True"
         return
 
+    @property
+    def length(self) -> int:
+        return len(self.script_line)
+
     def setup(self, **kwargs) -> bool:
         item = kwargs.get("root", None)
         if item is not None:
@@ -254,7 +258,7 @@ class Parser(object):
             self.script_line.append(_command)
         return
 
-    def update(self) -> bool:
+    def copy(self):
         for _domain in self._domains:
             for _lang in _domain.lang:
                 if self._is_windows is True:
@@ -262,19 +266,30 @@ class Parser(object):
                 else:
                     _comment = 'echo "Update {0:s}/{1:s}"'.format(_lang.lang, _domain.domain)
 
-                if os.path.exists(_lang.po) is True:
-                    _command = "msgmerge{0:s} -N -U {1:s} {2:s}".format(self._ext, _lang.po, _domain.pot)
+                if self._is_windows is True:
+                    _command = "copy {0:s} {1:s}".format(_domain.pot, _lang.po)
                 else:
-                    if self._is_windows is True:
-                        _command = "copy {0:s} {1:s}".format(_domain.pot, _lang.po)
-                    else:
-                        _command = "cp {0:s} {1:s}".format(_domain.pot, _lang.po)
+                    _command = "cp {0:s} {1:s}".format(_domain.pot, _lang.po)
 
                 self.script_line.append(_comment)
                 self.script_line.append(_command)
-        return True
+        return
 
-    def compile(self) -> bool:
+    def update(self):
+        for _domain in self._domains:
+            for _lang in _domain.lang:
+                if self._is_windows is True:
+                    _comment = 'echo Update {0:s}/{1:s}'.format(_lang.lang, _domain.domain)
+                else:
+                    _comment = 'echo "Update {0:s}/{1:s}"'.format(_lang.lang, _domain.domain)
+
+                _command = "msgmerge{0:s} -N -U {1:s} {2:s}".format(self._ext, _lang.po, _domain.pot)
+
+                self.script_line.append(_comment)
+                self.script_line.append(_command)
+        return
+
+    def compile(self):
         _root = os.getcwd()
 
         for _domain in self._domains:
@@ -291,4 +306,4 @@ class Parser(object):
 
                 self.script_line.append(_comment)
                 self.script_line.append(_command)
-        return True
+        return
