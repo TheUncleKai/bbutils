@@ -159,7 +159,8 @@
             "path": "tests.lang.lang",
             "classname": "TestLang",
             "tests": [
-                "test_constructor_01"
+                "test_constructor_01",
+                "test_setup_01"
             ]
         }
     ]

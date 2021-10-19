@@ -42,3 +42,25 @@ class TestLang(unittest.TestCase):
         self.assertEqual(lang.use_dummy, False, "use_dummy != False")
         self.assertEqual(lang.is_setup, False, "is_setup != False")
         return
+
+    # noinspection PyUnresolvedReferences
+    def test_setup_01(self):
+        lang = Lang()
+
+        _check = lang.setup("")
+
+        self.assertNotEqual(lang, None, "Lang: None")
+        self.assertEqual(_check, False, "_check != False")
+        self.assertEqual(lang.is_setup, False, "is_setup != False")
+        return
+
+    # noinspection PyUnresolvedReferences
+    def test_setup_01(self):
+        lang = Lang()
+
+        _check = lang.setup("")
+
+        self.assertNotEqual(lang, None, "Lang: None")
+        self.assertEqual(_check, False, "_check != False")
+        self.assertEqual(lang.is_setup, False, "is_setup != False")
+        return
