@@ -87,6 +87,7 @@ class Lang(object):
         self.ignore = os.getenv("IGNORE_GETTEXT", None)
         self.domains: Dict[str, Domain] = {}
         self.use_dummy: bool = False
+        self.is_setup: bool = False
         return
 
     @staticmethod
@@ -94,7 +95,12 @@ class Lang(object):
         return text
 
     def setup(self, localedir: str, used_lang: str = "en") -> bool:
+        self.is_setup = False
         if localedir == "":
+            return False
+
+        if os.path.exists(localedir) is False:
+            self.use_dummy = True
             return False
 
         self.localedir = localedir
@@ -104,6 +110,7 @@ class Lang(object):
 
         if self.ignore is not None:
             self.use_dummy = True
+        self.is_setup = True
         return True
 
     def _get_domain(self, domain: str) -> Optional[Domain]:
