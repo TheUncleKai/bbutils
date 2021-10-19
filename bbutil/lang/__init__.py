@@ -23,8 +23,6 @@ import gettext
 from typing import Dict, Optional, Any, List
 
 __all__ = [
-    "lang",
-
     "Domain",
     "Lang"
 ]
