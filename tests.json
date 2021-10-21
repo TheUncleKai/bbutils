@@ -179,7 +179,11 @@
                 "test_constructor_01",
                 "test_create_01",
                 "test_create_02",
-                "test_create_03"
+                "test_create_03",
+                "test_create_04",
+                "test_load_01",
+                "test_load_02",
+                "test_load_03"
             ]
         }
     ]

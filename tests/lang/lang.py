@@ -42,6 +42,7 @@ class _TestHook(object):
         self.hook_number: int = 0
         return
 
+    # noinspection PyUnusedLocal
     def set_hook(self, language):
         self.hook_number += 1
         return
@@ -293,14 +294,82 @@ class TestDomain(unittest.TestCase):
     def test_create_04(self):
         _locales = full_path("tests/locales")
 
-        _text = _("Text")
-
-        _domain = Domain(localedir=_locales, domain="test", use_dummy=False, ignore=1, used_lang="de")
-
+        _domain = Domain(localedir=_locales, domain="test", use_dummy=False, ignore=None, used_lang="de")
         _domain.create()
 
         self.assertNotEqual(_domain, None, "_domain: None")
         self.assertEqual(_domain.localedir, _locales, "localedir != None")
         self.assertNotEqual(_domain.lang, None, "lang == None")
+        self.assertNotEqual(_domain.gettext, None, "gettext == None")
         self.assertEqual(_domain.is_set, True, "is_set != False")
+        return
+
+    # noinspection PyUnresolvedReferences
+    def test_load_01(self):
+        _locales = full_path("tests/locales")
+
+        _domain = Domain(localedir=_locales, domain="test", use_dummy=False, ignore=None, used_lang="de")
+
+        _domain.callback.append(set_lang)
+
+        _domain.create()
+        _domain.load()
+
+        _test1 = _("Test1")
+
+        self.assertNotEqual(_domain, None, "_domain: None")
+        self.assertEqual(_domain.localedir, _locales, "localedir != None")
+        self.assertNotEqual(_domain.lang, None, "lang == None")
+        self.assertNotEqual(_domain.gettext, None, "gettext == None")
+        self.assertEqual(_domain.is_set, True, "is_set != False")
+        self.assertEqual(_test1, "Test_DE", "_test1 != Test_DE")
+        return
+
+    # noinspection PyUnresolvedReferences
+    def test_load_02(self):
+        _locales = full_path("tests/locales")
+
+        _domain = Domain(localedir=_locales, domain="test", use_dummy=False, ignore=None, used_lang="en")
+
+        _domain.callback.append(set_lang)
+
+        _domain.create()
+        _domain.load()
+
+        _test1 = _("Test1")
+
+        self.assertNotEqual(_domain, None, "_domain: None")
+        self.assertEqual(_domain.localedir, _locales, "localedir != None")
+        self.assertNotEqual(_domain.lang, None, "lang == None")
+        self.assertNotEqual(_domain.gettext, None, "gettext == None")
+        self.assertEqual(_domain.is_set, True, "is_set != False")
+        self.assertEqual(_test1, "Test_EN", "_test1 != Test_DE")
+        return
+
+    # noinspection PyUnresolvedReferences
+    def test_load_03(self):
+        _locales = full_path("tests/locales")
+
+        _domain = Domain(localedir=_locales, domain="test", use_dummy=False, ignore=None, used_lang="en")
+        _domain.callback.append(set_lang)
+
+        _domain.is_set = False
+        _domain.used_lang = "en"
+        _domain.create()
+        _domain.load()
+        _test1 = _("Test1")
+
+        _domain.is_set = False
+        _domain.used_lang = "de"
+        _domain.create()
+        _domain.load()
+        _test2 = _("Test1")
+
+        self.assertNotEqual(_domain, None, "_domain: None")
+        self.assertEqual(_domain.localedir, _locales, "localedir != None")
+        self.assertNotEqual(_domain.lang, None, "lang == None")
+        self.assertNotEqual(_domain.gettext, None, "gettext == None")
+        self.assertEqual(_domain.is_set, True, "is_set != False")
+        self.assertEqual(_test1, "Test_EN", "_test1 != Test_DE")
+        self.assertEqual(_test2, "Test_DE", "_test1 != Test_DE")
         return
