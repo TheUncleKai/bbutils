@@ -23,6 +23,10 @@ from bbutil.lang import Lang
 from bbutil.utils import full_path
 
 
+def _set_dummy(language):
+    return
+
+
 class TestLang(unittest.TestCase):
     """Testing class for locking module."""
 
@@ -130,4 +134,43 @@ class TestLang(unittest.TestCase):
 
         self.assertNotEqual(lang, None, "Lang: None")
         self.assertEqual(_value, _test, "_value != _test")
+        return
+
+    # noinspection PyUnresolvedReferences
+    def test_add_01(self):
+        os.environ["IGNORE_GETTEXT"] = "1"
+        lang = Lang()
+
+        _check1 = lang.setup("tests/locales")
+
+        lang.add("test", _set_dummy)
+
+        _length = len(lang.domains)
+
+        self.assertNotEqual(lang, None, "Lang: None")
+        self.assertEqual(_check1, True, "_check1 != True")
+        self.assertEqual(_length, 1, "_length != 1")
+
+        os.environ.pop('IGNORE_GETTEXT')
+        return
+
+    # noinspection PyUnresolvedReferences
+    def test_add_02(self):
+        os.environ["IGNORE_GETTEXT"] = "1"
+        lang = Lang()
+
+        _check1 = lang.setup("tests/locales")
+
+        lang.add("test", _set_dummy)
+        _length1 = len(lang.domains)
+
+        lang.add("test", _set_dummy)
+        _length2 = len(lang.domains)
+
+        self.assertNotEqual(lang, None, "Lang: None")
+        self.assertEqual(_check1, True, "_check1 != True")
+        self.assertEqual(_length1, 1, "_length1 != 1")
+        self.assertEqual(_length2, 1, "_length1 != 1")
+
+        os.environ.pop('IGNORE_GETTEXT')
         return

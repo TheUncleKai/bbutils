@@ -165,7 +165,9 @@
                 "test_setup_03",
                 "test_setup_04",
                 "test_setup_05",
-                "test_dummy_01"
+                "test_dummy_01",
+                "test_add_01",
+                "test_add_02"
             ]
         }
     ]
