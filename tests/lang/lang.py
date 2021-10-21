@@ -373,3 +373,22 @@ class TestDomain(unittest.TestCase):
         self.assertEqual(_test1, "Test_EN", "_test1 != Test_DE")
         self.assertEqual(_test2, "Test_DE", "_test1 != Test_DE")
         return
+
+    # noinspection PyUnresolvedReferences
+    def test_load_04(self):
+        _locales = full_path("tests/locales")
+
+        _domain = Domain(localedir=_locales, domain="test", use_dummy=True, ignore=None, used_lang="en")
+        _domain.callback.append(set_lang)
+
+        _domain.create()
+        _domain.load()
+        _test1 = _("Test1")
+
+        self.assertNotEqual(_domain, None, "_domain: None")
+        self.assertEqual(_domain.localedir, _locales, "localedir != None")
+        self.assertNotEqual(_domain.lang, None, "lang == None")
+        self.assertEqual(_domain.gettext, None, "gettext != None")
+        self.assertEqual(_domain.is_set, True, "is_set != False")
+        self.assertEqual(_test1, "Test1", "_test1 != Test1")
+        return

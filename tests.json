@@ -183,7 +183,8 @@
                 "test_create_04",
                 "test_load_01",
                 "test_load_02",
-                "test_load_03"
+                "test_load_03",
+                "test_load_04"
             ]
         }
     ]
