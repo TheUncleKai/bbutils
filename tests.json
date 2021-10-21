@@ -167,7 +167,16 @@
                 "test_setup_05",
                 "test_dummy_01",
                 "test_add_01",
-                "test_add_02"
+                "test_add_02",
+                "test_set_language_01"
+            ]
+        },
+        {
+            "id": "Lang.Domain",
+            "path": "tests.lang.lang",
+            "classname": "TestDomain",
+            "tests": [
+                "test_constructor_01"
             ]
         }
     ]

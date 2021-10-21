@@ -19,12 +19,32 @@
 import os.path
 import unittest
 
-from bbutil.lang import Lang
+from bbutil.lang import Lang, Domain
 from bbutil.utils import full_path
 
 
 def _set_dummy(language):
+    return language
+
+
+_ = _set_dummy
+
+
+def set_lang(hook_func):
+    global _
+    _ = hook_func
     return
+
+
+class _TestHook(object):
+
+    def __init__(self):
+        self.hook_number: int = 0
+        return
+
+    def set_hook(self, language):
+        self.hook_number += 1
+        return
 
 
 class TestLang(unittest.TestCase):
@@ -173,4 +193,55 @@ class TestLang(unittest.TestCase):
         self.assertEqual(_length2, 1, "_length1 != 1")
 
         os.environ.pop('IGNORE_GETTEXT')
+        return
+
+    # noinspection PyUnresolvedReferences
+    def test_set_language_01(self):
+        os.environ["IGNORE_GETTEXT"] = "1"
+        lang = Lang()
+
+        _hook = _TestHook()
+
+        _check1 = lang.setup("tests/locales")
+
+        lang.add("test", _hook.set_hook)
+        _num1 = _hook.hook_number
+
+        lang.set_language("de")
+        _num2 = _hook.hook_number
+
+        self.assertNotEqual(lang, None, "Lang: None")
+        self.assertEqual(_check1, True, "_check1 != True")
+        self.assertEqual(_num1, 1, "_num1 != 1")
+        self.assertEqual(_num2, 2, "_num2 != 2")
+
+        os.environ.pop('IGNORE_GETTEXT')
+        return
+
+
+class TestDomain(unittest.TestCase):
+    """Testing class for locking module."""
+
+    def setUp(self):
+        return
+
+    def tearDown(self):
+        return
+
+    # noinspection PyUnresolvedReferences
+    def test_constructor_01(self):
+        _locales = full_path("tests/locales")
+
+        _domain = Domain(localedir=_locales, domain="test", use_dummy=True, ignore=None, used_lang="de")
+
+        self.assertNotEqual(_domain, None, "_domain: None")
+        self.assertEqual(_domain.localedir, _locales, "localedir != None")
+        self.assertEqual(_domain.domain, "test", "domain != test")
+        self.assertEqual(_domain.gettext, None, "gettext != None")
+        self.assertEqual(_domain.lang, None, "lang != None")
+        self.assertEqual(_domain.is_set, False, "is_set != False")
+        self.assertEqual(_domain.ignore, None, "ignore != None")
+        self.assertEqual(len(_domain.callback), 0, "len != 0")
+        self.assertEqual(_domain.used_lang, "de", "used_lang != de")
+        self.assertEqual(_domain.use_dummy, True, "use_dummy != True")
         return
