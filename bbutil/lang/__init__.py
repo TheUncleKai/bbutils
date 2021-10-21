@@ -57,6 +57,7 @@ class Domain(object):
 
         if self.use_dummy is True:
             self.lang = self._dummy
+            self.is_set = True
             return
 
         used_catalog = [

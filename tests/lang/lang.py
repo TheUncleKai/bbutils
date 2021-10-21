@@ -245,3 +245,62 @@ class TestDomain(unittest.TestCase):
         self.assertEqual(_domain.used_lang, "de", "used_lang != de")
         self.assertEqual(_domain.use_dummy, True, "use_dummy != True")
         return
+
+    # noinspection PyUnresolvedReferences
+    def test_create_01(self):
+        _locales = full_path("tests/locales")
+
+        _domain = Domain(localedir=_locales, domain="test", use_dummy=True, ignore=None, used_lang="de")
+
+        _domain.create()
+
+        self.assertNotEqual(_domain, None, "_domain: None")
+        self.assertEqual(_domain.localedir, _locales, "localedir != None")
+        self.assertNotEqual(_domain.lang, None, "lang == None")
+        self.assertEqual(_domain.is_set, True, "is_set != False")
+        return
+
+    # noinspection PyUnresolvedReferences
+    def test_create_02(self):
+        _locales = full_path("tests/locales")
+
+        _domain = Domain(localedir=_locales, domain="test", use_dummy=True, ignore=None, used_lang="de")
+        _domain.is_set = True
+
+        _domain.create()
+
+        self.assertNotEqual(_domain, None, "_domain: None")
+        self.assertEqual(_domain.localedir, _locales, "localedir != None")
+        self.assertEqual(_domain.lang, None, "lang != None")
+        self.assertEqual(_domain.is_set, True, "is_set != False")
+        return
+
+    # noinspection PyUnresolvedReferences
+    def test_create_03(self):
+        _locales = full_path("tests/locales")
+
+        _domain = Domain(localedir=_locales, domain="test", use_dummy=False, ignore=1, used_lang="de")
+
+        _domain.create()
+
+        self.assertNotEqual(_domain, None, "_domain: None")
+        self.assertEqual(_domain.localedir, _locales, "localedir != None")
+        self.assertNotEqual(_domain.lang, None, "lang == None")
+        self.assertEqual(_domain.is_set, True, "is_set != False")
+        return
+
+    # noinspection PyUnresolvedReferences
+    def test_create_04(self):
+        _locales = full_path("tests/locales")
+
+        _text = _("Text")
+
+        _domain = Domain(localedir=_locales, domain="test", use_dummy=False, ignore=1, used_lang="de")
+
+        _domain.create()
+
+        self.assertNotEqual(_domain, None, "_domain: None")
+        self.assertEqual(_domain.localedir, _locales, "localedir != None")
+        self.assertNotEqual(_domain.lang, None, "lang == None")
+        self.assertEqual(_domain.is_set, True, "is_set != False")
+        return

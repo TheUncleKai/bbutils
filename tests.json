@@ -176,7 +176,10 @@
             "path": "tests.lang.lang",
             "classname": "TestDomain",
             "tests": [
-                "test_constructor_01"
+                "test_constructor_01",
+                "test_create_01",
+                "test_create_02",
+                "test_create_03"
             ]
         }
     ]
