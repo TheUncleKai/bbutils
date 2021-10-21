@@ -16,10 +16,11 @@
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
 
-
+import os.path
 import unittest
 
 from bbutil.lang import Lang
+from bbutil.utils import full_path
 
 
 class TestLang(unittest.TestCase):
@@ -47,7 +48,7 @@ class TestLang(unittest.TestCase):
     def test_setup_01(self):
         lang = Lang()
 
-        _check = lang.setup("")
+        _check = lang.setup(localedir="")
 
         self.assertNotEqual(lang, None, "Lang: None")
         self.assertEqual(_check, False, "_check != False")
@@ -55,12 +56,78 @@ class TestLang(unittest.TestCase):
         return
 
     # noinspection PyUnresolvedReferences
-    def test_setup_01(self):
+    def test_setup_02(self):
         lang = Lang()
 
-        _check = lang.setup("")
+        _locales = full_path("tests/locales")
+
+        _check = lang.setup(localedir=_locales)
+
+        self.assertNotEqual(lang, None, "Lang: None")
+        self.assertEqual(_check, True, "_check != True")
+        self.assertEqual(lang.is_setup, True, "is_setup != True")
+        self.assertEqual(lang.localedir, _locales, "localedir != {0:s}".format(_locales))
+        self.assertEqual(lang.used_lang, "en", "used_lang != en")
+        self.assertEqual(lang.use_dummy, False, "use_dummy != False")
+        return
+
+    # noinspection PyUnresolvedReferences
+    def test_setup_03(self):
+        lang = Lang()
+
+        _locales = full_path("tests/locales")
+
+        _check = lang.setup(localedir=_locales, used_lang="de")
+
+        self.assertNotEqual(lang, None, "Lang: None")
+        self.assertEqual(_check, True, "_check != True")
+        self.assertEqual(lang.is_setup, True, "is_setup != True")
+        self.assertEqual(lang.localedir, _locales, "localedir != {0:s}".format(_locales))
+        self.assertEqual(lang.used_lang, "de", "used_lang != de")
+        self.assertEqual(lang.use_dummy, False, "use_dummy != False")
+        return
+
+    # noinspection PyUnresolvedReferences
+    def test_setup_04(self):
+        lang = Lang()
+
+        _locales = full_path("tests-www/locales")
+
+        _check = lang.setup(localedir=_locales, used_lang="de")
 
         self.assertNotEqual(lang, None, "Lang: None")
         self.assertEqual(_check, False, "_check != False")
         self.assertEqual(lang.is_setup, False, "is_setup != False")
+        self.assertEqual(lang.use_dummy, True, "use_dummy != True")
+        return
+
+    # noinspection PyUnresolvedReferences
+    def test_setup_05(self):
+        os.environ["IGNORE_GETTEXT"] = "1"
+        lang = Lang()
+
+        _locales = full_path("tests/locales")
+
+        _check = lang.setup(localedir=_locales, used_lang="de")
+
+        self.assertNotEqual(lang, None, "Lang: None")
+        self.assertEqual(_check, True, "_check != True")
+        self.assertEqual(lang.is_setup, True, "is_setup != True")
+        self.assertEqual(lang.localedir, _locales, "localedir != {0:s}".format(_locales))
+        self.assertEqual(lang.used_lang, "de", "used_lang != de")
+        self.assertEqual(lang.use_dummy, True, "use_dummy != True")
+
+        os.environ.pop('IGNORE_GETTEXT')
+        return
+
+    # noinspection PyUnresolvedReferences
+    def test_dummy_01(self):
+        lang = Lang()
+
+        _test = "test1"
+
+        _value = lang.dummy(_test)
+
+        self.assertNotEqual(lang, None, "Lang: None")
+        self.assertEqual(_value, _test, "_value != _test")
         return
