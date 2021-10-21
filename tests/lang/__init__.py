@@ -17,5 +17,6 @@
 #
 
 __all__ = [
-    "lang"
+    "lang",
+    "parse"
 ]

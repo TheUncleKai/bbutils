@@ -186,6 +186,17 @@
                 "test_load_03",
                 "test_load_04"
             ]
+        },
+        {
+            "id": "Lang.Parser",
+            "path": "tests.lang.parser",
+            "classname": "TestParser",
+            "tests": [
+                "test_constructor_01",
+                "test_setup_01",
+                "test_setup_02",
+                "test_parse_01"
+            ]
         }
     ]
 }

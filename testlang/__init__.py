@@ -16,38 +16,25 @@
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
 
-import os.path
-import unittest
+from bbutil.lang import Lang
 
-from bbutil.lang import Lang, Domain
-from bbutil.utils import full_path
+lang = Lang()
+lang.setup(localedir="locales")
 
+lang_domain = "gui"
 
-def _set_dummy(language):
-    return language
-
-
-_ = _set_dummy
+_ = lang.dummy
 
 
-def set_lang(hook_func):
+def _set_lang(message):
     global _
-    _ = hook_func
+    _ = message
     return
 
 
-class TestParser(unittest.TestCase):
-    """Testing class for locking module."""
+lang.add("test", _set_lang)
 
-    def setUp(self):
-        return
 
-    def tearDown(self):
-        return
+if __name__ == '__main__':
 
-    # noinspection PyUnresolvedReferences
-    def test_create_01(self):
-        _text = _("Text")
-        _text = _("Text1")
-        _text = _("Text2")
-        return
+    print(_("Test1"))

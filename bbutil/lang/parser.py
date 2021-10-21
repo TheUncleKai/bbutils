@@ -41,6 +41,9 @@ def set_log(logging: Logging):
 
 class PythonFile(object):
 
+    def __repr__(self):
+        return self.basename
+
     def __init__(self, root_path: str, filename: str):
         self.root_path: str = root_path
         self.fullname: str = filename
@@ -92,6 +95,9 @@ class PythonFile(object):
 
 class Languages(object):
 
+    def __repr__(self):
+        return self.lang
+
     def __init__(self, path: str, lang: str, domain: str):
         self.domain: str = domain
         self.lang: str = lang
@@ -102,6 +108,9 @@ class Languages(object):
 
 
 class Domain(object):
+
+    def __repr__(self):
+        return self.domain
 
     def __init__(self, root_path: str, domain: str):
         self.root_path: str = root_path
