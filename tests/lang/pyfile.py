@@ -73,9 +73,51 @@ class TestPythonFile(unittest.TestCase):
         _locales = full_path("{0:s}/.locales".format(_root))
         _module = "testlang"
 
-        _pyfile = PythonFile(root_path=_root, filename=_filename, module=_module, locales=_locales)
+        _pyfile = PythonFile(root_path=_root,
+                             filename=_filename,
+                             module=_module,
+                             module_filter="testlang.test1",
+                             locales=_locales)
         _check1 = _pyfile.create()
 
         self.assertNotEqual(_pyfile, None, "_pyfile: None")
         self.assertEqual(_check1, True, "_check != True")
+        self.assertEqual(_pyfile.path, '/home/raphahk/projekte/bbutils/testlang/.locales/gui')
+        self.assertEqual(_pyfile.pot, '/home/raphahk/projekte/bbutils/testlang/.locales/gui/_testlang.test1.pot')
+        self.assertEqual(_pyfile.domain, 'gui')
+        self.assertEqual(_pyfile.classname, 'testlang.test1')
+        return
+
+    def test_create_02(self):
+        _root = full_path("{0:s}/testlang".format(os.getcwd()))
+        _filename = full_path("{0:s}/test1/__init__.py".format(_root))
+        _locales = full_path("{0:s}/.locales".format(_root))
+        _module = "testlang"
+
+        _pyfile = PythonFile(root_path=_root,
+                             filename=_filename,
+                             module=_module,
+                             module_filter="testlang.test2",
+                             locales=_locales)
+        _check1 = _pyfile.create()
+
+        self.assertNotEqual(_pyfile, None, "_pyfile: None")
+        self.assertEqual(_check1, False, "_check != False")
+        return
+
+    def test_create_03(self):
+        _root = full_path("{0:s}/testlang".format(os.getcwd()))
+        _filename = full_path("{0:s}/test2/__init__.py".format(_root))
+        _locales = full_path("{0:s}/.locales".format(_root))
+        _module = "testlang"
+
+        _pyfile = PythonFile(root_path=_root,
+                             filename=_filename,
+                             module=_module,
+                             module_filter="testlang.test2",
+                             locales=_locales)
+        _check1 = _pyfile.create()
+
+        self.assertNotEqual(_pyfile, None, "_pyfile: None")
+        self.assertEqual(_check1, False, "_check != False")
         return

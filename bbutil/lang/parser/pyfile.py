@@ -72,6 +72,9 @@ class PythonFile(object):
         _info = "{0:s}: {1:s}".format(self._root_path, _filename)
         log.debug3("Parse", _info)
 
+        if self._module_filter not in self.classname:
+            return False
+
         try:
             lang = get_attribute(self.classname, "lang_domain")
         except ImportError as e:

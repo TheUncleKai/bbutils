@@ -204,7 +204,9 @@
             "classname": "TestPythonFile",
             "tests": [
                 "test_constructor_01",
-                "test_create_01"
+                "test_create_01",
+                "test_create_02",
+                "test_create_03"
             ]
         }
     ]
