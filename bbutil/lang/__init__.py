@@ -23,6 +23,9 @@ import gettext
 from typing import Dict, Optional, Any, List
 
 __all__ = [
+    "parser",
+    "pyfile",
+
     "Domain",
     "Lang"
 ]

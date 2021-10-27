@@ -20,11 +20,11 @@ import os.path
 
 from typing import Optional, List
 
-from bbutil.utils import full_path, get_attribute
+from bbutil.utils import full_path
+from bbutil.lang.pyfile import PythonFile
 from bbutil.logging import Logging
 
 __all__ = [
-    "PythonFile",
     "Languages",
     "Domain",
     "Parser"
@@ -37,60 +37,6 @@ def set_log(logging: Logging):
     global log
     log = logging
     return
-
-
-class PythonFile(object):
-
-    def __repr__(self):
-        return self.basename
-
-    def __init__(self, root_path: str, filename: str):
-        self.root_path: str = root_path
-        self.fullname: str = filename
-        self.basename: str = os.path.basename(filename).replace(".py", "")
-        self.domain: str = ""
-        self.classname: str = ""
-        self.pot: str = ""
-        self.path: str = ""
-        return
-
-    def create(self) -> bool:
-
-        _root = full_path("{0:s}/".format(self.root_path))
-        _root = "{0:s}{1:s}".format(_root, os.path.sep)
-        _filename = self.fullname.replace(_root, "")
-
-        module_path = _filename.replace(".py", "")
-        module_path = module_path.replace(os.path.sep, ".")
-
-        if "__init__" in module_path:
-            module_path = module_path.replace(".__init__", "")
-
-        self.classname = module_path
-
-        lang = get_attribute(module_path, "lang_domain")
-
-        if lang is None:
-            return False
-
-        _logtext = "{0:s}: {1:s}".format(lang, self.classname)
-
-        log.inform("Add", _logtext)
-        self.domain = lang
-        _pot = "{0:s}/.locales/{1:s}/_{2:s}.pot".format(self.root_path, self.domain, self.classname)
-        _path = "{0:s}/.locales/{1:s}".format(self.root_path, self.domain)
-        self.pot = full_path(_pot)
-        self.path = full_path(_path)
-        return True
-
-    def prepare(self) -> bool:
-        try:
-            os.makedirs(self.path, exist_ok=True)
-        except OSError as e:
-            log.error("Unable to create path: {0:s}".format(self.path))
-            log.exception(e)
-            return False
-        return True
 
 
 class Languages(object):
@@ -130,6 +76,7 @@ class Parser(object):
 
         self._root_path: str = os.getcwd()
         self._module: str = ""
+        self._module_filter: str = ""
 
         self._script: str = ""
         self._locales: str = ""
@@ -143,6 +90,10 @@ class Parser(object):
         return
 
     @property
+    def file_number(self) -> int:
+        return len(self._python_files)
+
+    @property
     def length(self) -> int:
         return len(self.script_line)
 
@@ -154,6 +105,10 @@ class Parser(object):
         item = kwargs.get("module", None)
         if item is not None:
             self._module = item
+
+        item = kwargs.get("filter", None)
+        if item is not None:
+            self._module_filter = item
 
         item = kwargs.get("windows", None)
         if item is not None:
@@ -193,9 +148,8 @@ class Parser(object):
 
             file_list.append(main_file)
 
-        module_path = full_path("{0:s}/{1:s}".format(self._root_path, self._module))
-        log.inform("Check", module_path)
-        for root, dirs, files in os.walk(module_path, topdown=True):
+        log.inform("Check", self._root_path)
+        for root, dirs, files in os.walk(self._root_path, topdown=True):
             for name in files:
                 _filename = full_path("{0:s}/{1:s}".format(root, name))
                 if "__pycache__" in _filename:
@@ -203,7 +157,11 @@ class Parser(object):
                 file_list.append(_filename)
 
         for _filename in file_list:
-            _file = PythonFile(self._root_path, _filename)
+            log.debug2("Parse", _filename)
+            _file = PythonFile(root_path=self._root_path,
+                               filename=_filename,
+                               module=self._module,
+                               module_filter=self._module_filter)
             check = _file.create()
             if check is False:
                 continue

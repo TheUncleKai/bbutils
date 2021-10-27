@@ -189,7 +189,7 @@
         },
         {
             "id": "Lang.Parser",
-            "path": "tests.lang.parser",
+            "path": "tests.lang.parse",
             "classname": "TestParser",
             "tests": [
                 "test_constructor_01",
