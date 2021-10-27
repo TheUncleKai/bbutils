@@ -19,7 +19,7 @@ import os
 import unittest
 
 import bbutil.lang.parser
-import bbutil.lang.pyfile
+import bbutil.lang.parser.pyfile
 
 from bbutil.lang.parser import Parser
 
@@ -52,7 +52,7 @@ class TestParser(unittest.TestCase):
         _log = self.set_log()
 
         bbutil.lang.parser.set_log(_log)
-        bbutil.lang.pyfile.set_log(_log)
+        bbutil.lang.parser.pyfile.set_log(_log)
         return
 
     def tearDown(self):
@@ -102,6 +102,6 @@ class TestParser(unittest.TestCase):
 
         self.assertNotEqual(_parser, None, "_parser: None")
         self.assertEqual(_check1, True, "_check != True")
-        self.assertEqual(_parser.file_number, 1, "_parser.file_number != 1")
+        self.assertEqual(_parser.file_number, 2, "_parser.file_number != 2")
         self.assertEqual(_check2, True, "_check != True")
         return
