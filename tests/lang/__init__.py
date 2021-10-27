@@ -18,5 +18,6 @@
 
 __all__ = [
     "lang",
-    "parse"
+    "parse",
+    "pyfile"
 ]
