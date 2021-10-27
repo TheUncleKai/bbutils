@@ -203,7 +203,8 @@
             "path": "tests.lang.pyfile",
             "classname": "TestPythonFile",
             "tests": [
-                "test_constructor_01"
+                "test_constructor_01",
+                "test_create_01"
             ]
         }
     ]

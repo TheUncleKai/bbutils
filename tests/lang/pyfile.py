@@ -18,9 +18,9 @@
 import os
 import unittest
 
-import bbutil.lang.pyfile
+import bbutil.lang.parser.pyfile
 
-from bbutil.lang.pyfile import PythonFile
+from bbutil.lang.parser.pyfile import PythonFile
 
 from bbutil.utils import full_path
 
@@ -40,7 +40,7 @@ class TestPythonFile(unittest.TestCase):
     @staticmethod
     def set_log() -> Logging:
         log = Logging()
-        log.setup(app="Test", level=2, index=_index)
+        log.setup(app="Test", level=3, index=_index)
 
         console = log.get_writer("console")
         log.register(console)
@@ -50,8 +50,7 @@ class TestPythonFile(unittest.TestCase):
     def setUp(self):
         _log = self.set_log()
 
-        bbutil.lang.parser.set_log(_log)
-        bbutil.lang.pyfile.set_log(_log)
+        bbutil.lang.parser.pyfile.set_log(_log)
         return
 
     def tearDown(self):
@@ -59,7 +58,24 @@ class TestPythonFile(unittest.TestCase):
 
     # noinspection PyUnresolvedReferences
     def test_constructor_01(self):
-        _parser = Parser()
+        _root = full_path("{0:s}/testlang".format(os.getcwd()))
+        _filename = full_path("{0:s}/test1/__init__.py".format(_root))
+        _module = "testlang"
 
-        self.assertNotEqual(_parser, None, "_parser: None")
+        _pyfile = PythonFile(root_path=_root, filename=_filename, module=_module)
+
+        self.assertNotEqual(_pyfile, None, "_pyfile: None")
+        return
+
+    def test_create_01(self):
+        _root = full_path("{0:s}/testlang".format(os.getcwd()))
+        _filename = full_path("{0:s}/test1/__init__.py".format(_root))
+        _locales = full_path("{0:s}/.locales".format(_root))
+        _module = "testlang"
+
+        _pyfile = PythonFile(root_path=_root, filename=_filename, module=_module, locales=_locales)
+        _check1 = _pyfile.create()
+
+        self.assertNotEqual(_pyfile, None, "_pyfile: None")
+        self.assertEqual(_check1, True, "_check != True")
         return

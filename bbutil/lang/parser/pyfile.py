@@ -39,25 +39,27 @@ def set_log(logging: Logging):
 class PythonFile(object):
 
     def __repr__(self):
-        return self.basename
+        return self._basename
 
-    def __init__(self, root_path: str, filename: str, module: str, module_filter: str = ""):
-        self.root_path: str = root_path
-        self.fullname: str = filename
-        self.basename: str = os.path.basename(filename).replace(".py", "")
+    def __init__(self, root_path: str, filename: str, module: str, module_filter: str = "", locales: str = ".locales"):
+        self._root_path: str = root_path
+        self._fullname: str = filename
+        self._basename: str = os.path.basename(filename).replace(".py", "")
+        self._module: str = module
+        self._module_filter: str = module_filter
+        self._locales: str = locales
+
         self.domain: str = ""
         self.classname: str = ""
         self.pot: str = ""
         self.path: str = ""
-        self.module: str = module
-        self.module_filter: str = module_filter
         return
 
     def create(self) -> bool:
 
-        _root = full_path("{0:s}/".format(self.root_path))
+        _root = full_path("{0:s}/".format(self._root_path))
         _root = "{0:s}{1:s}".format(_root, os.path.sep)
-        _filename = self.fullname.replace(_root, "")
+        _filename = self._fullname.replace(_root, "")
 
         module_path = _filename.replace(".py", "")
         module_path = module_path.replace(os.path.sep, ".")
@@ -65,9 +67,9 @@ class PythonFile(object):
         if "__init__" in module_path:
             module_path = module_path.replace(".__init__", "")
 
-        self.classname = "{0:s}.{1:s}".format(self.module, module_path)
+        self.classname = "{0:s}.{1:s}".format(self._module, module_path)
 
-        _info = "{0:s}: {1:s}".format(self.root_path, _filename)
+        _info = "{0:s}: {1:s}".format(self._root_path, _filename)
         log.debug3("Parse", _info)
 
         try:
@@ -84,17 +86,8 @@ class PythonFile(object):
 
         log.inform("Add", _logtext)
         self.domain = lang
-        _pot = "{0:s}/.locales/{1:s}/_{2:s}.pot".format(self.root_path, self.domain, self.classname)
-        _path = "{0:s}/.locales/{1:s}".format(self.root_path, self.domain)
+        _pot = "{0:s}/{1:s}/_{2:s}.pot".format(self._locales, self.domain, self.classname)
+        _path = "{0:s}/{1:s}".format(self._locales, self.domain)
         self.pot = full_path(_pot)
         self.path = full_path(_path)
-        return True
-
-    def prepare(self) -> bool:
-        try:
-            os.makedirs(self.path, exist_ok=True)
-        except OSError as e:
-            log.error("Unable to create path: {0:s}".format(self.path))
-            log.exception(e)
-            return False
         return True

@@ -20,13 +20,18 @@ import os.path
 
 from typing import Optional, List
 
+from bbutil.lang.parser.domain import Domain
+from bbutil.lang.parser.language import Languages
+
 from bbutil.utils import full_path
-from bbutil.lang.pyfile import PythonFile
+from bbutil.lang.parser.pyfile import PythonFile
 from bbutil.logging import Logging
 
 __all__ = [
-    "Languages",
-    "Domain",
+    "pyfile",
+    "domain",
+    "language",
+
     "Parser"
 ]
 
@@ -37,35 +42,6 @@ def set_log(logging: Logging):
     global log
     log = logging
     return
-
-
-class Languages(object):
-
-    def __repr__(self):
-        return self.lang
-
-    def __init__(self, path: str, lang: str, domain: str):
-        self.domain: str = domain
-        self.lang: str = lang
-        self.path: str = full_path("{0:s}/{1:s}/LC_MESSAGES".format(path, lang))
-        self.po: str = full_path("{0:s}/{1:s}.po".format(self.path, self.domain))
-        self.mo: str = full_path("{0:s}/{1:s}.mo".format(self.path, self.domain))
-        return
-
-
-class Domain(object):
-
-    def __repr__(self):
-        return self.domain
-
-    def __init__(self, root_path: str, domain: str):
-        self.root_path: str = root_path
-        self.domain: str = domain
-        self.path: str = full_path("{0:s}/.locales/{1:s}".format(self.root_path, self.domain))
-        self.pot: str = full_path("{0:s}/.locales/{1:s}/{1:s}.pot".format(self.root_path, self.domain))
-        self.lang: List[Languages] = []
-        self.files: List[PythonFile] = []
-        return
 
 
 class Parser(object):
