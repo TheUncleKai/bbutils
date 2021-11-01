@@ -137,3 +137,32 @@ class TestParser(unittest.TestCase):
         self.assertEqual(_parser.file_number, 4, "_parser.file_number != 4")
         self.assertEqual(_check2, True, "_check != True")
         return
+
+    # noinspection PyUnresolvedReferences
+    def test_parse_03(self):
+        _locales = full_path("tests/locales")
+
+        _root = full_path("{0:s}/testdata".format(os.getcwd()))
+        sys.path.append(_root)
+
+        _package = full_path("{0:s}/testlang".format(_root))
+
+        _scripts = [
+            full_path("{0:s}/testos1.py".format(_root)),
+            full_path("{0:s}/testos2.py".format(_root)),
+            full_path("{0:s}/testos3.py".format(_root))
+        ]
+
+        _parser = Parser()
+        _check1 = _parser.setup(locales=_locales,
+                                module="testlang",
+                                filter="testlang.test1",
+                                script=_scripts,
+                                package_path=_package)
+        _check2 = _parser.parse()
+
+        self.assertNotEqual(_parser, None, "_parser: None")
+        self.assertEqual(_check1, True, "_check != True")
+        self.assertEqual(_parser.file_number, 4, "_parser.file_number != 4")
+        self.assertEqual(_check2, True, "_check != True")
+        return
