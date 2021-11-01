@@ -202,7 +202,10 @@
                 "test_generate_02",
                 "test_merge_01",
                 "test_merge_02",
-                "test_copy_01"
+                "test_copy_01",
+                "test_copy_02",
+                "test_update_01",
+                "test_update_02"
             ]
         },
         {
