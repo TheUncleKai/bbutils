@@ -184,7 +184,8 @@ class TestParser(unittest.TestCase):
                                 package_path=_package)
 
         _check2 = _parser.parse()
-        _parser.generate()
+        _checklist = _parser.generate()
+        _length = len(_checklist)
 
         _file1_out = full_path("{0:s}/.locales/gui/_testlang.test1.pot".format(_root))
         _file1_in = full_path("{0:s}/testdata/testlang/test1/__init__.py".format(_root))
@@ -202,8 +203,8 @@ class TestParser(unittest.TestCase):
         self.assertNotEqual(_parser, None, "_parser: None")
         self.assertEqual(_check1, True, "_check1 != True")
         self.assertEqual(_check2, True, "_check2 != True")
-        self.assertEqual(_parser.length, 4, "_parser.length != 4")
-        self.assertListEqual(_lines, _parser.script_line)
+        self.assertEqual(_length, 4, "_parser.length != 4")
+        self.assertListEqual(_lines, _checklist)
         return
 
     # noinspection PyUnresolvedReferences
@@ -224,7 +225,8 @@ class TestParser(unittest.TestCase):
                                 package_path=_package)
 
         _check2 = _parser.parse()
-        _parser.generate()
+        _checklist = _parser.generate()
+        _length = len(_checklist)
 
         _file1_out = full_path("{0:s}/.locales/gui/_testlang.test1.pot".format(_root))
         _file1_in = full_path("{0:s}/testdata/testlang/test1/__init__.py".format(_root))
@@ -242,8 +244,8 @@ class TestParser(unittest.TestCase):
         self.assertNotEqual(_parser, None, "_parser: None")
         self.assertEqual(_check1, True, "_check1 != True")
         self.assertEqual(_check2, True, "_check2 != True")
-        self.assertEqual(_parser.length, 4, "_parser.length != 4")
-        self.assertListEqual(_lines, _parser.script_line)
+        self.assertEqual(_length, 4, "_parser.length != 4")
+        self.assertListEqual(_lines, _checklist)
         return
 
     # noinspection PyUnresolvedReferences
@@ -263,7 +265,8 @@ class TestParser(unittest.TestCase):
                                 package_path=_package)
 
         _check2 = _parser.parse()
-        _parser.merge()
+        _checklist = _parser.merge()
+        _length = len(_checklist)
 
         _file1_in = full_path("{0:s}/.locales/gui/_testlang.test1.pot".format(_root))
         _file2_in = full_path("{0:s}/.locales/gui/_testlang.test1.tester.pot".format(_root))
@@ -277,8 +280,8 @@ class TestParser(unittest.TestCase):
         self.assertNotEqual(_parser, None, "_parser: None")
         self.assertEqual(_check1, True, "_check1 != True")
         self.assertEqual(_check2, True, "_check2 != True")
-        self.assertEqual(_parser.length, 2, "_parser.length != 2")
-        self.assertListEqual(_lines, _parser.script_line)
+        self.assertEqual(_length, 2, "_parser.length != 2")
+        self.assertListEqual(_lines, _checklist)
         return
 
     # noinspection PyUnresolvedReferences
@@ -299,7 +302,8 @@ class TestParser(unittest.TestCase):
                                 package_path=_package)
 
         _check2 = _parser.parse()
-        _parser.merge()
+        _checklist = _parser.merge()
+        _length = len(_checklist)
 
         _file1_in = full_path("{0:s}/.locales/gui/_testlang.test1.pot".format(_root))
         _file2_in = full_path("{0:s}/.locales/gui/_testlang.test1.tester.pot".format(_root))
@@ -313,8 +317,8 @@ class TestParser(unittest.TestCase):
         self.assertNotEqual(_parser, None, "_parser: None")
         self.assertEqual(_check1, True, "_check1 != True")
         self.assertEqual(_check2, True, "_check2 != True")
-        self.assertEqual(_parser.length, 2, "_parser.length != 2")
-        self.assertListEqual(_lines, _parser.script_line)
+        self.assertEqual(_length, 2, "_parser.length != 2")
+        self.assertListEqual(_lines, _checklist)
         return
 
     # noinspection PyUnresolvedReferences
@@ -334,7 +338,8 @@ class TestParser(unittest.TestCase):
                                 package_path=_package)
 
         _check2 = _parser.parse()
-        _parser.copy()
+        _checklist = _parser.copy()
+        _length = len(_checklist)
 
         _pot = full_path("{0:s}/.locales/gui/gui.pot".format(_root))
         _po_en = full_path("{0:s}/tests/locales/en/LC_MESSAGES/gui.po".format(_root))
@@ -350,8 +355,8 @@ class TestParser(unittest.TestCase):
         self.assertNotEqual(_parser, None, "_parser: None")
         self.assertEqual(_check1, True, "_check1 != True")
         self.assertEqual(_check2, True, "_check2 != True")
-        self.assertEqual(_parser.length, 4, "_parser.length != 4")
-        self.assertListEqual(_lines, _parser.script_line)
+        self.assertEqual(_length, 4, "_parser.length != 4")
+        self.assertListEqual(_lines, _checklist)
         return
 
     # noinspection PyUnresolvedReferences
@@ -372,7 +377,8 @@ class TestParser(unittest.TestCase):
                                 package_path=_package)
 
         _check2 = _parser.parse()
-        _parser.copy()
+        _checklist = _parser.copy()
+        _length = len(_checklist)
 
         _pot = full_path("{0:s}/.locales/gui/gui.pot".format(_root))
         _po_en = full_path("{0:s}/tests/locales/en/LC_MESSAGES/gui.po".format(_root))
@@ -388,8 +394,8 @@ class TestParser(unittest.TestCase):
         self.assertNotEqual(_parser, None, "_parser: None")
         self.assertEqual(_check1, True, "_check1 != True")
         self.assertEqual(_check2, True, "_check2 != True")
-        self.assertEqual(_parser.length, 4, "_parser.length != 4")
-        self.assertListEqual(_lines, _parser.script_line)
+        self.assertEqual(_length, 4, "_parser.length != 4")
+        self.assertListEqual(_lines, _checklist)
         return
 
     # noinspection PyUnresolvedReferences
@@ -409,7 +415,8 @@ class TestParser(unittest.TestCase):
                                 package_path=_package)
 
         _check2 = _parser.parse()
-        _parser.update()
+        _checklist = _parser.update()
+        _length = len(_checklist)
 
         _pot = full_path("{0:s}/.locales/gui/gui.pot".format(_root))
         _po_en = full_path("{0:s}/tests/locales/en/LC_MESSAGES/gui.po".format(_root))
@@ -425,8 +432,8 @@ class TestParser(unittest.TestCase):
         self.assertNotEqual(_parser, None, "_parser: None")
         self.assertEqual(_check1, True, "_check1 != True")
         self.assertEqual(_check2, True, "_check2 != True")
-        self.assertEqual(_parser.length, 4, "_parser.length != 4")
-        self.assertListEqual(_lines, _parser.script_line)
+        self.assertEqual(_length, 4, "_parser.length != 4")
+        self.assertListEqual(_lines, _checklist)
         return
 
     # noinspection PyUnresolvedReferences
@@ -447,7 +454,8 @@ class TestParser(unittest.TestCase):
                                 package_path=_package)
 
         _check2 = _parser.parse()
-        _parser.update()
+        _checklist = _parser.update()
+        _length = len(_checklist)
 
         _pot = full_path("{0:s}/.locales/gui/gui.pot".format(_root))
         _po_en = full_path("{0:s}/tests/locales/en/LC_MESSAGES/gui.po".format(_root))
@@ -463,8 +471,8 @@ class TestParser(unittest.TestCase):
         self.assertNotEqual(_parser, None, "_parser: None")
         self.assertEqual(_check1, True, "_check1 != True")
         self.assertEqual(_check2, True, "_check2 != True")
-        self.assertEqual(_parser.length, 4, "_parser.length != 4")
-        self.assertListEqual(_lines, _parser.script_line)
+        self.assertEqual(_length, 4, "_parser.length != 4")
+        self.assertListEqual(_lines, _checklist)
         return
 
     # noinspection PyUnresolvedReferences
@@ -484,7 +492,8 @@ class TestParser(unittest.TestCase):
                                 package_path=_package)
 
         _check2 = _parser.parse()
-        _parser.compile()
+        _checklist = _parser.compile()
+        _length = len(_checklist)
 
         _po_en = full_path("{0:s}/tests/locales/en/LC_MESSAGES/gui.po".format(_root))
         _po_de = full_path("{0:s}/tests/locales/de/LC_MESSAGES/gui.po".format(_root))
@@ -501,8 +510,8 @@ class TestParser(unittest.TestCase):
         self.assertNotEqual(_parser, None, "_parser: None")
         self.assertEqual(_check1, True, "_check1 != True")
         self.assertEqual(_check2, True, "_check2 != True")
-        self.assertEqual(_parser.length, 4, "_parser.length != 4")
-        self.assertListEqual(_lines, _parser.script_line)
+        self.assertEqual(_length, 4, "_parser.length != 4")
+        self.assertListEqual(_lines, _checklist)
         return
 
     # noinspection PyUnresolvedReferences
@@ -523,7 +532,8 @@ class TestParser(unittest.TestCase):
                                 package_path=_package)
 
         _check2 = _parser.parse()
-        _parser.compile()
+        _checklist = _parser.compile()
+        _length = len(_checklist)
 
         _po_en = full_path("{0:s}/tests/locales/en/LC_MESSAGES/gui.po".format(_root))
         _po_de = full_path("{0:s}/tests/locales/de/LC_MESSAGES/gui.po".format(_root))
@@ -540,6 +550,6 @@ class TestParser(unittest.TestCase):
         self.assertNotEqual(_parser, None, "_parser: None")
         self.assertEqual(_check1, True, "_check1 != True")
         self.assertEqual(_check2, True, "_check2 != True")
-        self.assertEqual(_parser.length, 4, "_parser.length != 4")
-        self.assertListEqual(_lines, _parser.script_line)
+        self.assertEqual(_length, 4, "_parser.length != 4")
+        self.assertListEqual(_lines, _checklist)
         return

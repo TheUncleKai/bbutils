@@ -17,6 +17,7 @@
 #
 
 import os.path
+import io
 
 from typing import Optional, List
 
@@ -50,6 +51,7 @@ class Parser(object):
         self._ext: str = ""
         self._echo: str = '"'
         self._is_windows: bool = False
+        self._f: Optional[io.TextIOBase] = None
 
         self._root_path: str = os.getcwd()
         self._package_path: str = os.getcwd()
@@ -58,8 +60,6 @@ class Parser(object):
 
         self._script: List[str] = []
         self._locales: str = ""
-
-        self.script_line: List[str] = []
 
         self._python_files: List[PythonFile] = []
         self._domains: List[Domain] = []
@@ -70,10 +70,6 @@ class Parser(object):
     @property
     def file_number(self) -> int:
         return len(self._python_files)
-
-    @property
-    def length(self) -> int:
-        return len(self.script_line)
 
     def setup(self, **kwargs) -> bool:
         item = kwargs.get("root_path", None)
@@ -187,6 +183,7 @@ class Parser(object):
         return True
 
     def generate(self):
+        script_line = []
         for _file in self._python_files:
             _pot = os.path.basename(_file.pot)
 
@@ -196,11 +193,12 @@ class Parser(object):
                                                                                 _file.pot,
                                                                                 _file.fullname)
 
-            self.script_line.append(_comment)
-            self.script_line.append(_command)
-        return
+            script_line.append(_comment)
+            script_line.append(_command)
+        return script_line
 
     def merge(self):
+        script_line = []
         for _domain in self._domains:
             _pot = os.path.basename(_domain.pot)
 
@@ -212,11 +210,12 @@ class Parser(object):
 
             _command = "{0:s} -o {1:s}".format(_command, _domain.pot)
 
-            self.script_line.append(_comment)
-            self.script_line.append(_command)
-        return
+            script_line.append(_comment)
+            script_line.append(_command)
+        return script_line
 
     def copy(self):
+        script_line = []
         for _domain in self._domains:
             for _lang in _domain.lang:
                 _comment = 'echo {2:s}Update {0:s}/{1:s}{2:s}'.format(_lang.lang, _domain.domain, self._echo)
@@ -226,27 +225,54 @@ class Parser(object):
                 else:
                     _command = "cp {0:s} {1:s}".format(_domain.pot, _lang.po)
 
-                self.script_line.append(_comment)
-                self.script_line.append(_command)
-        return
+                script_line.append(_comment)
+                script_line.append(_command)
+        return script_line
 
-    def update(self):
+    def update(self) -> list:
+        script_line = []
         for _domain in self._domains:
             for _lang in _domain.lang:
                 _comment = 'echo {2:s}Update {0:s}/{1:s}{2:s}'.format(_lang.lang, _domain.domain, self._echo)
                 _command = "msgmerge{0:s} -N -U {1:s} {2:s}".format(self._ext, _lang.po, _domain.pot)
 
-                self.script_line.append(_comment)
-                self.script_line.append(_command)
-        return
+                script_line.append(_comment)
+                script_line.append(_command)
+        return script_line
 
-    def compile(self):
+    def compile(self) -> list:
         _root = os.getcwd()
+        script_line = []
 
         for _domain in self._domains:
             for _lang in _domain.lang:
                 _comment = 'echo {2:s}Compile {0:s}/{1:s}{2:s}'.format(_lang.lang, _domain.domain, self._echo)
                 _command = "msgfmt{0:s} -o {1:s} {2:s}".format(self._ext, _lang.mo, _lang.po)
-                self.script_line.append(_comment)
-                self.script_line.append(_command)
-        return
+                script_line.append(_comment)
+                script_line.append(_command)
+        return script_line
+
+    def _open(self, filename: str) -> bool:
+
+        if self._is_windows is True:
+            script_ext = ".cmd"
+            first_line = "@echo off\n"
+        else:
+            script_ext = ".sh"
+            first_line = "#!/bin/bash\n"
+
+        _filename = full_path("{0:s}{1:s}".format(filename, script_ext))
+
+        try:
+            f = open(_filename, "w")
+        except IOError as e:
+            log.exception(e)
+            return False
+
+        f.write(first_line)
+
+        log.inform("Open", _filename)
+        return True
+
+    def store(self) -> bool:
+        return True
