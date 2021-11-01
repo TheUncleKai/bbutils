@@ -246,9 +246,6 @@ class Parser(object):
         for _domain in self._domains:
             for _lang in _domain.lang:
                 _comment = 'echo {2:s}Compile {0:s}/{1:s}{2:s}'.format(_lang.lang, _domain.domain, self._echo)
-                if os.path.exists(_lang.po) is False:
-                    continue
-
                 _command = "msgfmt{0:s} -o {1:s} {2:s}".format(self._ext, _lang.mo, _lang.po)
                 self.script_line.append(_comment)
                 self.script_line.append(_command)

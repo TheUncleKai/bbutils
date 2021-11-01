@@ -205,7 +205,9 @@
                 "test_copy_01",
                 "test_copy_02",
                 "test_update_01",
-                "test_update_02"
+                "test_update_02",
+                "test_compile_01",
+                "test_compile_02"
             ]
         },
         {
