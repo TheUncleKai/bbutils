@@ -63,7 +63,7 @@ class TestPythonFile(unittest.TestCase):
         _filename = full_path("{0:s}/test1/__init__.py".format(_root))
         _module = "testlang"
 
-        _pyfile = PythonFile(root_path=_root, filename=_filename, module=_module)
+        _pyfile = PythonFile(package_path=_root, filename=_filename, module=_module)
 
         self.assertNotEqual(_pyfile, None, "_pyfile: None")
         return
@@ -71,15 +71,15 @@ class TestPythonFile(unittest.TestCase):
     def test_create_01(self):
 
         _root = full_path("{0:s}/testdata".format(os.getcwd()))
-        _filename = full_path("{0:s}/test1/__init__.py".format(_root))
-        _locales = full_path("{0:s}/.locales".format(_root))
-        _module = "testlang"
+        _package = full_path("{0:s}/testlang".format(_root))
 
+        _filename = full_path("{0:s}/testlang/test1/__init__.py".format(_root))
+        _locales = full_path("{0:s}/.locales".format(_root))
         sys.path.append(_root)
 
-        _pyfile = PythonFile(root_path=_root,
+        _pyfile = PythonFile(package_path=_package,
                              filename=_filename,
-                             module=_module,
+                             module="testlang",
                              module_filter="testlang.test1",
                              locales=_locales)
         _check1 = _pyfile.create()
@@ -94,11 +94,13 @@ class TestPythonFile(unittest.TestCase):
 
     def test_create_02(self):
         _root = full_path("{0:s}/testlang".format(os.getcwd()))
+        _package = full_path("{0:s}/testlang".format(_root))
+
         _filename = full_path("{0:s}/test1/__init__.py".format(_root))
         _locales = full_path("{0:s}/.locales".format(_root))
         _module = "testlang"
 
-        _pyfile = PythonFile(root_path=_root,
+        _pyfile = PythonFile(package_path=_package,
                              filename=_filename,
                              module=_module,
                              module_filter="testlang.test2",
@@ -111,11 +113,13 @@ class TestPythonFile(unittest.TestCase):
 
     def test_create_03(self):
         _root = full_path("{0:s}/testlang".format(os.getcwd()))
+        _package = full_path("{0:s}/testlang".format(_root))
+
         _filename = full_path("{0:s}/test2/__init__.py".format(_root))
         _locales = full_path("{0:s}/.locales".format(_root))
         _module = "testlang"
 
-        _pyfile = PythonFile(root_path=_root,
+        _pyfile = PythonFile(package_path=_package,
                              filename=_filename,
                              module=_module,
                              module_filter="testlang.test2",

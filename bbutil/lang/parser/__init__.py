@@ -50,7 +50,7 @@ class Parser(object):
         self._ext: str = ""
         self._is_windows: bool = False
 
-        self._root_path: str = os.getcwd()
+        self._package_path: str = os.getcwd()
         self._module: str = ""
         self._module_filter: str = ""
 
@@ -74,9 +74,9 @@ class Parser(object):
         return len(self.script_line)
 
     def setup(self, **kwargs) -> bool:
-        item = kwargs.get("root", None)
+        item = kwargs.get("package_path", None)
         if item is not None:
-            self._root_path = item
+            self._package_path = item
 
         item = kwargs.get("module", None)
         if item is not None:
@@ -124,8 +124,8 @@ class Parser(object):
 
             file_list.append(main_file)
 
-        log.inform("Check", self._root_path)
-        for root, dirs, files in os.walk(self._root_path, topdown=True):
+        log.inform("Check", self._package_path)
+        for root, dirs, files in os.walk(self._package_path, topdown=True):
             for name in files:
                 _filename = full_path("{0:s}/{1:s}".format(root, name))
                 if "__pycache__" in _filename:
@@ -134,7 +134,9 @@ class Parser(object):
 
         for _filename in file_list:
             log.debug2("Parse", _filename)
-            _file = PythonFile(root_path=self._root_path,
+            _info = "Module: {0:s}, Filter: {1:s}".format(self._module, self._module_filter)
+            log.debug2("Debug", _info)
+            _file = PythonFile(package_path=self._package_path,
                                filename=_filename,
                                module=self._module,
                                module_filter=self._module_filter)
@@ -147,7 +149,7 @@ class Parser(object):
         for _file in self._python_files:
             _domain = self.get_domain(_file.domain)
             if _domain is None:
-                _domain = Domain(self._root_path, _file.domain)
+                _domain = Domain(self._package_path, _file.domain)
                 _domain.files.append(_file)
                 _domain.lang.append(Languages(self._locales, 'en', _domain.domain))
                 _domain.lang.append(Languages(self._locales, 'de', _domain.domain))

@@ -41,8 +41,14 @@ class PythonFile(object):
     def __repr__(self):
         return self._basename
 
-    def __init__(self, root_path: str, filename: str, module: str, module_filter: str = "", locales: str = ".locales"):
-        self._root_path: str = root_path
+    def __init__(self,
+                 package_path: str,
+                 filename: str,
+                 module: str,
+                 module_filter: str = "",
+                 locales: str = ".locales"):
+
+        self._package_path: str = package_path
         self._fullname: str = filename
         self._basename: str = os.path.basename(filename).replace(".py", "")
         self._module: str = module
@@ -57,7 +63,7 @@ class PythonFile(object):
 
     def create(self) -> bool:
 
-        _root = full_path("{0:s}/".format(self._root_path))
+        _root = full_path("{0:s}/".format(self._package_path))
         _root = "{0:s}{1:s}".format(_root, os.path.sep)
         _filename = self._fullname.replace(_root, "")
 
@@ -69,7 +75,7 @@ class PythonFile(object):
 
         self.classname = "{0:s}.{1:s}".format(self._module, module_path)
 
-        _info = "{0:s}: {1:s}".format(self._root_path, _filename)
+        _info = "{0:s}: {1:s}".format(self._package_path, _filename)
         log.debug3("Parse", _info)
 
         if self._module_filter not in self.classname:

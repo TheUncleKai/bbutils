@@ -17,6 +17,7 @@
 #
 import os
 import unittest
+import sys
 
 import bbutil.lang.parser
 import bbutil.lang.parser.pyfile
@@ -91,13 +92,16 @@ class TestParser(unittest.TestCase):
     def test_parse_01(self):
         _locales = full_path("tests/locales")
 
-        _root = full_path("{0:s}/testlang".format(os.getcwd()))
+        _root = full_path("{0:s}/testdata".format(os.getcwd()))
+        sys.path.append(_root)
+
+        _package = full_path("{0:s}/testlang".format(_root))
 
         _parser = Parser()
         _check1 = _parser.setup(locales=_locales,
                                 module="testlang",
                                 filter="testlang.test1",
-                                root=_root)
+                                package_path=_package)
         _check2 = _parser.parse()
 
         self.assertNotEqual(_parser, None, "_parser: None")
