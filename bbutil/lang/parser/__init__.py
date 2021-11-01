@@ -48,6 +48,7 @@ class Parser(object):
 
     def __init__(self):
         self._ext: str = ""
+        self._echo: str = '"'
         self._is_windows: bool = False
 
         self._root_path: str = os.getcwd()
@@ -95,6 +96,7 @@ class Parser(object):
         if item is not None:
             self._is_windows = item
             self._ext = ".exe"
+            self._echo = ""
 
         item = kwargs.get("script", None)
         if item is not None:
@@ -188,11 +190,7 @@ class Parser(object):
         for _file in self._python_files:
             _pot = os.path.basename(_file.pot)
 
-            if self._is_windows is True:
-                _comment = 'echo Create {0:s}'.format(_pot)
-            else:
-                _comment = 'echo "Create {0:s}"'.format(_pot)
-
+            _comment = 'echo {1:s}Create {0:s}{1:s}'.format(_pot, self._echo)
             _command = "xgettext{0:s} -L python -d {1:s} -o {2:s} {3:s}".format(self._ext,
                                                                                 _file.domain,
                                                                                 _file.pot,
@@ -206,11 +204,7 @@ class Parser(object):
         for _domain in self._domains:
             _pot = os.path.basename(_domain.pot)
 
-            if self._is_windows is True:
-                _comment = 'echo Merge {0:s}'.format(_pot)
-            else:
-                _comment = 'echo "Merge {0:s}"'.format(_pot)
-
+            _comment = 'echo {1:s}Merge {0:s}{1:s}'.format(_pot, self._echo)
             _command = "msgcat{0:s}".format(self._ext)
 
             for _file in _domain.files:
@@ -225,10 +219,7 @@ class Parser(object):
     def copy(self):
         for _domain in self._domains:
             for _lang in _domain.lang:
-                if self._is_windows is True:
-                    _comment = 'echo Update {0:s}/{1:s}'.format(_lang.lang, _domain.domain)
-                else:
-                    _comment = 'echo "Update {0:s}/{1:s}"'.format(_lang.lang, _domain.domain)
+                _comment = 'echo {2:s}Update {0:s}/{1:s}{2:s}'.format(_lang.lang, _domain.domain, self._echo)
 
                 if self._is_windows is True:
                     _command = "copy {0:s} {1:s}".format(_domain.pot, _lang.po)
@@ -242,11 +233,7 @@ class Parser(object):
     def update(self):
         for _domain in self._domains:
             for _lang in _domain.lang:
-                if self._is_windows is True:
-                    _comment = 'echo Update {0:s}/{1:s}'.format(_lang.lang, _domain.domain)
-                else:
-                    _comment = 'echo "Update {0:s}/{1:s}"'.format(_lang.lang, _domain.domain)
-
+                _comment = 'echo {2:s}Update {0:s}/{1:s}{2:s}'.format(_lang.lang, _domain.domain, self._echo)
                 _command = "msgmerge{0:s} -N -U {1:s} {2:s}".format(self._ext, _lang.po, _domain.pot)
 
                 self.script_line.append(_comment)
@@ -258,16 +245,11 @@ class Parser(object):
 
         for _domain in self._domains:
             for _lang in _domain.lang:
-                if self._is_windows is True:
-                    _comment = 'echo Compile {0:s}/{1:s}'.format(_lang.lang, _domain.domain)
-                else:
-                    _comment = 'echo "Compile {0:s}/{1:s}"'.format(_lang.lang, _domain.domain)
-
+                _comment = 'echo {2:s}Compile {0:s}/{1:s}{2:s}'.format(_lang.lang, _domain.domain, self._echo)
                 if os.path.exists(_lang.po) is False:
                     continue
 
                 _command = "msgfmt{0:s} -o {1:s} {2:s}".format(self._ext, _lang.mo, _lang.po)
-
                 self.script_line.append(_comment)
                 self.script_line.append(_command)
         return
