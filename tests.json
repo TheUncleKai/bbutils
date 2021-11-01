@@ -199,7 +199,9 @@
                 "test_parse_02",
                 "test_parse_03",
                 "test_generate_01",
-                "test_generate_02"
+                "test_generate_02",
+                "test_merge_01",
+                "test_merge_02"
             ]
         },
         {

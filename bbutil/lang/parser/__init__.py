@@ -50,6 +50,7 @@ class Parser(object):
         self._ext: str = ""
         self._is_windows: bool = False
 
+        self._root_path: str = os.getcwd()
         self._package_path: str = os.getcwd()
         self._module: str = ""
         self._module_filter: str = ""
@@ -74,6 +75,10 @@ class Parser(object):
         return len(self.script_line)
 
     def setup(self, **kwargs) -> bool:
+        item = kwargs.get("root_path", None)
+        if item is not None:
+            self._root_path = item
+
         item = kwargs.get("package_path", None)
         if item is not None:
             self._package_path = item
@@ -167,7 +172,7 @@ class Parser(object):
         for _file in self._python_files:
             _domain = self.get_domain(_file.domain)
             if _domain is None:
-                _domain = Domain(self._package_path, _file.domain)
+                _domain = Domain(root_path=self._root_path, domain=_file.domain)
                 _domain.files.append(_file)
                 _domain.lang.append(Languages(self._locales, 'en', _domain.domain))
                 _domain.lang.append(Languages(self._locales, 'de', _domain.domain))

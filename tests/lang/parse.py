@@ -235,3 +235,64 @@ class TestParser(unittest.TestCase):
         self.assertEqual(_parser.length, 4, "_parser.length != 4")
         self.assertListEqual(_lines, _parser.script_line)
         return
+
+    # noinspection PyUnresolvedReferences
+    def test_merge_01(self):
+        _locales = full_path("tests/locales")
+
+        _root = full_path("{0:s}/testdata".format(os.getcwd()))
+        sys.path.append(_root)
+
+        _package = full_path("{0:s}/testlang".format(_root))
+
+        _parser = Parser()
+        _check1 = _parser.setup(locales=_locales,
+                                module="testlang",
+                                filter="testlang.test1",
+                                package_path=_package)
+
+        _check2 = _parser.parse()
+        _parser.merge()
+
+        _lines = [
+            'echo "Merge gui.pot"',
+            'msgcat {0:s}/.locales/gui/_testlang.test1.pot {0:s}/.locales/gui/_testlang.test1.tester.pot -o {0:s}/.locales/gui/gui.pot'.format(os.getcwd())
+        ]
+
+        self.assertNotEqual(_parser, None, "_parser: None")
+        self.assertEqual(_check1, True, "_check1 != True")
+        self.assertEqual(_check2, True, "_check2 != True")
+        self.assertEqual(_parser.length, 2, "_parser.length != 2")
+        self.assertListEqual(_lines, _parser.script_line)
+        return
+
+    # noinspection PyUnresolvedReferences
+    def test_merge_02(self):
+        _locales = full_path("tests/locales")
+
+        _root = full_path("{0:s}/testdata".format(os.getcwd()))
+        sys.path.append(_root)
+
+        _package = full_path("{0:s}/testlang".format(_root))
+
+        _parser = Parser()
+        _check1 = _parser.setup(locales=_locales,
+                                module="testlang",
+                                windows=True,
+                                filter="testlang.test1",
+                                package_path=_package)
+
+        _check2 = _parser.parse()
+        _parser.merge()
+
+        _lines = [
+            'echo Merge gui.pot',
+            'msgcat.exe {0:s}/.locales/gui/_testlang.test1.pot {0:s}/.locales/gui/_testlang.test1.tester.pot -o {0:s}/.locales/gui/gui.pot'.format(os.getcwd())
+        ]
+
+        self.assertNotEqual(_parser, None, "_parser: None")
+        self.assertEqual(_check1, True, "_check1 != True")
+        self.assertEqual(_check2, True, "_check2 != True")
+        self.assertEqual(_parser.length, 2, "_parser.length != 2")
+        self.assertListEqual(_lines, _parser.script_line)
+        return
