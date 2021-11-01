@@ -54,7 +54,7 @@ class Parser(object):
         self._module: str = ""
         self._module_filter: str = ""
 
-        self._script: str = ""
+        self._script: List[str] = []
         self._locales: str = ""
 
         self.script_line: List[str] = []
@@ -113,16 +113,21 @@ class Parser(object):
 
         return None
 
-    def parse(self) -> bool:
+    def _parse_script(self, filename: str) -> bool:
+        _package_path = os.path.dirname(filename)
+
+        log.debug2("Parse", filename)
+        _file = PythonFile(package_path=_package_path,
+                           filename=filename,
+                           module="")
+
+        check = _file.create()
+        if check is True:
+            self._python_files.append(_file)
+        return check
+
+    def _parse_package(self) -> bool:
         file_list = []
-
-        if self._script != "":
-            main_file = full_path(self._script)
-            if os.path.exists(main_file) is False:
-                log.error("Unable to find mainfile: {0:s}".format(main_file))
-                return False
-
-            file_list.append(main_file)
 
         log.inform("Check", self._package_path)
         for root, dirs, files in os.walk(self._package_path, topdown=True):
@@ -145,6 +150,19 @@ class Parser(object):
                 continue
 
             self._python_files.append(_file)
+        return True
+
+    def parse(self) -> bool:
+
+        if self._script != "":
+            for _item in self._script:
+                _file = full_path(_item)
+
+                _check = self._parse_script(_file)
+                if _check is False:
+                    continue
+
+        self._parse_package()
 
         for _file in self._python_files:
             _domain = self.get_domain(_file.domain)
