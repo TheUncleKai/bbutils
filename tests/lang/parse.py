@@ -166,3 +166,72 @@ class TestParser(unittest.TestCase):
         self.assertEqual(_parser.file_number, 4, "_parser.file_number != 4")
         self.assertEqual(_check2, True, "_check != True")
         return
+
+    # noinspection PyUnresolvedReferences
+    def test_generate_01(self):
+        _locales = full_path("tests/locales")
+
+        _root = full_path("{0:s}/testdata".format(os.getcwd()))
+        sys.path.append(_root)
+
+        _package = full_path("{0:s}/testlang".format(_root))
+
+        _parser = Parser()
+        _check1 = _parser.setup(locales=_locales,
+                                module="testlang",
+                                filter="testlang.test1",
+                                package_path=_package)
+
+        _check2 = _parser.parse()
+        _parser.generate()
+
+        _lines = [
+            'echo "Create _testlang.test1.pot"',
+            'xgettext -L python -d gui -o {0:s}/.locales/gui/_testlang.test1.pot {0:s}/testdata/testlang/test1/__init__.py'.format(
+                os.getcwd()),
+            'echo "Create _testlang.test1.tester.pot"',
+            'xgettext -L python -d gui -o {0:s}/.locales/gui/_testlang.test1.tester.pot {0:s}/testdata/testlang/test1/tester.py'.format(
+                os.getcwd())
+        ]
+
+        self.assertNotEqual(_parser, None, "_parser: None")
+        self.assertEqual(_check1, True, "_check1 != True")
+        self.assertEqual(_check2, True, "_check2 != True")
+        self.assertEqual(_parser.length, 4, "_parser.length != 4")
+        self.assertListEqual(_lines, _parser.script_line)
+        return
+
+    # noinspection PyUnresolvedReferences
+    def test_generate_02(self):
+        _locales = full_path("tests/locales")
+
+        _root = full_path("{0:s}/testdata".format(os.getcwd()))
+        sys.path.append(_root)
+
+        _package = full_path("{0:s}/testlang".format(_root))
+
+        _parser = Parser()
+        _check1 = _parser.setup(locales=_locales,
+                                windows=True,
+                                module="testlang",
+                                filter="testlang.test1",
+                                package_path=_package)
+
+        _check2 = _parser.parse()
+        _parser.generate()
+
+        _lines = [
+            'echo Create _testlang.test1.pot',
+            'xgettext.exe -L python -d gui -o {0:s}/.locales/gui/_testlang.test1.pot {0:s}/testdata/testlang/test1/__init__.py'.format(
+                os.getcwd()),
+            'echo Create _testlang.test1.tester.pot',
+            'xgettext.exe -L python -d gui -o {0:s}/.locales/gui/_testlang.test1.tester.pot {0:s}/testdata/testlang/test1/tester.py'.format(
+                os.getcwd())
+        ]
+
+        self.assertNotEqual(_parser, None, "_parser: None")
+        self.assertEqual(_check1, True, "_check1 != True")
+        self.assertEqual(_check2, True, "_check2 != True")
+        self.assertEqual(_parser.length, 4, "_parser.length != 4")
+        self.assertListEqual(_lines, _parser.script_line)
+        return

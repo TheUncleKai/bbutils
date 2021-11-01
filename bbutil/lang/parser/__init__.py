@@ -181,10 +181,6 @@ class Parser(object):
 
     def generate(self):
         for _file in self._python_files:
-            _check = _file.prepare()
-            if _check is False:
-                continue
-
             _pot = os.path.basename(_file.pot)
 
             if self._is_windows is True:

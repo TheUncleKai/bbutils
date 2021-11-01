@@ -197,7 +197,9 @@
                 "test_setup_02",
                 "test_parse_01",
                 "test_parse_02",
-                "test_parse_03"
+                "test_parse_03",
+                "test_generate_01",
+                "test_generate_02"
             ]
         },
         {

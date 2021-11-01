@@ -49,12 +49,12 @@ class PythonFile(object):
                  locales: str = ".locales"):
 
         self._package_path: str = package_path
-        self._fullname: str = filename
         self._basename: str = os.path.basename(filename).replace(".py", "")
         self._module: str = module
         self._module_filter: str = module_filter
         self._locales: str = locales
 
+        self.fullname: str = filename
         self.domain: str = ""
         self.classname: str = ""
         self.pot: str = ""
@@ -65,7 +65,7 @@ class PythonFile(object):
 
         _root = full_path("{0:s}/".format(self._package_path))
         _root = "{0:s}{1:s}".format(_root, os.path.sep)
-        _filename = self._fullname.replace(_root, "")
+        _filename = self.fullname.replace(_root, "")
 
         module_path = _filename.replace(".py", "")
         module_path = module_path.replace(os.path.sep, ".")
