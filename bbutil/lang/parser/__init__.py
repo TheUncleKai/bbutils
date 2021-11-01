@@ -17,9 +17,8 @@
 #
 
 import os.path
-import io
 
-from typing import Optional, List
+from typing import Optional, List, TextIO
 
 from bbutil.lang.parser.domain import Domain
 from bbutil.lang.parser.language import Languages
@@ -51,7 +50,6 @@ class Parser(object):
         self._ext: str = ""
         self._echo: str = '"'
         self._is_windows: bool = False
-        self._f: Optional[io.TextIOBase] = None
 
         self._root_path: str = os.getcwd()
         self._package_path: str = os.getcwd()
@@ -252,8 +250,7 @@ class Parser(object):
                 script_line.append(_command)
         return script_line
 
-    def _open(self, filename: str) -> bool:
-
+    def _open(self, filename: str) -> Optional[TextIO]:
         if self._is_windows is True:
             script_ext = ".cmd"
             first_line = "@echo off\n"
@@ -267,12 +264,53 @@ class Parser(object):
             f = open(_filename, "w")
         except IOError as e:
             log.exception(e)
-            return False
+            return None
 
         f.write(first_line)
 
         log.inform("Open", _filename)
+        return f
+
+    @staticmethod
+    def _write(f: TextIO, lines: List[str]):
+        for _item in lines:
+            data = "{0:s}\n".format(_item)
+            f.write(data)
+        return
+
+    def store_generate(self) -> bool:
+        f = self._open("_lang-generate")
+        if f is None:
+            return False
+
+        self._write(f, self.generate())
+        self._write(f, self.merge())
+        f.close()
         return True
 
-    def store(self) -> bool:
+    def store_update(self) -> bool:
+        f = self._open("_lang-update")
+        if f is None:
+            return False
+
+        self._write(f, self.update())
+        f.close()
+        return True
+
+    def store_copy(self) -> bool:
+        f = self._open("_lang-copy")
+        if f is None:
+            return False
+
+        self._write(f, self.copy())
+        f.close()
+        return True
+
+    def store_compile(self) -> bool:
+        f = self._open("_lang-compile")
+        if f is None:
+            return False
+
+        self._write(f, self.compile())
+        f.close()
         return True
