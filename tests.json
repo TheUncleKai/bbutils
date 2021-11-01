@@ -207,7 +207,12 @@
                 "test_update_01",
                 "test_update_02",
                 "test_compile_01",
-                "test_compile_02"
+                "test_compile_02",
+                "test_store_generate_01",
+                "test_store_generate_02",
+                "test_store_generate_03",
+                "test_store_update_01",
+                "test_store_update_02"
             ]
         },
         {
