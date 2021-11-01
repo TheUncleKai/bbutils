@@ -201,7 +201,8 @@
                 "test_generate_01",
                 "test_generate_02",
                 "test_merge_01",
-                "test_merge_02"
+                "test_merge_02",
+                "test_copy_01"
             ]
         },
         {
