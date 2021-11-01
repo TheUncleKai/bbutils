@@ -17,6 +17,7 @@
 #
 
 __all__ = [
+    "domain",
     "lang",
     "parse",
     "pyfile"

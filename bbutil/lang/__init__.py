@@ -18,66 +18,20 @@
 
 import os
 import os.path
-import gettext
 
-from typing import Dict, Optional, Any, List
+from typing import Dict, Optional, Any
+
+from bbutil.lang.domain import Domain
 
 __all__ = [
     "parser",
-    "pyfile",
 
-    "Domain",
+    "domain",
+
     "Lang"
 ]
 
 lang_domain = None
-
-
-class Domain(object):
-
-    def __init__(self, localedir: str, domain: str, use_dummy: bool, ignore, used_lang: str):
-        self.localedir: str = localedir
-        self.domain: str = domain
-        self.gettext: Optional[gettext.translation] = None
-        self.lang = None
-        self.is_set: bool = False
-        self.ignore = ignore
-        self.callback: List[Any] = []
-        self.used_lang: str = used_lang
-        self.use_dummy: bool = use_dummy
-        return
-
-    @staticmethod
-    def _dummy(text: str):
-        return text
-
-    def create(self):
-        if self.is_set is True:
-            return
-
-        if self.ignore is not None:
-            self.use_dummy = True
-
-        if self.use_dummy is True:
-            self.lang = self._dummy
-            self.is_set = True
-            return
-
-        used_catalog = [
-            self.used_lang
-        ]
-
-        self.gettext = gettext.translation(self.domain, localedir=self.localedir, languages=used_catalog)
-        self.gettext.install()
-
-        self.lang = self.gettext.gettext
-        self.is_set = True
-        return
-
-    def load(self):
-        for _callback in self.callback:
-            _callback(self.lang)
-        return
 
 
 class Lang(object):
@@ -115,18 +69,18 @@ class Lang(object):
         self.is_setup = True
         return True
 
-    def _get_domain(self, domain: str) -> Optional[Domain]:
+    def _get_domain(self, domain_name: str) -> Optional[Domain]:
 
         try:
-            _domain = self.domains[domain]
+            _domain = self.domains[domain_name]
         except KeyError:
             return None
 
         return _domain
 
-    def _create_domain(self, domain: str) -> Domain:
+    def _create_domain(self, domain_name: str) -> Domain:
         _domain = Domain(localedir=self.localedir,
-                         domain=domain,
+                         domain=domain_name,
                          use_dummy=self.use_dummy,
                          ignore=self.ignore,
                          used_lang=self.used_lang)
@@ -144,11 +98,11 @@ class Lang(object):
             _domain.load()
         return
 
-    def add(self, domain: str, callback: Any = None):
+    def add(self, domain_name: str, callback: Any = None):
 
-        _domain = self._get_domain(domain)
+        _domain = self._get_domain(domain_name)
         if _domain is None:
-            _domain = self._create_domain(domain)
+            _domain = self._create_domain(domain_name)
             _domain.create()
 
         _domain.callback.append(callback)

@@ -173,7 +173,7 @@
         },
         {
             "id": "Lang.Domain",
-            "path": "tests.lang.lang",
+            "path": "tests.lang.domain",
             "classname": "TestDomain",
             "tests": [
                 "test_constructor_01",

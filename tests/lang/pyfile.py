@@ -17,6 +17,7 @@
 #
 import os
 import unittest
+import sys
 
 import bbutil.lang.parser.pyfile
 
@@ -68,10 +69,13 @@ class TestPythonFile(unittest.TestCase):
         return
 
     def test_create_01(self):
-        _root = full_path("{0:s}/testlang".format(os.getcwd()))
+
+        _root = full_path("{0:s}/testdata".format(os.getcwd()))
         _filename = full_path("{0:s}/test1/__init__.py".format(_root))
         _locales = full_path("{0:s}/.locales".format(_root))
         _module = "testlang"
+
+        sys.path.append(_root)
 
         _pyfile = PythonFile(root_path=_root,
                              filename=_filename,
@@ -82,8 +86,8 @@ class TestPythonFile(unittest.TestCase):
 
         self.assertNotEqual(_pyfile, None, "_pyfile: None")
         self.assertEqual(_check1, True, "_check != True")
-        self.assertEqual(_pyfile.path, '/home/raphahk/projekte/bbutils/testlang/.locales/gui')
-        self.assertEqual(_pyfile.pot, '/home/raphahk/projekte/bbutils/testlang/.locales/gui/_testlang.test1.pot')
+        self.assertEqual(_pyfile.path, '/home/raphahk/projekte/bbutils/testdata/.locales/gui')
+        self.assertEqual(_pyfile.pot, '/home/raphahk/projekte/bbutils/testdata/.locales/gui/_testlang.test1.pot')
         self.assertEqual(_pyfile.domain, 'gui')
         self.assertEqual(_pyfile.classname, 'testlang.test1')
         return
