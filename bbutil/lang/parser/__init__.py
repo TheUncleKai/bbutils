@@ -62,15 +62,15 @@ class Parser(object):
 
         self._ext: str = ""
         self._echo: str = '"'
-        self._is_windows: bool = False
 
+        self.is_windows: bool = False
         self.root_path: str = os.getcwd()
-        self._package_path: str = os.getcwd()
-        self._module: str = ""
-        self._module_filter: str = ""
+        self.package_path: str = os.getcwd()
+        self.module: str = ""
+        self.module_filter: str = ""
 
-        self._script: List[str] = []
-        self._locales: str = ""
+        self.script: List[str] = []
+        self.locales: str = ""
 
         self._python_files: List[PythonFile] = []
         self._domains: List[Domain] = []
@@ -132,32 +132,32 @@ class Parser(object):
 
         item = kwargs.get("package_path", None)
         if item is not None:
-            self._package_path = item
+            self.package_path = item
 
         item = kwargs.get("locales", None)
         if item is not None:
-            self._locales = item
+            self.locales = item
 
         item = kwargs.get("module", None)
         if item is not None:
-            self._module = item
+            self.module = item
 
         item = kwargs.get("filter", None)
         if item is not None:
-            self._module_filter = item
+            self.module_filter = item
 
         item = kwargs.get("windows", None)
         if item is not None:
             if item is True:
-                self._is_windows = item
+                self.is_windows = item
                 self._ext = ".exe"
                 self._echo = ""
 
         item = kwargs.get("script", None)
         if item is not None:
-            self._script = item
+            self.script = item
 
-        if (self._module == "") or (self._locales == ""):
+        if (self.module == "") or (self.locales == ""):
             log.error("Need module name or locales path!")
             return False
 
@@ -187,8 +187,8 @@ class Parser(object):
     def _parse_package(self) -> bool:
         file_list = []
 
-        log.inform("Check", self._package_path)
-        for root, dirs, files in os.walk(self._package_path, topdown=True):
+        log.inform("Check", self.package_path)
+        for root, dirs, files in os.walk(self.package_path, topdown=True):
             for name in files:
                 _filename = full_path("{0:s}/{1:s}".format(root, name))
                 if "__pycache__" in _filename:
@@ -197,12 +197,12 @@ class Parser(object):
 
         for _filename in file_list:
             log.debug2("Parse", _filename)
-            _info = "Module: {0:s}, Filter: {1:s}".format(self._module, self._module_filter)
+            _info = "Module: {0:s}, Filter: {1:s}".format(self.module, self.module_filter)
             log.debug2("Debug", _info)
-            _file = PythonFile(package_path=self._package_path,
+            _file = PythonFile(package_path=self.package_path,
                                filename=_filename,
-                               module=self._module,
-                               module_filter=self._module_filter)
+                               module=self.module,
+                               module_filter=self.module_filter)
             check = _file.create()
             if check is False:
                 continue
@@ -213,8 +213,8 @@ class Parser(object):
     def parse(self) -> bool:
         os.environ["IGNORE_GETTEXT"] = "True"
 
-        if self._script != "":
-            for _item in self._script:
+        if self.script != "":
+            for _item in self.script:
                 _file = full_path(_item)
 
                 _check = self._parse_script(_file)
@@ -228,8 +228,8 @@ class Parser(object):
             if _domain is None:
                 _domain = Domain(root_path=self.root_path, domain=_file.domain)
                 _domain.files.append(_file)
-                _domain.lang.append(Languages(self._locales, 'en', _domain.domain))
-                _domain.lang.append(Languages(self._locales, 'de', _domain.domain))
+                _domain.lang.append(Languages(self.locales, 'en', _domain.domain))
+                _domain.lang.append(Languages(self.locales, 'de', _domain.domain))
                 self._domains.append(_domain)
             else:
                 _domain.files.append(_file)
@@ -273,7 +273,7 @@ class Parser(object):
             for _lang in _domain.lang:
                 _comment = 'echo {2:s}Update {0:s}/{1:s}{2:s}'.format(_lang.lang, _domain.domain, self._echo)
 
-                if self._is_windows is True:
+                if self.is_windows is True:
                     _command = "copy {0:s} {1:s}".format(_domain.pot, _lang.po)
                 else:
                     _command = "cp {0:s} {1:s}".format(_domain.pot, _lang.po)
@@ -306,7 +306,7 @@ class Parser(object):
         return script_line
 
     def _open(self, filename: str) -> Optional[TextIO]:
-        if self._is_windows is True:
+        if self.is_windows is True:
             script_ext = ".cmd"
             first_line = "@echo off\n"
         else:
