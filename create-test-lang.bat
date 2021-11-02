@@ -8,6 +8,7 @@ SET MO_DE=tests\locales\de\LC_MESSAGES\test.mo
 
 SET TEST_POT=tests\locales\test.pot
 
+
 xgettext -L python -d test -o tests\locales\test1.pot testdata\testlang\test1\__init__.py
 xgettext -L python -d test -o tests\locales\tester.pot testdata\testlang\test1\tester.py
 
