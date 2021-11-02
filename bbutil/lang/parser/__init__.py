@@ -198,7 +198,7 @@ class Parser(object):
                     continue
                 file_list.append(_filename)
 
-        for _filename in file_list:
+        for _filename in sorted(file_list):
             log.debug2("Parse", _filename)
             _info = "Module: {0:s}, Filter: {1:s}".format(self.module, self.module_filter)
             log.debug2("Debug", _info)
