@@ -263,7 +263,7 @@ class TestParser(unittest.TestCase):
         return
 
     @staticmethod
-    def _create_test_list(command: str, is_windows: bool = False, newline: bool = False) -> list:
+    def _create_test_list(command: str, is_windows: bool = False, newline: bool = False, script: bool = False) -> list:
         _root = os.getcwd()
 
         _ext = ""
@@ -281,7 +281,14 @@ class TestParser(unittest.TestCase):
         if newline is True:
             _newline = "\n"
 
+        _testos1_py = full_path("{0:s}/testdata/testos1.py".format(_root))
+        _testos2_py = full_path("{0:s}/testdata/testos2.py".format(_root))
+
+        _testos1_pot = full_path("{0:s}/.locales/gui/_testos1.pot".format(_root))
+        _testos2_pot = full_path("{0:s}/.locales/gui/_testos2.pot".format(_root))
+
         _file1_pot = full_path("{0:s}/.locales/gui/_testlang.test1.pot".format(_root))
+
         _file1_py = full_path("{0:s}/testdata/testlang/test1/__init__.py".format(_root))
 
         _file2_pot = full_path("{0:s}/.locales/gui/_testlang.test1.tester.pot".format(_root))
@@ -295,22 +302,71 @@ class TestParser(unittest.TestCase):
         _mo_en = full_path("{0:s}/tests/locales/en/LC_MESSAGES/gui.mo".format(_root))
         _mo_de = full_path("{0:s}/tests/locales/de/LC_MESSAGES/gui.mo".format(_root))
 
+        _file1_basename_pot = os.path.basename(_file1_pot)
+        _file2_basename_pot = os.path.basename(_file2_pot)
+        _testos1_basename_pot = os.path.basename(_testos1_pot)
+        _testos2_basename_pot = os.path.basename(_testos2_pot)
+        _domain_basename_pot = os.path.basename(_domain_pot)
+
         _ret = []
 
         if newline is True:
             _ret.append(_first_line)
 
         if command == "generate":
-            _ret.append('echo {0:s}Create _testlang.test1.pot{0:s}{1:s}'.format(_echo, _newline))
-            _ret.append('xgettext{0:s} -L python -d gui -o {1:s} {2:s}{3:s}'.format(_ext, _file1_pot, _file1_py,
-                                                                                    _newline))
-            _ret.append('echo {0:s}Create _testlang.test1.tester.pot{0:s}{1:s}'.format(_echo, _newline))
-            _ret.append('xgettext{0:s} -L python -d gui -o {1:s} {2:s}{3:s}'.format(_ext, _file2_pot, _file2_py,
+            if script is True:
+                _ret.append('echo {0:s}Create {1:s}{0:s}{2:s}'.format(_echo,
+                                                                      _testos1_basename_pot,
+                                                                      _newline))
+                _ret.append('xgettext{0:s} -L python -d gui -o {1:s} {2:s}{3:s}'.format(_ext,
+                                                                                        _testos1_pot,
+                                                                                        _testos1_py,
+                                                                                        _newline))
+
+                _ret.append('echo {0:s}Create {1:s}{0:s}{2:s}'.format(_echo,
+                                                                      _testos2_basename_pot,
+                                                                      _newline))
+                _ret.append('xgettext{0:s} -L python -d gui -o {1:s} {2:s}{3:s}'.format(_ext,
+                                                                                        _testos2_pot,
+                                                                                        _testos2_py,
+                                                                                        _newline))
+
+            _ret.append('echo {0:s}Create {1:s}{0:s}{2:s}'.format(_echo,
+                                                                  _file1_basename_pot,
+                                                                  _newline))
+
+            _ret.append('xgettext{0:s} -L python -d gui -o {1:s} {2:s}{3:s}'.format(_ext,
+                                                                                    _file1_pot,
+                                                                                    _file1_py,
                                                                                     _newline))
 
-            _ret.append('echo {0:s}Merge gui.pot{0:s}{1:s}'.format(_echo, _newline))
-            _ret.append('msgcat{0:s} {1:s} {2:s} -o {3:s}{4:s}'.format(_ext, _file1_pot, _file2_pot,
-                                                                       _domain_pot, _newline))
+            _ret.append('echo {0:s}Create {1:s}{0:s}{2:s}'.format(_echo,
+                                                                  _file2_basename_pot,
+                                                                  _newline))
+
+            _ret.append('xgettext{0:s} -L python -d gui -o {1:s} {2:s}{3:s}'.format(_ext,
+                                                                                    _file2_pot,
+                                                                                    _file2_py,
+                                                                                    _newline))
+
+            _ret.append('echo {0:s}Merge {1:s}{0:s}{2:s}'.format(_echo,
+                                                                 _domain_basename_pot,
+                                                                 _newline))
+
+            if script is True:
+                _ret.append('msgcat{0:s} {1:s} {2:s} {3:s} {4:s} -o {5:s}{6:s}'.format(_ext,
+                                                                                       _testos1_pot,
+                                                                                       _testos2_pot,
+                                                                                       _file1_pot,
+                                                                                       _file2_pot,
+                                                                                       _domain_pot,
+                                                                                       _newline))
+            else:
+                _ret.append('msgcat{0:s} {1:s} {2:s} -o {3:s}{4:s}'.format(_ext,
+                                                                           _file1_pot,
+                                                                           _file2_pot,
+                                                                           _domain_pot,
+                                                                           _newline))
 
         if command == "copy":
             _ret.append('echo {0:s}Update en/gui{0:s}{1:s}'.format(_echo, _newline))
@@ -842,8 +898,8 @@ class TestParser(unittest.TestCase):
         _testdata = full_path("{0:s}/testdata".format(_root))
         sys.path.append(_testdata)
 
-        _script1 = full_path("{0:s}/testos1.py".format(_root))
-        _script2 = full_path("{0:s}/testos2.py".format(_root))
+        _script1 = full_path("{0:s}/testos1.py".format(_testdata))
+        _script2 = full_path("{0:s}/testos2.py".format(_testdata))
 
         _scripts = [
             _script1,
@@ -851,6 +907,7 @@ class TestParser(unittest.TestCase):
         ]
 
         _package = full_path("{0:s}/testlang".format(_testdata))
+        _scriptline = "{0:s},{1:s}".format(_script1, _script2)
 
         _args = [
             "-r", _root,
@@ -858,6 +915,7 @@ class TestParser(unittest.TestCase):
             "-l", _locales,
             "-m", "testlang",
             "-f", "testlang.test1",
+            "-s", _scriptline,
             "-v", "3"
         ]
 
@@ -870,7 +928,7 @@ class TestParser(unittest.TestCase):
         _check5 = _parser.store(command=Command.copy)
         _check6 = _parser.store(command=Command.compile)
 
-        _list_generate = self._create_test_list(command="generate", is_windows=False, newline=True)
+        _list_generate = self._create_test_list(command="generate", is_windows=False, newline=True, script=True)
         _list_update = self._create_test_list(command="update", is_windows=False, newline=True)
         _list_copy = self._create_test_list(command="copy", is_windows=False, newline=True)
         _list_compile = self._create_test_list(command="compile", is_windows=False, newline=True)
