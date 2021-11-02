@@ -55,6 +55,10 @@ class Command(Enum):
     compile = "Compile"
 
 
+def sort_files(python_file: PythonFile):
+    return python_file.basename
+
+
 class Parser(object):
 
     def __init__(self):
@@ -222,7 +226,7 @@ class Parser(object):
 
         self._parse_package()
 
-        for _file in self._python_files:
+        for _file in sorted(self._python_files, key=sort_files):
             _domain = self.get_domain(_file.domain)
             if _domain is None:
                 _domain = Domain(root_path=self.root_path, domain=_file.domain)

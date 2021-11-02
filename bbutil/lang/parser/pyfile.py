@@ -41,6 +41,10 @@ class PythonFile(object):
     def __repr__(self):
         return self._basename
 
+    @property
+    def basename(self) -> str:
+        return self._basename
+
     def __init__(self,
                  package_path: str,
                  filename: str,
