@@ -62,6 +62,7 @@ class Parser(object):
 
         self._ext: str = ""
         self._echo: str = '"'
+        self.log: Optional[Logging] = None
 
         self.is_windows: bool = False
         self.root_path: str = os.getcwd()
@@ -82,7 +83,7 @@ class Parser(object):
     def file_number(self) -> int:
         return len(self._python_files)
 
-    def init(self) -> bool:
+    def init(self, args: list) -> bool:
         _argument_parser = ArgumentParser()
 
         _argument_parser.add_argument("-r", "--rootpath", help="root path", type=str, default=os.getcwd())
@@ -94,14 +95,10 @@ class Parser(object):
         _argument_parser.add_argument("-w", "--windows", help="used on windows", action='store_true')
 
         _argument_parser.add_argument("-s", "--script", help="script names seperated by comma", type=str)
-        _argument_parser.add_argument("-v", "--verbose", help="increase output verbosity", type=int, default=0,
-                                      choices=[0, 1, 2, 3])
+        _argument_parser.add_argument("-v", "--verbose", help="increase output verbosity", type=int,
+                                      choices=[0, 1, 2, 3], default=0)
 
-        options = _argument_parser.parse_args()
-
-        if options.module is None:
-            log.error("Module name is missing!")
-            return False
+        options = _argument_parser.parse_args(args)
 
         _scripts = []
 
@@ -121,8 +118,10 @@ class Parser(object):
         if check is False:
             return False
 
-        log.setup(level=options.verbose)
+        if options.verbose is not None:
+            log.setup(level=options.verbose)
 
+        self.log = log
         return True
 
     def setup(self, **kwargs) -> bool:

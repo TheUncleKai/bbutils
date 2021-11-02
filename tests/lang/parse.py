@@ -55,13 +55,13 @@ class TestParser(unittest.TestCase):
 
     @staticmethod
     def set_log() -> Logging:
-        log = Logging()
-        log.setup(app="Test", level=2, index=_index)
+        _log = Logging()
+        _log.setup(app="Test", level=2, index=_index)
 
-        console = log.get_writer("console")
-        log.register(console)
-        log.open()
-        return log
+        console = _log.get_writer("console")
+        _log.register(console)
+        _log.open()
+        return _log
 
     def setUp(self):
         _log = self.set_log()
@@ -73,14 +73,12 @@ class TestParser(unittest.TestCase):
     def tearDown(self):
         return
 
-    # noinspection PyUnresolvedReferences
     def test_constructor_01(self):
         _parser = Parser()
 
         self.assertNotEqual(_parser, None, "_parser: None")
         return
 
-    # noinspection PyUnresolvedReferences
     def test_setup_01(self):
         _parser = Parser()
 
@@ -90,7 +88,6 @@ class TestParser(unittest.TestCase):
         self.assertEqual(_check, False, "_check != False")
         return
 
-    # noinspection PyUnresolvedReferences
     def test_setup_02(self):
         _locales = full_path("tests/locales")
 
@@ -102,7 +99,6 @@ class TestParser(unittest.TestCase):
         self.assertEqual(_check, True, "_check != True")
         return
 
-    # noinspection PyUnresolvedReferences
     def test_setup_03(self):
         _locales = full_path("tests/locales")
 
@@ -129,7 +125,64 @@ class TestParser(unittest.TestCase):
         self.assertEqual(_check, True, "_check != True")
         return
 
-    # noinspection PyUnresolvedReferences
+    def test_init_01(self):
+        _locales = full_path("tests/locales")
+
+        _root = os.getcwd()
+        _testdata = full_path("{0:s}/testdata".format(_root))
+        sys.path.append(_testdata)
+
+        _script = ["test1", "test2"]
+
+        _package = full_path("{0:s}/testlang".format(_testdata))
+
+        _args = [
+            "-r", _root,
+            "-p", _package,
+            "-l", _locales,
+            "-m", "testlang",
+            "-f", "testlang.test1",
+            "-s", "test1,test2",
+            "-v", "3"
+        ]
+
+        _parser = Parser()
+        _check1 = _parser.init(_args)
+
+        self.assertNotEqual(_parser, None, "_parser: None")
+        self.assertEqual(_check1, True, "_check1 != True")
+        self.assertEqual(_parser.root_path, _root)
+        self.assertEqual(_parser.package_path, _package)
+        self.assertEqual(_parser.locales, _locales)
+        self.assertEqual(_parser.module, "testlang")
+        self.assertEqual(_parser.module_filter, "testlang.test1")
+        self.assertEqual(_parser.log.verbose, 3)
+        self.assertListEqual(_parser.script, _script)
+        return
+
+    def test_init_02(self):
+        _locales = full_path("tests/locales")
+
+        _root = os.getcwd()
+        _testdata = full_path("{0:s}/testdata".format(_root))
+        sys.path.append(_testdata)
+
+        _package = full_path("{0:s}/testlang".format(_testdata))
+
+        _args = [
+            "-r", _root,
+            "-p", _package,
+            "-l", _locales,
+            "-f", "testlang.test1"
+        ]
+
+        _parser = Parser()
+        _check1 = _parser.init(_args)
+
+        self.assertNotEqual(_parser, None, "_parser: None")
+        self.assertEqual(_check1, False, "_check1 != False")
+        return
+
     def test_parse_01(self):
         _locales = full_path("tests/locales")
 
@@ -151,7 +204,6 @@ class TestParser(unittest.TestCase):
         self.assertEqual(_check2, True, "_check != True")
         return
 
-    # noinspection PyUnresolvedReferences
     def test_parse_02(self):
         _locales = full_path("tests/locales")
 
@@ -179,7 +231,6 @@ class TestParser(unittest.TestCase):
         self.assertEqual(_check2, True, "_check != True")
         return
 
-    # noinspection PyUnresolvedReferences
     def test_parse_03(self):
         _locales = full_path("tests/locales")
 
@@ -278,7 +329,6 @@ class TestParser(unittest.TestCase):
 
         return _ret
 
-    # noinspection PyUnresolvedReferences
     def test_generate_01(self):
         _locales = full_path("tests/locales")
 
@@ -307,7 +357,6 @@ class TestParser(unittest.TestCase):
         self.assertListEqual(_testlist, _checklist)
         return
 
-    # noinspection PyUnresolvedReferences
     def test_generate_02(self):
         _locales = full_path("tests/locales")
 
@@ -337,7 +386,6 @@ class TestParser(unittest.TestCase):
         self.assertListEqual(_testlist, _checklist)
         return
 
-    # noinspection PyUnresolvedReferences
     def test_copy_01(self):
         _locales = full_path("tests/locales")
 
@@ -366,7 +414,6 @@ class TestParser(unittest.TestCase):
         self.assertListEqual(_testlist, _checklist)
         return
 
-    # noinspection PyUnresolvedReferences
     def test_copy_02(self):
         _locales = full_path("tests/locales")
 
@@ -396,7 +443,6 @@ class TestParser(unittest.TestCase):
         self.assertListEqual(_testlist, _checklist)
         return
 
-    # noinspection PyUnresolvedReferences
     def test_update_01(self):
         _locales = full_path("tests/locales")
 
@@ -425,7 +471,6 @@ class TestParser(unittest.TestCase):
         self.assertListEqual(_testlist, _checklist)
         return
 
-    # noinspection PyUnresolvedReferences
     def test_update_02(self):
         _locales = full_path("tests/locales")
 
@@ -455,7 +500,6 @@ class TestParser(unittest.TestCase):
         self.assertListEqual(_testlist, _checklist)
         return
 
-    # noinspection PyUnresolvedReferences
     def test_compile_01(self):
         _locales = full_path("tests/locales")
 
@@ -484,7 +528,6 @@ class TestParser(unittest.TestCase):
         self.assertListEqual(_testlist, _checklist)
         return
 
-    # noinspection PyUnresolvedReferences
     def test_compile_02(self):
         _locales = full_path("tests/locales")
 
@@ -514,7 +557,6 @@ class TestParser(unittest.TestCase):
         self.assertListEqual(_testlist, _checklist)
         return
 
-    # noinspection PyUnresolvedReferences
     @mock.patch('builtins.open', new=mock_store_01)
     def test_store_01(self):
         _locales = full_path("tests/locales")
@@ -550,7 +592,6 @@ class TestParser(unittest.TestCase):
         self.assertListEqual(_testlist, _arg_list)
         return
 
-    # noinspection PyUnresolvedReferences
     @mock.patch('builtins.open', new=mock_store_02)
     def test_store_02(self):
         _locales = full_path("tests/locales")
@@ -587,7 +628,6 @@ class TestParser(unittest.TestCase):
         self.assertListEqual(_testlist, _arg_list)
         return
 
-    # noinspection PyUnresolvedReferences
     @mock.patch('builtins.open', new=mock_store_03)
     def test_store_03(self):
         _locales = full_path("tests/locales")
@@ -624,7 +664,6 @@ class TestParser(unittest.TestCase):
         self.assertListEqual(_arg_list, _testlist)
         return
 
-    # noinspection PyUnresolvedReferences
     @mock.patch('builtins.open', new=mock_store_04)
     def test_store_04(self):
         _locales = full_path("tests/locales")
@@ -661,7 +700,6 @@ class TestParser(unittest.TestCase):
         self.assertListEqual(_arg_list, _testlist)
         return
 
-    # noinspection PyUnresolvedReferences
     @mock.patch('builtins.open', new=mock_store_05)
     def test_store_05(self):
         _locales = full_path("tests/locales")
@@ -698,7 +736,6 @@ class TestParser(unittest.TestCase):
         self.assertListEqual(_arg_list, _testlist)
         return
 
-    # noinspection PyUnresolvedReferences
     @mock.patch('builtins.open', new=mock_store_06)
     def test_store_06(self):
         _locales = full_path("tests/locales")
@@ -735,7 +772,6 @@ class TestParser(unittest.TestCase):
         self.assertListEqual(_arg_list, _testlist)
         return
 
-    # noinspection PyUnresolvedReferences
     @mock.patch('builtins.open', new=mock_store_07)
     def test_store_07(self):
         _locales = full_path("tests/locales")
@@ -772,7 +808,6 @@ class TestParser(unittest.TestCase):
         self.assertListEqual(_arg_list, _testlist)
         return
 
-    # noinspection PyUnresolvedReferences
     @mock.patch('builtins.open', new=mock_store_08)
     def test_store_08(self):
         _locales = full_path("tests/locales")
@@ -809,7 +844,6 @@ class TestParser(unittest.TestCase):
         self.assertListEqual(_arg_list, _testlist)
         return
 
-    # noinspection PyUnresolvedReferences
     @mock.patch('builtins.open', new=mock_store_09)
     def test_store_09(self):
         _locales = full_path("tests/locales")
