@@ -184,6 +184,71 @@ class TestParser(unittest.TestCase):
         self.assertEqual(_check2, True, "_check != True")
         return
 
+    @staticmethod
+    def _create_test_list(command: str, is_windows: bool = False, newline: bool = False) -> list:
+        _root = os.getcwd()
+
+        _ext = ""
+        _echo = '"'
+        _newline = ""
+        _copy = "cp"
+
+        if is_windows is True:
+            _ext = ".exe"
+            _echo = ""
+            _copy = "copy"
+
+        if newline is True:
+            _newline = "\n"
+
+        _file1_pot = full_path("{0:s}/.locales/gui/_testlang.test1.pot".format(_root))
+        _file1_py = full_path("{0:s}/testdata/testlang/test1/__init__.py".format(_root))
+
+        _file2_pot = full_path("{0:s}/.locales/gui/_testlang.test1.tester.pot".format(_root))
+        _file2_py = full_path("{0:s}/testdata/testlang/test1/tester.py".format(_root))
+
+        _domain_pot = full_path("{0:s}/.locales/gui/gui.pot".format(_root))
+
+        _po_en = full_path("{0:s}/tests/locales/en/LC_MESSAGES/gui.po".format(_root))
+        _po_de = full_path("{0:s}/tests/locales/de/LC_MESSAGES/gui.po".format(_root))
+
+        _mo_en = full_path("{0:s}/tests/locales/en/LC_MESSAGES/gui.mo".format(_root))
+        _mo_de = full_path("{0:s}/tests/locales/de/LC_MESSAGES/gui.mo".format(_root))
+
+        _ret = []
+
+        if command == "generate":
+            _ret.append('echo {0:s}Create _testlang.test1.pot{0:s}{1:s}'.format(_echo, _newline))
+            _ret.append('xgettext{0:s} -L python -d gui -o {1:s} {2:s}{3:s}'.format(_ext, _file1_pot, _file1_py,
+                                                                                    _newline))
+            _ret.append('echo {0:s}Create _testlang.test1.tester.pot{0:s}{1:s}'.format(_echo, _newline))
+            _ret.append('xgettext{0:s} -L python -d gui -o {1:s} {2:s}{3:s}'.format(_ext, _file2_pot, _file2_py,
+                                                                                    _newline))
+
+            _ret.append('echo {0:s}Merge gui.pot{0:s}{1:s}'.format(_echo, _newline))
+            _ret.append('msgcat{0:s} {1:s} {2:s} -o {3:s}{4:s}'.format(_ext, _file1_pot, _file2_pot,
+                                                                       _domain_pot, _newline))
+
+        if command == "copy":
+            _ret.append('echo {0:s}Update en/gui{0:s}{1:s}'.format(_echo, _newline))
+            _ret.append('{0:s} {1:s} {2:s}{3:s}'.format(_copy, _domain_pot, _po_en, _newline))
+            _ret.append('echo {0:s}Update de/gui{0:s}{1:s}'.format(_echo, _newline))
+            _ret.append('{0:s} {1:s} {2:s}{3:s}'.format(_copy, _domain_pot, _po_de, _newline))
+
+        if command == "update":
+            _ret.append('echo {0:s}Update en/gui{0:s}{1:s}'.format(_echo, _newline))
+            _ret.append('msgmerge{0:s} -N -U {1:s} {2:s}{3:s}'.format(_ext, _po_en, _domain_pot, _newline))
+            _ret.append('echo {0:s}Update de/gui{0:s}{1:s}'.format(_echo, _newline))
+            _ret.append('msgmerge{0:s} -N -U {1:s} {2:s}{3:s}'.format(_ext, _po_de, _domain_pot, _newline))
+
+        if command == "compile":
+            _ret.append('echo {0:s}Compile en/gui{0:s}{1:s}'.format(_echo, _newline))
+            _ret.append('msgfmt{0:s} -o {1:s} {2:s}{3:s}'.format(_ext, _mo_en, _po_en, _newline))
+            _ret.append('echo {0:s}Compile de/gui{0:s}{1:s}'.format(_echo, _newline))
+            _ret.append('msgfmt{0:s} -o {1:s} {2:s}{3:s}'.format(_ext, _mo_de, _po_de, _newline))
+
+        return _ret
+
     # noinspection PyUnresolvedReferences
     def test_generate_01(self):
         _locales = full_path("tests/locales")
@@ -204,24 +269,13 @@ class TestParser(unittest.TestCase):
         _checklist = _parser.generate()
         _length = len(_checklist)
 
-        _file1_out = full_path("{0:s}/.locales/gui/_testlang.test1.pot".format(_root))
-        _file1_in = full_path("{0:s}/testdata/testlang/test1/__init__.py".format(_root))
-
-        _file2_out = full_path("{0:s}/.locales/gui/_testlang.test1.tester.pot".format(_root))
-        _file2_in = full_path("{0:s}/testdata/testlang/test1/tester.py".format(_root))
-
-        _lines = [
-            'echo "Create _testlang.test1.pot"',
-            'xgettext -L python -d gui -o {0:s} {1:s}'.format(_file1_out, _file1_in),
-            'echo "Create _testlang.test1.tester.pot"',
-            'xgettext -L python -d gui -o {0:s} {1:s}'.format(_file2_out, _file2_in)
-        ]
+        _testlist = self._create_test_list(command="generate")
 
         self.assertNotEqual(_parser, None, "_parser: None")
         self.assertEqual(_check1, True, "_check1 != True")
         self.assertEqual(_check2, True, "_check2 != True")
-        self.assertEqual(_length, 4, "_parser.length != 4")
-        self.assertListEqual(_lines, _checklist)
+        self.assertEqual(_length, 6, "_parser.length != 6")
+        self.assertListEqual(_testlist, _checklist)
         return
 
     # noinspection PyUnresolvedReferences
@@ -245,97 +299,13 @@ class TestParser(unittest.TestCase):
         _checklist = _parser.generate()
         _length = len(_checklist)
 
-        _file1_out = full_path("{0:s}/.locales/gui/_testlang.test1.pot".format(_root))
-        _file1_in = full_path("{0:s}/testdata/testlang/test1/__init__.py".format(_root))
-
-        _file2_out = full_path("{0:s}/.locales/gui/_testlang.test1.tester.pot".format(_root))
-        _file2_in = full_path("{0:s}/testdata/testlang/test1/tester.py".format(_root))
-
-        _lines = [
-            'echo Create _testlang.test1.pot',
-            'xgettext.exe -L python -d gui -o {0:s} {1:s}'.format(_file1_out, _file1_in),
-            'echo Create _testlang.test1.tester.pot',
-            'xgettext.exe -L python -d gui -o {0:s} {1:s}'.format(_file2_out, _file2_in)
-        ]
+        _testlist = self._create_test_list(command="generate", is_windows=True)
 
         self.assertNotEqual(_parser, None, "_parser: None")
         self.assertEqual(_check1, True, "_check1 != True")
         self.assertEqual(_check2, True, "_check2 != True")
-        self.assertEqual(_length, 4, "_parser.length != 4")
-        self.assertListEqual(_lines, _checklist)
-        return
-
-    # noinspection PyUnresolvedReferences
-    def test_merge_01(self):
-        _locales = full_path("tests/locales")
-
-        _root = os.getcwd()
-        _testdata = full_path("{0:s}/testdata".format(_root))
-        sys.path.append(_testdata)
-
-        _package = full_path("{0:s}/testlang".format(_testdata))
-
-        _parser = Parser()
-        _check1 = _parser.setup(locales=_locales,
-                                module="testlang",
-                                filter="testlang.test1",
-                                package_path=_package)
-
-        _check2 = _parser.parse()
-        _checklist = _parser.merge()
-        _length = len(_checklist)
-
-        _file1_in = full_path("{0:s}/.locales/gui/_testlang.test1.pot".format(_root))
-        _file2_in = full_path("{0:s}/.locales/gui/_testlang.test1.tester.pot".format(_root))
-        _file_out = full_path("{0:s}/.locales/gui/gui.pot".format(_root))
-
-        _lines = [
-            'echo "Merge gui.pot"',
-            'msgcat {0:s} {1:s} -o {2:s}'.format(_file1_in, _file2_in, _file_out)
-        ]
-
-        self.assertNotEqual(_parser, None, "_parser: None")
-        self.assertEqual(_check1, True, "_check1 != True")
-        self.assertEqual(_check2, True, "_check2 != True")
-        self.assertEqual(_length, 2, "_parser.length != 2")
-        self.assertListEqual(_lines, _checklist)
-        return
-
-    # noinspection PyUnresolvedReferences
-    def test_merge_02(self):
-        _locales = full_path("tests/locales")
-
-        _root = os.getcwd()
-        _testdata = full_path("{0:s}/testdata".format(_root))
-        sys.path.append(_testdata)
-
-        _package = full_path("{0:s}/testlang".format(_testdata))
-
-        _parser = Parser()
-        _check1 = _parser.setup(locales=_locales,
-                                windows=True,
-                                module="testlang",
-                                filter="testlang.test1",
-                                package_path=_package)
-
-        _check2 = _parser.parse()
-        _checklist = _parser.merge()
-        _length = len(_checklist)
-
-        _file1_in = full_path("{0:s}/.locales/gui/_testlang.test1.pot".format(_root))
-        _file2_in = full_path("{0:s}/.locales/gui/_testlang.test1.tester.pot".format(_root))
-        _file_out = full_path("{0:s}/.locales/gui/gui.pot".format(_root))
-
-        _lines = [
-            'echo Merge gui.pot',
-            'msgcat.exe {0:s} {1:s} -o {2:s}'.format(_file1_in, _file2_in, _file_out)
-        ]
-
-        self.assertNotEqual(_parser, None, "_parser: None")
-        self.assertEqual(_check1, True, "_check1 != True")
-        self.assertEqual(_check2, True, "_check2 != True")
-        self.assertEqual(_length, 2, "_parser.length != 2")
-        self.assertListEqual(_lines, _checklist)
+        self.assertEqual(_length, 6, "_parser.length != 6")
+        self.assertListEqual(_testlist, _checklist)
         return
 
     # noinspection PyUnresolvedReferences
@@ -358,22 +328,13 @@ class TestParser(unittest.TestCase):
         _checklist = _parser.copy()
         _length = len(_checklist)
 
-        _pot = full_path("{0:s}/.locales/gui/gui.pot".format(_root))
-        _po_en = full_path("{0:s}/tests/locales/en/LC_MESSAGES/gui.po".format(_root))
-        _po_de = full_path("{0:s}/tests/locales/de/LC_MESSAGES/gui.po".format(_root))
-
-        _lines = [
-            'echo "Update en/gui"',
-            'cp {0:s} {1:s}'.format(_pot, _po_en),
-            'echo "Update de/gui"',
-            'cp {0:s} {1:s}'.format(_pot, _po_de)
-        ]
+        _testlist = self._create_test_list(command="copy")
 
         self.assertNotEqual(_parser, None, "_parser: None")
         self.assertEqual(_check1, True, "_check1 != True")
         self.assertEqual(_check2, True, "_check2 != True")
         self.assertEqual(_length, 4, "_parser.length != 4")
-        self.assertListEqual(_lines, _checklist)
+        self.assertListEqual(_testlist, _checklist)
         return
 
     # noinspection PyUnresolvedReferences
@@ -397,22 +358,13 @@ class TestParser(unittest.TestCase):
         _checklist = _parser.copy()
         _length = len(_checklist)
 
-        _pot = full_path("{0:s}/.locales/gui/gui.pot".format(_root))
-        _po_en = full_path("{0:s}/tests/locales/en/LC_MESSAGES/gui.po".format(_root))
-        _po_de = full_path("{0:s}/tests/locales/de/LC_MESSAGES/gui.po".format(_root))
-
-        _lines = [
-            'echo Update en/gui',
-            'copy {0:s} {1:s}'.format(_pot, _po_en),
-            'echo Update de/gui',
-            'copy {0:s} {1:s}'.format(_pot, _po_de)
-        ]
+        _testlist = self._create_test_list(command="copy", is_windows=True)
 
         self.assertNotEqual(_parser, None, "_parser: None")
         self.assertEqual(_check1, True, "_check1 != True")
         self.assertEqual(_check2, True, "_check2 != True")
         self.assertEqual(_length, 4, "_parser.length != 4")
-        self.assertListEqual(_lines, _checklist)
+        self.assertListEqual(_testlist, _checklist)
         return
 
     # noinspection PyUnresolvedReferences
@@ -435,22 +387,13 @@ class TestParser(unittest.TestCase):
         _checklist = _parser.update()
         _length = len(_checklist)
 
-        _pot = full_path("{0:s}/.locales/gui/gui.pot".format(_root))
-        _po_en = full_path("{0:s}/tests/locales/en/LC_MESSAGES/gui.po".format(_root))
-        _po_de = full_path("{0:s}/tests/locales/de/LC_MESSAGES/gui.po".format(_root))
-
-        _lines = [
-            'echo "Update en/gui"',
-            'msgmerge -N -U {0:s} {1:s}'.format(_po_en, _pot),
-            'echo "Update de/gui"',
-            'msgmerge -N -U {0:s} {1:s}'.format(_po_de, _pot),
-        ]
+        _testlist = self._create_test_list(command="update")
 
         self.assertNotEqual(_parser, None, "_parser: None")
         self.assertEqual(_check1, True, "_check1 != True")
         self.assertEqual(_check2, True, "_check2 != True")
         self.assertEqual(_length, 4, "_parser.length != 4")
-        self.assertListEqual(_lines, _checklist)
+        self.assertListEqual(_testlist, _checklist)
         return
 
     # noinspection PyUnresolvedReferences
@@ -474,22 +417,13 @@ class TestParser(unittest.TestCase):
         _checklist = _parser.update()
         _length = len(_checklist)
 
-        _pot = full_path("{0:s}/.locales/gui/gui.pot".format(_root))
-        _po_en = full_path("{0:s}/tests/locales/en/LC_MESSAGES/gui.po".format(_root))
-        _po_de = full_path("{0:s}/tests/locales/de/LC_MESSAGES/gui.po".format(_root))
-
-        _lines = [
-            'echo Update en/gui',
-            'msgmerge.exe -N -U {0:s} {1:s}'.format(_po_en, _pot),
-            'echo Update de/gui',
-            'msgmerge.exe -N -U {0:s} {1:s}'.format(_po_de, _pot),
-        ]
+        _testlist = self._create_test_list(command="update", is_windows=True)
 
         self.assertNotEqual(_parser, None, "_parser: None")
         self.assertEqual(_check1, True, "_check1 != True")
         self.assertEqual(_check2, True, "_check2 != True")
         self.assertEqual(_length, 4, "_parser.length != 4")
-        self.assertListEqual(_lines, _checklist)
+        self.assertListEqual(_testlist, _checklist)
         return
 
     # noinspection PyUnresolvedReferences
@@ -512,23 +446,13 @@ class TestParser(unittest.TestCase):
         _checklist = _parser.compile()
         _length = len(_checklist)
 
-        _po_en = full_path("{0:s}/tests/locales/en/LC_MESSAGES/gui.po".format(_root))
-        _po_de = full_path("{0:s}/tests/locales/de/LC_MESSAGES/gui.po".format(_root))
-        _mo_en = full_path("{0:s}/tests/locales/en/LC_MESSAGES/gui.mo".format(_root))
-        _mo_de = full_path("{0:s}/tests/locales/de/LC_MESSAGES/gui.mo".format(_root))
-
-        _lines = [
-            'echo "Compile en/gui"',
-            'msgfmt -o {0:s} {1:s}'.format(_mo_en, _po_en),
-            'echo "Compile de/gui"',
-            'msgfmt -o {0:s} {1:s}'.format(_mo_de, _po_de),
-        ]
+        _testlist = self._create_test_list(command="compile")
 
         self.assertNotEqual(_parser, None, "_parser: None")
         self.assertEqual(_check1, True, "_check1 != True")
         self.assertEqual(_check2, True, "_check2 != True")
         self.assertEqual(_length, 4, "_parser.length != 4")
-        self.assertListEqual(_lines, _checklist)
+        self.assertListEqual(_testlist, _checklist)
         return
 
     # noinspection PyUnresolvedReferences
@@ -552,23 +476,13 @@ class TestParser(unittest.TestCase):
         _checklist = _parser.compile()
         _length = len(_checklist)
 
-        _po_en = full_path("{0:s}/tests/locales/en/LC_MESSAGES/gui.po".format(_root))
-        _po_de = full_path("{0:s}/tests/locales/de/LC_MESSAGES/gui.po".format(_root))
-        _mo_en = full_path("{0:s}/tests/locales/en/LC_MESSAGES/gui.mo".format(_root))
-        _mo_de = full_path("{0:s}/tests/locales/de/LC_MESSAGES/gui.mo".format(_root))
-
-        _lines = [
-            'echo Compile en/gui',
-            'msgfmt.exe -o {0:s} {1:s}'.format(_mo_en, _po_en),
-            'echo Compile de/gui',
-            'msgfmt.exe -o {0:s} {1:s}'.format(_mo_de, _po_de),
-        ]
+        _testlist = self._create_test_list(command="compile", is_windows=True)
 
         self.assertNotEqual(_parser, None, "_parser: None")
         self.assertEqual(_check1, True, "_check1 != True")
         self.assertEqual(_check2, True, "_check2 != True")
         self.assertEqual(_length, 4, "_parser.length != 4")
-        self.assertListEqual(_lines, _checklist)
+        self.assertListEqual(_testlist, _checklist)
         return
 
     # noinspection PyUnresolvedReferences

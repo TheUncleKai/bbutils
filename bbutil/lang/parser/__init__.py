@@ -19,6 +19,7 @@
 import os.path
 
 from typing import Optional, List, TextIO
+from enum import Enum
 
 from bbutil.lang.parser.domain import Domain
 from bbutil.lang.parser.language import Languages
@@ -42,6 +43,14 @@ def set_log(logging: Logging):
     global log
     log = logging
     return
+
+
+class Command(Enum):
+
+    generate = "Generate"
+    update = "Update"
+    copy = "Copy"
+    compile = "Compile"
 
 
 class Parser(object):
@@ -193,10 +202,7 @@ class Parser(object):
 
             script_line.append(_comment)
             script_line.append(_command)
-        return script_line
 
-    def merge(self):
-        script_line = []
         for _domain in self._domains:
             _pot = os.path.basename(_domain.pot)
 
@@ -278,39 +284,37 @@ class Parser(object):
             f.write(data)
         return
 
-    def store_generate(self) -> bool:
-        f = self._open("_lang-generate")
+    def store(self, command: Command) -> bool:
+        _name = ""
+
+        if command is Command.generate:
+            _name = "_lang-generate"
+
+        if command is Command.update:
+            _name = "_lang-update"
+
+        if command is Command.copy:
+            _name = "_lang-copy"
+
+        if command is Command.compile:
+            _name = "_lang-compile"
+
+        f = self._open(_name)
         if f is None:
             return False
 
-        self._write(f, self.generate())
-        self._write(f, self.merge())
-        f.close()
-        return True
+        if command is Command.generate:
+            self._write(f, self.generate())
+            self._write(f, self.merge())
 
-    def store_update(self) -> bool:
-        f = self._open("_lang-update")
-        if f is None:
-            return False
+        if command is Command.update:
+            self._write(f, self.update())
 
-        self._write(f, self.update())
-        f.close()
-        return True
+        if command is Command.copy:
+            self._write(f, self.copy())
 
-    def store_copy(self) -> bool:
-        f = self._open("_lang-copy")
-        if f is None:
-            return False
+        if command is Command.compile:
+            self._write(f, self.compile())
 
-        self._write(f, self.copy())
-        f.close()
-        return True
-
-    def store_compile(self) -> bool:
-        f = self._open("_lang-compile")
-        if f is None:
-            return False
-
-        self._write(f, self.compile())
         f.close()
         return True
