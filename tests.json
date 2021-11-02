@@ -195,6 +195,7 @@
                 "test_constructor_01",
                 "test_setup_01",
                 "test_setup_02",
+                "test_setup_03",
                 "test_parse_01",
                 "test_parse_02",
                 "test_parse_03",

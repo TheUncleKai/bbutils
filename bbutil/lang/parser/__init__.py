@@ -20,6 +20,7 @@ import os.path
 
 from typing import Optional, List, TextIO
 from enum import Enum
+from argparse import ArgumentParser
 
 from bbutil.lang.parser.domain import Domain
 from bbutil.lang.parser.language import Languages
@@ -57,11 +58,13 @@ class Command(Enum):
 class Parser(object):
 
     def __init__(self):
+        self._argument_parser: ArgumentParser = ArgumentParser()
+
         self._ext: str = ""
         self._echo: str = '"'
         self._is_windows: bool = False
 
-        self._root_path: str = os.getcwd()
+        self.root_path: str = os.getcwd()
         self._package_path: str = os.getcwd()
         self._module: str = ""
         self._module_filter: str = ""
@@ -79,14 +82,61 @@ class Parser(object):
     def file_number(self) -> int:
         return len(self._python_files)
 
+    def init(self) -> bool:
+        _argument_parser = ArgumentParser()
+
+        _argument_parser.add_argument("-r", "--rootpath", help="root path", type=str, default=os.getcwd())
+        _argument_parser.add_argument("-p", "--packagepath", help="package path", type=str, default=os.getcwd())
+        _argument_parser.add_argument("-l", "--locales", help="locales output path", type=str, default="locale")
+
+        _argument_parser.add_argument("-m", "--module", help="module name of package", type=str)
+        _argument_parser.add_argument("-f", "--filter", help="filter for module names", type=str)
+        _argument_parser.add_argument("-w", "--windows", help="used on windows", action='store_true')
+
+        _argument_parser.add_argument("-s", "--script", help="script names seperated by comma", type=str)
+        _argument_parser.add_argument("-v", "--verbose", help="increase output verbosity", type=int, default=0,
+                                      choices=[0, 1, 2, 3])
+
+        options = _argument_parser.parse_args()
+
+        if options.module is None:
+            log.error("Module name is missing!")
+            return False
+
+        _scripts = []
+
+        if options.script is not None:
+            _items = options.script.split(",")
+            for _item in _items:
+                _scripts.append(_item)
+
+        check = self.setup(root_path=options.rootpath,
+                           package_path=options.packagepath,
+                           locales=options.locales,
+                           module=options.module,
+                           filter=options.filter,
+                           script=_scripts,
+                           windows=options.windows)
+
+        if check is False:
+            return False
+
+        log.setup(level=options.verbose)
+
+        return True
+
     def setup(self, **kwargs) -> bool:
         item = kwargs.get("root_path", None)
         if item is not None:
-            self._root_path = item
+            self.root_path = item
 
         item = kwargs.get("package_path", None)
         if item is not None:
             self._package_path = item
+
+        item = kwargs.get("locales", None)
+        if item is not None:
+            self._locales = item
 
         item = kwargs.get("module", None)
         if item is not None:
@@ -106,10 +156,6 @@ class Parser(object):
         item = kwargs.get("script", None)
         if item is not None:
             self._script = item
-
-        item = kwargs.get("locales", None)
-        if item is not None:
-            self._locales = item
 
         if (self._module == "") or (self._locales == ""):
             log.error("Need module name or locales path!")
@@ -165,6 +211,7 @@ class Parser(object):
         return True
 
     def parse(self) -> bool:
+        os.environ["IGNORE_GETTEXT"] = "True"
 
         if self._script != "":
             for _item in self._script:
@@ -179,7 +226,7 @@ class Parser(object):
         for _file in self._python_files:
             _domain = self.get_domain(_file.domain)
             if _domain is None:
-                _domain = Domain(root_path=self._root_path, domain=_file.domain)
+                _domain = Domain(root_path=self.root_path, domain=_file.domain)
                 _domain.files.append(_file)
                 _domain.lang.append(Languages(self._locales, 'en', _domain.domain))
                 _domain.lang.append(Languages(self._locales, 'de', _domain.domain))

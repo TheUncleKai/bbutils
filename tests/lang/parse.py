@@ -103,6 +103,19 @@ class TestParser(unittest.TestCase):
         return
 
     # noinspection PyUnresolvedReferences
+    def test_setup_03(self):
+        _locales = full_path("tests/locales")
+
+        _parser = Parser()
+
+        _check = _parser.setup(locales=_locales, module="tests.example", root_path="Test")
+
+        self.assertNotEqual(_parser, None, "_parser: None")
+        self.assertEqual(_parser.root_path, "Test", "_parser.root_path != Test")
+        self.assertEqual(_check, True, "_check != True")
+        return
+
+    # noinspection PyUnresolvedReferences
     def test_parse_01(self):
         _locales = full_path("tests/locales")
 
