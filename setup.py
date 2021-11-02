@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ import bbutil
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-packages = find_packages(where=".", exclude=["tests", "tests.logging"])
+packages = find_packages(where=".", exclude=["tests", "tests.logging", "tests.lang"])
 
 setup(
     name=bbutil.__name__,
@@ -36,6 +36,7 @@ setup(
     long_description_content_type="text/markdown",
     scripts=[
         'run-tests.py',
+        'make-lang.py'
     ],
     url='https://github.com/TheUncleKai/bbutils',
     packages=packages,
