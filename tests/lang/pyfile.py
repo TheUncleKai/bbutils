@@ -129,3 +129,26 @@ class TestPythonFile(unittest.TestCase):
         self.assertNotEqual(_pyfile, None, "_pyfile: None")
         self.assertEqual(_check1, False, "_check != False")
         return
+
+    def test_create_04(self):
+        _root = os.getcwd()
+        _testdata = full_path("{0:s}/testdata".format(_root))
+        _package = full_path("{0:s}/testlang".format(_root))
+
+        _filename = full_path("{0:s}/testos1.py".format(_testdata))
+        _locales = full_path("{0:s}/.locales".format(_root))
+        sys.path.append(_testdata)
+
+        _pyfile = PythonFile(package_path=_testdata,
+                             filename=_filename,
+                             module="",
+                             locales=_locales)
+        _check1 = _pyfile.create()
+
+        self.assertNotEqual(_pyfile, None, "_pyfile: None")
+        self.assertEqual(_check1, True, "_check != True")
+        self.assertEqual(_pyfile.path, '/home/raphahk/projekte/bbutils/.locales/gui')
+        self.assertEqual(_pyfile.pot, '/home/raphahk/projekte/bbutils/.locales/gui/_testos1.pot')
+        self.assertEqual(_pyfile.domain, 'gui')
+        self.assertEqual(_pyfile.classname, 'testos1')
+        return

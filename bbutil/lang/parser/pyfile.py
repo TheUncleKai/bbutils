@@ -73,7 +73,10 @@ class PythonFile(object):
         if "__init__" in module_path:
             module_path = module_path.replace(".__init__", "")
 
-        self.classname = "{0:s}.{1:s}".format(self._module, module_path)
+        if self._module == "":
+            self.classname = module_path
+        else:
+            self.classname = "{0:s}.{1:s}".format(self._module, module_path)
 
         _info = "{0:s}: {1:s}".format(self._package_path, _filename)
         log.debug3("Parse", _info)
