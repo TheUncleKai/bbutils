@@ -86,8 +86,8 @@ class TestPythonFile(unittest.TestCase):
 
         self.assertNotEqual(_pyfile, None, "_pyfile: None")
         self.assertEqual(_check1, True, "_check != True")
-        self.assertEqual(_pyfile.path, '/home/raphahk/projekte/bbutils/testdata/.locales/gui')
-        self.assertEqual(_pyfile.pot, '/home/raphahk/projekte/bbutils/testdata/.locales/gui/_testlang.test1.pot')
+        self.assertEqual(_pyfile.path, '{0:s}/gui'.format(_locales))
+        self.assertEqual(_pyfile.pot, '{0:s}/gui/_testlang.test1.pot'.format(_locales))
         self.assertEqual(_pyfile.domain, 'gui')
         self.assertEqual(_pyfile.classname, 'testlang.test1')
         return
@@ -147,8 +147,8 @@ class TestPythonFile(unittest.TestCase):
 
         self.assertNotEqual(_pyfile, None, "_pyfile: None")
         self.assertEqual(_check1, True, "_check != True")
-        self.assertEqual(_pyfile.path, '/home/raphahk/projekte/bbutils/.locales/gui')
-        self.assertEqual(_pyfile.pot, '/home/raphahk/projekte/bbutils/.locales/gui/_testos1.pot')
+        self.assertEqual(_pyfile.path, '{0:s}/gui'.format(_locales))
+        self.assertEqual(_pyfile.pot, '{0:s}/gui/_testos1.pot'.format(_locales))
         self.assertEqual(_pyfile.domain, 'gui')
         self.assertEqual(_pyfile.classname, 'testos1')
         return
