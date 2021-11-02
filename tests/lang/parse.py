@@ -106,12 +106,26 @@ class TestParser(unittest.TestCase):
     def test_setup_03(self):
         _locales = full_path("tests/locales")
 
+        _script = ["test1", "test2"]
+
         _parser = Parser()
 
-        _check = _parser.setup(locales=_locales, module="tests.example", root_path="Test")
+        _check = _parser.setup(locales=_locales,
+                               module="tests.example",
+                               root_path="Test",
+                               package_path="Test2",
+                               filter="tests.example2",
+                               script=_script,
+                               windows=True)
 
         self.assertNotEqual(_parser, None, "_parser: None")
         self.assertEqual(_parser.root_path, "Test", "_parser.root_path != Test")
+        self.assertEqual(_parser.package_path, "Test2", "_parser.package_path != Test2")
+        self.assertEqual(_parser.module, "tests.example", "_parser.module != tests.example")
+        self.assertEqual(_parser.module_filter, "tests.example2", "_parser.module_filter != tests.example2")
+        self.assertEqual(_parser.locales, _locales)
+        self.assertListEqual(_parser.script, _script)
+        self.assertTrue(_parser.is_windows)
         self.assertEqual(_check, True, "_check != True")
         return
 
