@@ -23,6 +23,7 @@ import sys
 import bbutil.lang.parser
 import bbutil.lang.parser.pyfile
 
+from unittest.mock import MagicMock
 from bbutil.lang.parser import Parser, Command
 
 from bbutil.utils import full_path
@@ -46,6 +47,8 @@ mock_store_06 = unittest.mock.mock_open()
 mock_store_07 = unittest.mock.mock_open()
 mock_store_08 = unittest.mock.mock_open()
 mock_store_09 = unittest.mock.mock_open()
+
+mock_run = unittest.mock.mock_open()
 
 mock_store_09.side_effect = OSError(5)
 
@@ -329,6 +332,16 @@ class TestParser(unittest.TestCase):
 
         return _ret
 
+    @staticmethod
+    def _get_arg_list(mock_data: MagicMock) -> list:
+        _args = mock_data.return_value.write.call_args_list
+        _arg_list = []
+
+        for _call in _args:
+            _item = _call.args[0]
+            _arg_list.append(_item)
+        return _arg_list
+
     def test_generate_01(self):
         _locales = full_path("tests/locales")
 
@@ -576,13 +589,7 @@ class TestParser(unittest.TestCase):
         _check2 = _parser.parse()
         _check3 = _parser.store(command=Command.generate)
 
-        _args = mock_store_01.return_value.write.call_args_list
-        _arg_list = []
-
-        for _call in _args:
-            _item = _call.args[0]
-            _arg_list.append(_item)
-
+        _arg_list = self._get_arg_list(mock_store_01)
         _testlist = self._create_test_list(command="generate", is_windows=False, newline=True)
 
         self.assertNotEqual(_parser, None, "_parser: None")
@@ -612,13 +619,7 @@ class TestParser(unittest.TestCase):
         _check2 = _parser.parse()
         _check3 = _parser.store(command=Command.generate)
 
-        _args = mock_store_02.return_value.write.call_args_list
-        _arg_list = []
-
-        for _call in _args:
-            _item = _call.args[0]
-            _arg_list.append(_item)
-
+        _arg_list = self._get_arg_list(mock_store_02)
         _testlist = self._create_test_list(command="generate", is_windows=True, newline=True)
 
         self.assertNotEqual(_parser, None, "_parser: None")
@@ -648,13 +649,7 @@ class TestParser(unittest.TestCase):
         _check2 = _parser.parse()
         _check3 = _parser.store(command=Command.update)
 
-        _args = mock_store_03.return_value.write.call_args_list
-        _arg_list = []
-
-        for _call in _args:
-            _item = _call.args[0]
-            _arg_list.append(_item)
-
+        _arg_list = self._get_arg_list(mock_store_03)
         _testlist = self._create_test_list(command="update", is_windows=False, newline=True)
 
         self.assertNotEqual(_parser, None, "_parser: None")
@@ -684,13 +679,7 @@ class TestParser(unittest.TestCase):
         _check2 = _parser.parse()
         _check3 = _parser.store(command=Command.update)
 
-        _args = mock_store_04.return_value.write.call_args_list
-        _arg_list = []
-
-        for _call in _args:
-            _item = _call.args[0]
-            _arg_list.append(_item)
-
+        _arg_list = self._get_arg_list(mock_store_04)
         _testlist = self._create_test_list(command="update", is_windows=True, newline=True)
 
         self.assertNotEqual(_parser, None, "_parser: None")
@@ -720,13 +709,7 @@ class TestParser(unittest.TestCase):
         _check2 = _parser.parse()
         _check3 = _parser.store(command=Command.copy)
 
-        _args = mock_store_05.return_value.write.call_args_list
-        _arg_list = []
-
-        for _call in _args:
-            _item = _call.args[0]
-            _arg_list.append(_item)
-
+        _arg_list = self._get_arg_list(mock_store_05)
         _testlist = self._create_test_list(command="copy", is_windows=False, newline=True)
 
         self.assertNotEqual(_parser, None, "_parser: None")
@@ -756,13 +739,7 @@ class TestParser(unittest.TestCase):
         _check2 = _parser.parse()
         _check3 = _parser.store(command=Command.copy)
 
-        _args = mock_store_06.return_value.write.call_args_list
-        _arg_list = []
-
-        for _call in _args:
-            _item = _call.args[0]
-            _arg_list.append(_item)
-
+        _arg_list = self._get_arg_list(mock_store_06)
         _testlist = self._create_test_list(command="copy", is_windows=True, newline=True)
 
         self.assertNotEqual(_parser, None, "_parser: None")
@@ -792,13 +769,7 @@ class TestParser(unittest.TestCase):
         _check2 = _parser.parse()
         _check3 = _parser.store(command=Command.compile)
 
-        _args = mock_store_07.return_value.write.call_args_list
-        _arg_list = []
-
-        for _call in _args:
-            _item = _call.args[0]
-            _arg_list.append(_item)
-
+        _arg_list = self._get_arg_list(mock_store_07)
         _testlist = self._create_test_list(command="compile", is_windows=False, newline=True)
 
         self.assertNotEqual(_parser, None, "_parser: None")
@@ -828,13 +799,7 @@ class TestParser(unittest.TestCase):
         _check2 = _parser.parse()
         _check3 = _parser.store(command=Command.compile)
 
-        _args = mock_store_08.return_value.write.call_args_list
-        _arg_list = []
-
-        for _call in _args:
-            _item = _call.args[0]
-            _arg_list.append(_item)
-
+        _arg_list = self._get_arg_list(mock_store_08)
         _testlist = self._create_test_list(command="compile", is_windows=True, newline=True)
 
         self.assertNotEqual(_parser, None, "_parser: None")
@@ -867,4 +832,70 @@ class TestParser(unittest.TestCase):
         self.assertEqual(_check1, True, "_check1 != True")
         self.assertEqual(_check2, True, "_check2 != True")
         self.assertEqual(_check3, False, "_check2 != False")
+        return
+
+    @mock.patch('builtins.open', new=mock_run)
+    def test_run_01(self):
+        _locales = full_path("tests/locales")
+
+        _root = os.getcwd()
+        _testdata = full_path("{0:s}/testdata".format(_root))
+        sys.path.append(_testdata)
+
+        _script1 = full_path("{0:s}/testos1.py".format(_root))
+        _script2 = full_path("{0:s}/testos2.py".format(_root))
+
+        _scripts = [
+            _script1,
+            _script2
+        ]
+
+        _package = full_path("{0:s}/testlang".format(_testdata))
+
+        _args = [
+            "-r", _root,
+            "-p", _package,
+            "-l", _locales,
+            "-m", "testlang",
+            "-f", "testlang.test1",
+            "-v", "3"
+        ]
+
+        _parser = Parser()
+        _check1 = _parser.init(_args)
+        _check2 = _parser.parse()
+
+        _check3 = _parser.store(command=Command.generate)
+        _check4 = _parser.store(command=Command.update)
+        _check5 = _parser.store(command=Command.copy)
+        _check6 = _parser.store(command=Command.compile)
+
+        _list_generate = self._create_test_list(command="generate", is_windows=False, newline=True)
+        _list_update = self._create_test_list(command="update", is_windows=False, newline=True)
+        _list_copy = self._create_test_list(command="copy", is_windows=False, newline=True)
+        _list_compile = self._create_test_list(command="compile", is_windows=False, newline=True)
+
+        _all_list = [
+            *_list_generate,
+            *_list_update,
+            *_list_copy,
+            *_list_compile
+        ]
+
+        _arg_list = self._get_arg_list(mock_run)
+
+        self.assertNotEqual(_parser, None, "_parser: None")
+        self.assertEqual(_parser.root_path, _root)
+        self.assertEqual(_parser.package_path, _package)
+        self.assertEqual(_parser.locales, _locales)
+        self.assertEqual(_parser.module, "testlang")
+        self.assertEqual(_parser.module_filter, "testlang.test1")
+        self.assertEqual(_parser.log.verbose, 3)
+        self.assertListEqual(_arg_list, _all_list)
+        self.assertEqual(_check1, True, "_check1 != True")
+        self.assertEqual(_check2, True, "_check2 != True")
+        self.assertEqual(_check2, True, "_check3 != True")
+        self.assertEqual(_check2, True, "_check4 != True")
+        self.assertEqual(_check2, True, "_check5 != True")
+        self.assertEqual(_check2, True, "_check6 != True")
         return
