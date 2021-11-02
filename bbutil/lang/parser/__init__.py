@@ -33,6 +33,7 @@ __all__ = [
     "domain",
     "language",
 
+    "Command",
     "Parser"
 ]
 
@@ -97,9 +98,10 @@ class Parser(object):
 
         item = kwargs.get("windows", None)
         if item is not None:
-            self._is_windows = item
-            self._ext = ".exe"
-            self._echo = ""
+            if item is True:
+                self._is_windows = item
+                self._ext = ".exe"
+                self._echo = ""
 
         item = kwargs.get("script", None)
         if item is not None:
@@ -305,7 +307,6 @@ class Parser(object):
 
         if command is Command.generate:
             self._write(f, self.generate())
-            self._write(f, self.merge())
 
         if command is Command.update:
             self._write(f, self.update())

@@ -23,7 +23,7 @@ import sys
 import bbutil.lang.parser
 import bbutil.lang.parser.pyfile
 
-from bbutil.lang.parser import Parser
+from bbutil.lang.parser import Parser, Command
 
 from bbutil.utils import full_path
 
@@ -37,20 +37,17 @@ _index = {
 }
 
 
-mock_store_generate_01 = unittest.mock.mock_open()
-mock_store_generate_02 = unittest.mock.mock_open()
-mock_store_generate_03 = unittest.mock.mock_open()
-mock_store_update_01 = unittest.mock.mock_open()
-mock_store_update_02 = unittest.mock.mock_open()
-mock_store_copy_01 = unittest.mock.mock_open()
-mock_store_copy_02 = unittest.mock.mock_open()
-mock_store_compile_01 = unittest.mock.mock_open()
-mock_store_compile_02 = unittest.mock.mock_open()
+mock_store_01 = unittest.mock.mock_open()
+mock_store_02 = unittest.mock.mock_open()
+mock_store_03 = unittest.mock.mock_open()
+mock_store_04 = unittest.mock.mock_open()
+mock_store_05 = unittest.mock.mock_open()
+mock_store_06 = unittest.mock.mock_open()
+mock_store_07 = unittest.mock.mock_open()
+mock_store_08 = unittest.mock.mock_open()
+mock_store_09 = unittest.mock.mock_open()
 
-mock_store_generate_03.side_effect = OSError(5)
-mock_store_update_02.side_effect = OSError(5)
-mock_store_copy_02.side_effect = OSError(5)
-mock_store_compile_02.side_effect = OSError(5)
+mock_store_09.side_effect = OSError(5)
 
 
 class TestParser(unittest.TestCase):
@@ -192,11 +189,13 @@ class TestParser(unittest.TestCase):
         _echo = '"'
         _newline = ""
         _copy = "cp"
+        _first_line = "#!/bin/bash\n"
 
         if is_windows is True:
             _ext = ".exe"
             _echo = ""
             _copy = "copy"
+            _first_line = "@echo off\n"
 
         if newline is True:
             _newline = "\n"
@@ -216,6 +215,9 @@ class TestParser(unittest.TestCase):
         _mo_de = full_path("{0:s}/tests/locales/de/LC_MESSAGES/gui.mo".format(_root))
 
         _ret = []
+
+        if newline is True:
+            _ret.append(_first_line)
 
         if command == "generate":
             _ret.append('echo {0:s}Create _testlang.test1.pot{0:s}{1:s}'.format(_echo, _newline))
@@ -486,8 +488,8 @@ class TestParser(unittest.TestCase):
         return
 
     # noinspection PyUnresolvedReferences
-    @mock.patch('builtins.open', new=mock_store_generate_01)
-    def test_store_generate_01(self):
+    @mock.patch('builtins.open', new=mock_store_01)
+    def test_store_01(self):
         _locales = full_path("tests/locales")
 
         _root = os.getcwd()
@@ -503,44 +505,27 @@ class TestParser(unittest.TestCase):
                                 package_path=_package)
 
         _check2 = _parser.parse()
+        _check3 = _parser.store(command=Command.generate)
 
-        _file1_out = full_path("{0:s}/.locales/gui/_testlang.test1.pot".format(_root))
-        _file1_in = full_path("{0:s}/testdata/testlang/test1/__init__.py".format(_root))
-
-        _file2_out = full_path("{0:s}/.locales/gui/_testlang.test1.tester.pot".format(_root))
-        _file2_in = full_path("{0:s}/testdata/testlang/test1/tester.py".format(_root))
-
-        _file_out = full_path("{0:s}/.locales/gui/gui.pot".format(_root))
-
-        _check3 = _parser.store_generate()
-
-        _args = mock_store_generate_01.return_value.write.call_args_list
+        _args = mock_store_01.return_value.write.call_args_list
         _arg_list = []
 
         for _call in _args:
             _item = _call.args[0]
             _arg_list.append(_item)
 
-        _lines = [
-            '#!/bin/bash\n',
-            'echo "Create _testlang.test1.pot"\n',
-            'xgettext -L python -d gui -o {0:s} {1:s}\n'.format(_file1_out, _file1_in),
-            'echo "Create _testlang.test1.tester.pot"\n',
-            'xgettext -L python -d gui -o {0:s} {1:s}\n'.format(_file2_out, _file2_in),
-            'echo "Merge gui.pot"\n',
-            'msgcat {0:s} {1:s} -o {2:s}\n'.format(_file1_out, _file2_out, _file_out)
-        ]
+        _testlist = self._create_test_list(command="generate", is_windows=False, newline=True)
 
         self.assertNotEqual(_parser, None, "_parser: None")
         self.assertEqual(_check1, True, "_check1 != True")
         self.assertEqual(_check2, True, "_check2 != True")
         self.assertEqual(_check3, True, "_check2 != True")
-        self.assertListEqual(_lines, _arg_list)
+        self.assertListEqual(_testlist, _arg_list)
         return
 
     # noinspection PyUnresolvedReferences
-    @mock.patch('builtins.open', new=mock_store_generate_02)
-    def test_store_generate_02(self):
+    @mock.patch('builtins.open', new=mock_store_02)
+    def test_store_02(self):
         _locales = full_path("tests/locales")
 
         _root = os.getcwd()
@@ -557,44 +542,27 @@ class TestParser(unittest.TestCase):
                                 package_path=_package)
 
         _check2 = _parser.parse()
+        _check3 = _parser.store(command=Command.generate)
 
-        _file1_out = full_path("{0:s}/.locales/gui/_testlang.test1.pot".format(_root))
-        _file1_in = full_path("{0:s}/testdata/testlang/test1/__init__.py".format(_root))
-
-        _file2_out = full_path("{0:s}/.locales/gui/_testlang.test1.tester.pot".format(_root))
-        _file2_in = full_path("{0:s}/testdata/testlang/test1/tester.py".format(_root))
-
-        _file_out = full_path("{0:s}/.locales/gui/gui.pot".format(_root))
-
-        _check3 = _parser.store_generate()
-
-        _args = mock_store_generate_02.return_value.write.call_args_list
+        _args = mock_store_02.return_value.write.call_args_list
         _arg_list = []
 
         for _call in _args:
             _item = _call.args[0]
             _arg_list.append(_item)
 
-        _lines = [
-            '@echo off\n',
-            'echo Create _testlang.test1.pot\n',
-            'xgettext.exe -L python -d gui -o {0:s} {1:s}\n'.format(_file1_out, _file1_in),
-            'echo Create _testlang.test1.tester.pot\n',
-            'xgettext.exe -L python -d gui -o {0:s} {1:s}\n'.format(_file2_out, _file2_in),
-            'echo Merge gui.pot\n',
-            'msgcat.exe {0:s} {1:s} -o {2:s}\n'.format(_file1_out, _file2_out, _file_out)
-        ]
+        _testlist = self._create_test_list(command="generate", is_windows=True, newline=True)
 
         self.assertNotEqual(_parser, None, "_parser: None")
         self.assertEqual(_check1, True, "_check1 != True")
         self.assertEqual(_check2, True, "_check2 != True")
         self.assertEqual(_check3, True, "_check2 != True")
-        self.assertListEqual(_lines, _arg_list)
+        self.assertListEqual(_testlist, _arg_list)
         return
 
     # noinspection PyUnresolvedReferences
-    @mock.patch('builtins.open', new=mock_store_generate_03)
-    def test_store_generate_03(self):
+    @mock.patch('builtins.open', new=mock_store_03)
+    def test_store_03(self):
         _locales = full_path("tests/locales")
 
         _root = os.getcwd()
@@ -605,76 +573,218 @@ class TestParser(unittest.TestCase):
 
         _parser = Parser()
         _check1 = _parser.setup(locales=_locales,
+                                windows=False,
                                 module="testlang",
                                 filter="testlang.test1",
                                 package_path=_package)
 
         _check2 = _parser.parse()
+        _check3 = _parser.store(command=Command.update)
 
-        _file1_out = full_path("{0:s}/.locales/gui/_testlang.test1.pot".format(_root))
-        _file1_in = full_path("{0:s}/testdata/testlang/test1/__init__.py".format(_root))
-
-        _file2_out = full_path("{0:s}/.locales/gui/_testlang.test1.tester.pot".format(_root))
-        _file2_in = full_path("{0:s}/testdata/testlang/test1/tester.py".format(_root))
-
-        _file_out = full_path("{0:s}/.locales/gui/gui.pot".format(_root))
-
-        _check1 = _parser.store_generate()
-
-        self.assertNotEqual(_parser, None, "_parser: None")
-        self.assertEqual(_check1, False, "_check1 != False")
-        self.assertEqual(_check2, True, "_check2 != True")
-        return
-
-    # noinspection PyUnresolvedReferences
-    @mock.patch('builtins.open', new=mock_store_update_01)
-    def test_store_update_01(self):
-        _locales = full_path("tests/locales")
-
-        _root = os.getcwd()
-        _testdata = full_path("{0:s}/testdata".format(_root))
-        sys.path.append(_testdata)
-
-        _package = full_path("{0:s}/testlang".format(_testdata))
-
-        _parser = Parser()
-        _check1 = _parser.setup(locales=_locales,
-                                module="testlang",
-                                filter="testlang.test1",
-                                package_path=_package)
-
-        _check2 = _parser.parse()
-        _check3 = _parser.store_update()
-
-        _args = mock_store_update_01.return_value.write.call_args_list
+        _args = mock_store_03.return_value.write.call_args_list
         _arg_list = []
 
         for _call in _args:
             _item = _call.args[0]
             _arg_list.append(_item)
 
-        _pot = full_path("{0:s}/.locales/gui/gui.pot".format(_root))
-        _po_en = full_path("{0:s}/tests/locales/en/LC_MESSAGES/gui.po".format(_root))
-        _po_de = full_path("{0:s}/tests/locales/de/LC_MESSAGES/gui.po".format(_root))
-
-        _lines = [
-            '#!/bin/bash\n',
-            'echo "Update en/gui"\n',
-            'msgmerge -N -U {0:s} {1:s}\n'.format(_po_en, _pot),
-            'echo "Update de/gui"\n',
-            'msgmerge -N -U {0:s} {1:s}\n'.format(_po_de, _pot),
-        ]
+        _testlist = self._create_test_list(command="update", is_windows=False, newline=True)
 
         self.assertNotEqual(_parser, None, "_parser: None")
         self.assertEqual(_check1, True, "_check1 != True")
         self.assertEqual(_check2, True, "_check2 != True")
         self.assertEqual(_check3, True, "_check2 != True")
-        self.assertListEqual(_lines, _arg_list)
+        self.assertListEqual(_arg_list, _testlist)
         return
 
     # noinspection PyUnresolvedReferences
-    @mock.patch('builtins.open', new=mock_store_update_02)
-    def test_store_update_02(self):
+    @mock.patch('builtins.open', new=mock_store_04)
+    def test_store_04(self):
+        _locales = full_path("tests/locales")
+
+        _root = os.getcwd()
+        _testdata = full_path("{0:s}/testdata".format(_root))
+        sys.path.append(_testdata)
+
+        _package = full_path("{0:s}/testlang".format(_testdata))
+
+        _parser = Parser()
+        _check1 = _parser.setup(locales=_locales,
+                                windows=True,
+                                module="testlang",
+                                filter="testlang.test1",
+                                package_path=_package)
+
+        _check2 = _parser.parse()
+        _check3 = _parser.store(command=Command.update)
+
+        _args = mock_store_04.return_value.write.call_args_list
+        _arg_list = []
+
+        for _call in _args:
+            _item = _call.args[0]
+            _arg_list.append(_item)
+
+        _testlist = self._create_test_list(command="update", is_windows=True, newline=True)
+
+        self.assertNotEqual(_parser, None, "_parser: None")
+        self.assertEqual(_check1, True, "_check1 != True")
+        self.assertEqual(_check2, True, "_check2 != True")
+        self.assertEqual(_check3, True, "_check2 != True")
+        self.assertListEqual(_arg_list, _testlist)
+        return
+
+    # noinspection PyUnresolvedReferences
+    @mock.patch('builtins.open', new=mock_store_05)
+    def test_store_05(self):
+        _locales = full_path("tests/locales")
+
+        _root = os.getcwd()
+        _testdata = full_path("{0:s}/testdata".format(_root))
+        sys.path.append(_testdata)
+
+        _package = full_path("{0:s}/testlang".format(_testdata))
+
+        _parser = Parser()
+        _check1 = _parser.setup(locales=_locales,
+                                windows=False,
+                                module="testlang",
+                                filter="testlang.test1",
+                                package_path=_package)
+
+        _check2 = _parser.parse()
+        _check3 = _parser.store(command=Command.copy)
+
+        _args = mock_store_05.return_value.write.call_args_list
+        _arg_list = []
+
+        for _call in _args:
+            _item = _call.args[0]
+            _arg_list.append(_item)
+
+        _testlist = self._create_test_list(command="copy", is_windows=False, newline=True)
+
+        self.assertNotEqual(_parser, None, "_parser: None")
+        self.assertEqual(_check1, True, "_check1 != True")
+        self.assertEqual(_check2, True, "_check2 != True")
+        self.assertEqual(_check3, True, "_check2 != True")
+        self.assertListEqual(_arg_list, _testlist)
+        return
+
+    # noinspection PyUnresolvedReferences
+    @mock.patch('builtins.open', new=mock_store_06)
+    def test_store_06(self):
+        _locales = full_path("tests/locales")
+
+        _root = os.getcwd()
+        _testdata = full_path("{0:s}/testdata".format(_root))
+        sys.path.append(_testdata)
+
+        _package = full_path("{0:s}/testlang".format(_testdata))
+
+        _parser = Parser()
+        _check1 = _parser.setup(locales=_locales,
+                                windows=True,
+                                module="testlang",
+                                filter="testlang.test1",
+                                package_path=_package)
+
+        _check2 = _parser.parse()
+        _check3 = _parser.store(command=Command.copy)
+
+        _args = mock_store_06.return_value.write.call_args_list
+        _arg_list = []
+
+        for _call in _args:
+            _item = _call.args[0]
+            _arg_list.append(_item)
+
+        _testlist = self._create_test_list(command="copy", is_windows=True, newline=True)
+
+        self.assertNotEqual(_parser, None, "_parser: None")
+        self.assertEqual(_check1, True, "_check1 != True")
+        self.assertEqual(_check2, True, "_check2 != True")
+        self.assertEqual(_check3, True, "_check2 != True")
+        self.assertListEqual(_arg_list, _testlist)
+        return
+
+    # noinspection PyUnresolvedReferences
+    @mock.patch('builtins.open', new=mock_store_07)
+    def test_store_07(self):
+        _locales = full_path("tests/locales")
+
+        _root = os.getcwd()
+        _testdata = full_path("{0:s}/testdata".format(_root))
+        sys.path.append(_testdata)
+
+        _package = full_path("{0:s}/testlang".format(_testdata))
+
+        _parser = Parser()
+        _check1 = _parser.setup(locales=_locales,
+                                windows=False,
+                                module="testlang",
+                                filter="testlang.test1",
+                                package_path=_package)
+
+        _check2 = _parser.parse()
+        _check3 = _parser.store(command=Command.compile)
+
+        _args = mock_store_07.return_value.write.call_args_list
+        _arg_list = []
+
+        for _call in _args:
+            _item = _call.args[0]
+            _arg_list.append(_item)
+
+        _testlist = self._create_test_list(command="compile", is_windows=False, newline=True)
+
+        self.assertNotEqual(_parser, None, "_parser: None")
+        self.assertEqual(_check1, True, "_check1 != True")
+        self.assertEqual(_check2, True, "_check2 != True")
+        self.assertEqual(_check3, True, "_check2 != True")
+        self.assertListEqual(_arg_list, _testlist)
+        return
+
+    # noinspection PyUnresolvedReferences
+    @mock.patch('builtins.open', new=mock_store_08)
+    def test_store_08(self):
+        _locales = full_path("tests/locales")
+
+        _root = os.getcwd()
+        _testdata = full_path("{0:s}/testdata".format(_root))
+        sys.path.append(_testdata)
+
+        _package = full_path("{0:s}/testlang".format(_testdata))
+
+        _parser = Parser()
+        _check1 = _parser.setup(locales=_locales,
+                                windows=True,
+                                module="testlang",
+                                filter="testlang.test1",
+                                package_path=_package)
+
+        _check2 = _parser.parse()
+        _check3 = _parser.store(command=Command.compile)
+
+        _args = mock_store_08.return_value.write.call_args_list
+        _arg_list = []
+
+        for _call in _args:
+            _item = _call.args[0]
+            _arg_list.append(_item)
+
+        _testlist = self._create_test_list(command="compile", is_windows=True, newline=True)
+
+        self.assertNotEqual(_parser, None, "_parser: None")
+        self.assertEqual(_check1, True, "_check1 != True")
+        self.assertEqual(_check2, True, "_check2 != True")
+        self.assertEqual(_check3, True, "_check2 != True")
+        self.assertListEqual(_arg_list, _testlist)
+        return
+
+    # noinspection PyUnresolvedReferences
+    @mock.patch('builtins.open', new=mock_store_09)
+    def test_store_09(self):
         _locales = full_path("tests/locales")
 
         _root = os.getcwd()
@@ -690,7 +800,7 @@ class TestParser(unittest.TestCase):
                                 package_path=_package)
 
         _check2 = _parser.parse()
-        _check3 = _parser.store_update()
+        _check3 = _parser.store(command=Command.generate)
 
         self.assertNotEqual(_parser, None, "_parser: None")
         self.assertEqual(_check1, True, "_check1 != True")

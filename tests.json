@@ -205,7 +205,16 @@
                 "test_update_01",
                 "test_update_02",
                 "test_compile_01",
-                "test_compile_02"
+                "test_compile_02",
+                "test_store_01",
+                "test_store_02",
+                "test_store_03",
+                "test_store_04",
+                "test_store_05",
+                "test_store_06",
+                "test_store_07",
+                "test_store_08",
+                "test_store_09"
             ]
         },
         {
