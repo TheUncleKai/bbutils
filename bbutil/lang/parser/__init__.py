@@ -217,7 +217,7 @@ class Parser(object):
         os.environ["IGNORE_GETTEXT"] = "True"
 
         if self.script != "":
-            for _item in self.script:
+            for _item in sorted(self.script):
                 _file = full_path(_item)
 
                 _check = self._parse_script(_file)
@@ -226,7 +226,7 @@ class Parser(object):
 
         self._parse_package()
 
-        for _file in sorted(self._python_files, key=sort_files):
+        for _file in self._python_files:
             _domain = self.get_domain(_file.domain)
             if _domain is None:
                 _domain = Domain(root_path=self.root_path, domain=_file.domain)
