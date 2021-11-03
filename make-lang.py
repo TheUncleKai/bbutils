@@ -19,6 +19,7 @@
 
 import sys
 import bbutil.lang.parser
+import bbutil.lang.parser.pyfile
 
 from bbutil.logging import Logging
 from bbutil.lang.parser import Parser, Command
@@ -29,6 +30,7 @@ log: Logging = Logging()
 if __name__ == '__main__':
 
     bbutil.lang.parser.set_log(log)
+    bbutil.lang.parser.pyfile.set_log(log)
     log.setup(app="make-lang.py", level=0)
 
     console = log.get_writer("console")
