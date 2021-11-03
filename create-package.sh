@@ -40,7 +40,7 @@ upload-test() {
     fi
     source $PASSWORD_FILE
     inform "Use $USERNAME_TEST"
-    twine upload --repository testpypi dist/* --username $USERNAME_TEST $PASSWORD_TEST
+    twine upload --repository testpypi dist/* -u $USERNAME_TEST -p $PASSWORD_TEST
 }
 
 upload-dist() {
@@ -53,7 +53,7 @@ upload-dist() {
     fi
     source $PASSWORD_FILE
     inform "Use $USERNAME_DIST"
-    twine upload --repository pypi dist/* --username $USERNAME_DIST $PASSWORD_DIST
+    twine upload --repository pypi dist/* -u $USERNAME_DIST -p $PASSWORD_DIST
 }
 
 
