@@ -19,7 +19,7 @@
 import os.path
 import unittest
 
-from bbutil.lang import Lang, Domain
+from bbutil.lang import Lang
 from bbutil.utils import full_path
 
 
@@ -40,11 +40,13 @@ class _TestHook(object):
 
     def __init__(self):
         self.hook_number: int = 0
+        self.languages: list = []
         return
 
     # noinspection PyUnusedLocal
     def set_hook(self, language):
         self.hook_number += 1
+        self.languages.append(language)
         return
 
 
@@ -198,7 +200,6 @@ class TestLang(unittest.TestCase):
 
     # noinspection PyUnresolvedReferences
     def test_set_language_01(self):
-        os.environ["IGNORE_GETTEXT"] = "1"
         lang = Lang()
 
         _hook = _TestHook()
@@ -207,14 +208,16 @@ class TestLang(unittest.TestCase):
 
         lang.add("test", _hook.set_hook)
         _num1 = _hook.hook_number
+        _lang1 = _hook.languages[0]
 
         lang.set_language("de")
+
         _num2 = _hook.hook_number
+        _lang2 = _hook.languages[1]
 
         self.assertNotEqual(lang, None, "Lang: None")
         self.assertEqual(_check1, True, "_check1 != True")
         self.assertEqual(_num1, 1, "_num1 != 1")
         self.assertEqual(_num2, 2, "_num2 != 2")
-
-        os.environ.pop('IGNORE_GETTEXT')
+        self.assertNotEqual(_lang1, _lang2)
         return

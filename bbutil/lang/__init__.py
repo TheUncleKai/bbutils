@@ -93,6 +93,7 @@ class Lang(object):
 
         for _name in self.domains:
             _domain = self.domains[_name]
+            _domain.is_set = False
             _domain.used_lang = self.used_lang
             _domain.create()
             _domain.load()
