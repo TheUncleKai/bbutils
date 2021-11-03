@@ -153,6 +153,85 @@
                 "test_parse_04",
                 "test_parse_05"
             ]
+        },
+        {
+            "id": "Lang",
+            "path": "tests.lang.lang",
+            "classname": "TestLang",
+            "tests": [
+                "test_constructor_01",
+                "test_setup_01",
+                "test_setup_02",
+                "test_setup_03",
+                "test_setup_04",
+                "test_setup_05",
+                "test_dummy_01",
+                "test_add_01",
+                "test_add_02",
+                "test_set_language_01"
+            ]
+        },
+        {
+            "id": "Lang.Domain",
+            "path": "tests.lang.domain",
+            "classname": "TestDomain",
+            "tests": [
+                "test_constructor_01",
+                "test_create_01",
+                "test_create_02",
+                "test_create_03",
+                "test_create_04",
+                "test_load_01",
+                "test_load_02",
+                "test_load_03",
+                "test_load_04"
+            ]
+        },
+        {
+            "id": "Lang.Parser",
+            "path": "tests.lang.parse",
+            "classname": "TestParser",
+            "tests": [
+                "test_constructor_01",
+                "test_setup_01",
+                "test_setup_02",
+                "test_setup_03",
+                "test_init_01",
+                "test_init_02",
+                "test_parse_01",
+                "test_parse_02",
+                "test_parse_03",
+                "test_generate_01",
+                "test_generate_02",
+                "test_copy_01",
+                "test_copy_02",
+                "test_update_01",
+                "test_update_02",
+                "test_compile_01",
+                "test_compile_02",
+                "test_store_01",
+                "test_store_02",
+                "test_store_03",
+                "test_store_04",
+                "test_store_05",
+                "test_store_06",
+                "test_store_07",
+                "test_store_08",
+                "test_store_09",
+                "test_run_01"
+            ]
+        },
+        {
+            "id": "Lang.Parser.PythonFile",
+            "path": "tests.lang.pyfile",
+            "classname": "TestPythonFile",
+            "tests": [
+                "test_constructor_01",
+                "test_create_01",
+                "test_create_02",
+                "test_create_03",
+                "test_create_04"
+            ]
         }
     ]
 }

@@ -17,5 +17,9 @@
 #
 
 __all__ = [
-    "logging"
+    "lang",
+    "logging",
+
+    "data",
+    "utils"
 ]

@@ -16,9 +16,6 @@
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
 
-__all__ = [
-    "console",
-    "file",
-    "logging",
-    "types"
-]
+if __name__ == '__main__':
+
+    print("Test")

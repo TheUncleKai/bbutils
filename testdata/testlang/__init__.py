@@ -17,8 +17,8 @@
 #
 
 __all__ = [
-    "console",
-    "file",
-    "logging",
-    "types"
+    "test1",
+    "test2"
 ]
+
+lang_domain = None

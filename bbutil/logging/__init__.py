@@ -71,6 +71,10 @@ class Logging(object):
     def __del__(self):
         return
 
+    @property
+    def verbose(self) -> int:
+        return self._level
+
     @staticmethod
     def get_writer(name: str) -> Writer:
         c = None

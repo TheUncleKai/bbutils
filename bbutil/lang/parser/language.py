@@ -15,10 +15,22 @@
 #
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
+from bbutil.utils import full_path
 
 __all__ = [
-    "console",
-    "file",
-    "logging",
-    "types"
+    "Languages"
 ]
+
+
+class Languages(object):
+
+    def __repr__(self):
+        return self.lang
+
+    def __init__(self, path: str, lang: str, domain: str):
+        self.domain: str = domain
+        self.lang: str = lang
+        self.path: str = full_path("{0:s}/{1:s}/LC_MESSAGES".format(path, lang))
+        self.po: str = full_path("{0:s}/{1:s}.po".format(self.path, self.domain))
+        self.mo: str = full_path("{0:s}/{1:s}.mo".format(self.path, self.domain))
+        return

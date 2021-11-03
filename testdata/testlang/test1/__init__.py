@@ -16,9 +16,25 @@
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
 
-__all__ = [
-    "console",
-    "file",
-    "logging",
-    "types"
-]
+from bbutil.lang import Lang
+
+lang = Lang()
+lang.setup(localedir="locales")
+
+lang_domain = "gui"
+
+_ = lang.dummy
+
+
+def _set_lang(message):
+    global _
+    _ = message
+    return
+
+
+lang.add("test", _set_lang)
+
+
+if __name__ == '__main__':
+
+    print(_("Test1"))
