@@ -84,6 +84,7 @@ class ConsoleWriter(Writer):
 
         self.styles: Dict[str, _Style] = _schemes
         self.encoding: str = ""
+        self.app_space: int = 0
         self.text_space: int = 15
         self.seperator: str = "|"
         self.length: int = 0
@@ -102,6 +103,10 @@ class ConsoleWriter(Writer):
         item = kwargs.get("text_space", None)
         if item is not None:
             self.text_space = item
+
+        item = kwargs.get("app_space", None)
+        if item is not None:
+            self.app_space = item
 
         item = kwargs.get("seperator", None)
         if item is not None:
@@ -192,7 +197,10 @@ class ConsoleWriter(Writer):
         return
 
     def _create_color(self, item: Message, text: str) -> str:
-        appname = "{0:s} ".format(item.app).ljust(self.text_space)
+        _app_space = self.app_space
+        if self.app_space == 0:
+            _app_space = len(item.app) + 5
+        appname = "{0:s} ".format(item.app).ljust(_app_space)
         scheme = self.styles[item.level].scheme
 
         if item.tag == "":

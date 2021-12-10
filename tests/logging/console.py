@@ -21,8 +21,13 @@ import sys
 import unittest
 import unittest.mock as mock
 
-from bbutil.logging.writer.console import ConsoleWriter
+import colorama
+
+from bbutil.logging.writer.console import ConsoleWriter, _Style
 from bbutil.logging.types import Message, Progress, Writer
+
+
+RESET_ALL = colorama.Style.RESET_ALL
 
 
 class Callback(object):
@@ -239,6 +244,157 @@ class TestConsoleWriter(unittest.TestCase):
         self.assertEqual(n, 100)
         self.assertEqual(count, 0)
         self.assertFalse(write_called)
+        return
+
+    def test_write_07(self):
+        message = Message(app="TEST", level="INFORM", tag="TEST", content="This is a test!")
+
+        _style = _Style("INFORM", "BRIGHT", "GREEN", "")
+
+        item = ConsoleWriter()
+        item.open()
+        item.stdout = SysWrite()
+
+        item.write(message)
+
+        write_called = item.stdout.write.called
+        call = item.stdout.write.call_args_list[0]
+        (args, kwargs) = call
+        data = args[0]
+
+        print(data)
+
+        _tag = "TEST".ljust(15)
+        _app_space = len("TEST") + 5
+        _app = "{0:s} ".format("TEST").ljust(_app_space)
+
+        content = "{0:s}{1:s}{2:s} {3:s}{4:s} {5:s}{6:s}\n".format(RESET_ALL,
+                                                                   _app,
+                                                                   _style.scheme,
+                                                                   _tag,
+                                                                   "|",
+                                                                   RESET_ALL,
+                                                                   "This is a test!")
+
+        self.assertTrue(write_called)
+        self.assertIn(message.app, data)
+        self.assertIn(message.tag, data)
+        self.assertIn(message.content, data)
+        self.assertEqual(content, data)
+        return
+
+    def test_write_08(self):
+        message = Message(app="TEST", level="INFORM", tag="TEST", content="This is a test!")
+
+        _style = _Style("INFORM", "BRIGHT", "GREEN", "")
+
+        item = ConsoleWriter()
+        item.setup(app_space=15)
+        item.open()
+        item.stdout = SysWrite()
+
+        item.write(message)
+
+        write_called = item.stdout.write.called
+        call = item.stdout.write.call_args_list[0]
+        (args, kwargs) = call
+        data = args[0]
+
+        print(data)
+
+        _tag = "TEST".ljust(15)
+        _app_space = len("TEST") + 5
+        _app = "{0:s} ".format("TEST").ljust(15)
+
+        content = "{0:s}{1:s}{2:s} {3:s}{4:s} {5:s}{6:s}\n".format(RESET_ALL,
+                                                                   _app,
+                                                                   _style.scheme,
+                                                                   _tag,
+                                                                   "|",
+                                                                   RESET_ALL,
+                                                                   "This is a test!")
+
+        self.assertTrue(write_called)
+        self.assertIn(message.app, data)
+        self.assertIn(message.tag, data)
+        self.assertIn(message.content, data)
+        self.assertEqual(content, data)
+        return
+
+    def test_write_09(self):
+        message = Message(app="TEST", level="INFORM", tag="TEST", content="This is a test!")
+
+        _style = _Style("INFORM", "BRIGHT", "GREEN", "")
+
+        item = ConsoleWriter()
+        item.setup(app_space=10)
+        item.open()
+        item.stdout = SysWrite()
+
+        item.write(message)
+
+        write_called = item.stdout.write.called
+        call = item.stdout.write.call_args_list[0]
+        (args, kwargs) = call
+        data = args[0]
+
+        print(data)
+
+        _tag = "TEST".ljust(15)
+        _app_space = len("TEST") + 5
+        _app = "{0:s} ".format("TEST").ljust(15)
+
+        content = "{0:s}{1:s}{2:s} {3:s}{4:s} {5:s}{6:s}\n".format(RESET_ALL,
+                                                                   _app,
+                                                                   _style.scheme,
+                                                                   _tag,
+                                                                   "|",
+                                                                   RESET_ALL,
+                                                                   "This is a test!")
+
+        self.assertTrue(write_called)
+        self.assertIn(message.app, data)
+        self.assertIn(message.tag, data)
+        self.assertIn(message.content, data)
+        self.assertNotEqual(content, data)
+        return
+
+    def test_write_10(self):
+        message = Message(app="TEST", level="INFORM", tag="TEST", content="This is a test!")
+
+        _style = _Style("INFORM", "BRIGHT", "GREEN", "")
+
+        item = ConsoleWriter()
+        item.setup(text_space=10)
+        item.open()
+        item.stdout = SysWrite()
+
+        item.write(message)
+
+        write_called = item.stdout.write.called
+        call = item.stdout.write.call_args_list[0]
+        (args, kwargs) = call
+        data = args[0]
+
+        print(data)
+
+        _tag = "TEST".ljust(10)
+        _app_space = len("TEST") + 5
+        _app = "{0:s} ".format("TEST").ljust(_app_space)
+
+        content = "{0:s}{1:s}{2:s} {3:s}{4:s} {5:s}{6:s}\n".format(RESET_ALL,
+                                                                   _app,
+                                                                   _style.scheme,
+                                                                   _tag,
+                                                                   "|",
+                                                                   RESET_ALL,
+                                                                   "This is a test!")
+
+        self.assertTrue(write_called)
+        self.assertIn(message.app, data)
+        self.assertIn(message.tag, data)
+        self.assertIn(message.content, data)
+        self.assertEqual(content, data)
         return
 
     def test_clear_01(self):
