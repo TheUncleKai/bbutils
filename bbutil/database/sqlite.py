@@ -40,7 +40,7 @@ class Select(object):
 @dataclass
 class SQLite(object):
 
-    _log: Optional[Logging] = None
+    log: Optional[Logging] = None
 
     name: str = ""
     connection: Optional[sqlite3.Connection] = None
@@ -49,20 +49,6 @@ class SQLite(object):
     use_memory: bool = False
     filename: str = ""
     lock: Optional[Lock] = None
-
-    @property
-    def log(self) -> Logging:
-        if self._log is not None:
-            _logging = self._log
-        else:
-            raise Exception("Logging module is missing!")
-
-        return _logging
-
-    @log.setter
-    def log(self, logging: Logging):
-        self._log = logging
-        return
 
     def connect(self) -> bool:
 

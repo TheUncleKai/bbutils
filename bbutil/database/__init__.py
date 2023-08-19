@@ -17,13 +17,23 @@
 #
 
 from bbutil.database.types import Types, Column, DataType, Data, select_interval
+from bbutil.database.sqlite import SQLite
+from bbutil.database.table import Table
+from bbutil.database.database import Database
 
 __all__ = [
+    "database",
+    "sqlite",
+    "table",
     "types",
 
     "Types",
     "Column",
     "Data",
     "DataType",
-    "select_interval"
+    "select_interval",
+
+    "SQLite",
+    "Table",
+    "Database"
 ]
