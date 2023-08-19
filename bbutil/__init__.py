@@ -17,6 +17,7 @@
 #
 
 __all__ = [
+    "database",
     "logging",
     "lang",
 
@@ -53,13 +54,13 @@ __credits__ = [__author__]
 __milestone__ = 0
 
 #: version major
-__major__ = 4
+__major__ = 5
 
 #: version minor
 __minor__ = 0
 
 #: version patch
-__patch__ = 6
+__patch__ = 0
 
 #: package version
 __version__ = "{0:d}.{1:d}.{2:d}.{3:d}".format(__milestone__, __major__, __minor__, __patch__)
