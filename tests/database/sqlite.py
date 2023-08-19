@@ -20,6 +20,7 @@ import os
 import unittest
 import unittest.mock as mock
 import sys
+import sqlite3
 
 from typing import Optional
 
@@ -39,6 +40,8 @@ _index = {
     3: ["INFORM", "DEBUG1", "DEBUG2", "DEBUG3", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"]
 }
 
+mock_sub = mock.Mock(side_effect=sqlite3.OperationalError('Too much mems!'))
+
 
 class TestSQLite(unittest.TestCase):
     """Testing class for locking module."""
@@ -57,10 +60,12 @@ class TestSQLite(unittest.TestCase):
         return
 
     def test_connect_01(self):
-
         _log = self.set_log()
         _testfile = full_path("{0:s}/test.sqlite".format(os.getcwd()))
         _name = "Test"
+
+        if os.path.exists(_testfile) is True:
+            os.remove(_testfile)
 
         _sqlite = SQLite(filename=_testfile, name="Test", log=_log)
 
@@ -71,13 +76,66 @@ class TestSQLite(unittest.TestCase):
         self.assertEqual(_sqlite.filename, _testfile)
         self.assertTrue(_check1)
         self.assertTrue(_check2)
+
+        if os.path.exists(_testfile) is True:
+            os.remove(_testfile)
         return
 
-    def test_connect_01(self):
+    def test_connect_02(self):
 
+        _log = self.set_log()
+        _name = "Test"
+
+        _sqlite = SQLite(filename="", name="Test", log=_log)
+
+        _check1 = _sqlite.connect()
+
+        self.assertEqual(_sqlite.name, _name)
+        self.assertFalse(_check1)
+        return
+
+    def test_connect_03(self):
+
+        _log = self.set_log()
+
+        _sqlite = SQLite(filename="", name="", log=_log)
+
+        _check1 = _sqlite.connect()
+
+        self.assertFalse(_check1)
+        return
+
+    def test_connect_04(self):
+
+        _log = self.set_log()
+
+        _sqlite = SQLite(filename="", name="Test", log=_log, use_memory=True)
+
+        _check1 = _sqlite.connect()
+
+        self.assertTrue(_check1)
+        return
+
+    @mock.patch('sqlite3.connect', new=mock_sub)
+    def test_connect_05(self):
+
+        _log = self.set_log()
+
+        _sqlite = SQLite(filename="", name="Test", log=_log, use_memory=True)
+
+        _check1 = _sqlite.connect()
+
+        self.assertFalse(_check1)
+        return
+
+    @mock.patch('sqlite3.connect', new=mock_sub)
+    def test_connect_06(self):
         _log = self.set_log()
         _testfile = full_path("{0:s}/test.sqlite".format(os.getcwd()))
         _name = "Test"
+
+        if os.path.exists(_testfile) is True:
+            os.remove(_testfile)
 
         _sqlite = SQLite(filename=_testfile, name="Test", log=_log)
 
@@ -86,6 +144,7 @@ class TestSQLite(unittest.TestCase):
 
         self.assertEqual(_sqlite.name, _name)
         self.assertEqual(_sqlite.filename, _testfile)
-        self.assertTrue(_check1)
-        self.assertTrue(_check2)
+        self.assertFalse(_check1)
+        self.assertFalse(_check2)
         return
+

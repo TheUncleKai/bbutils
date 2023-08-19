@@ -51,8 +51,11 @@ class SQLite(object):
     lock: Optional[Lock] = None
 
     def connect(self) -> bool:
+        if self.name == "":
+            self.log.error("Connection is unnamed!")
+            return False
 
-        if self.filename == "":
+        if (self.filename == "") and (self.use_memory is False):
             self.log.error("No filename given!")
             return False
 

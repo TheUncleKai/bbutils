@@ -242,7 +242,12 @@
             "path": "tests.database.sqlite",
             "classname": "TestSQLite",
             "tests": [
-                "test_connect_01"
+                "test_connect_01",
+                "test_connect_02",
+                "test_connect_03",
+                "test_connect_04",
+                "test_connect_05",
+                "test_connect_06"
             ]
         }
     ]
