@@ -236,6 +236,14 @@
                 "test_create_03",
                 "test_create_04"
             ]
+        },
+        {
+            "id": "Database.SQLite",
+            "path": "tests.database.sqlite",
+            "classname": "TestSQLite",
+            "tests": [
+                "test_connect_01"
+            ]
         }
     ]
 }
