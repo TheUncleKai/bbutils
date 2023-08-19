@@ -247,7 +247,11 @@
                 "test_connect_03",
                 "test_connect_04",
                 "test_connect_05",
-                "test_connect_06"
+                "test_connect_06",
+                "test_disconnect_01",
+                "test_disconnect_02",
+                "test_disconnect_03",
+                "test_disconnect_04"
             ]
         }
     ]

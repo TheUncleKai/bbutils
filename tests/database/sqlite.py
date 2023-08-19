@@ -22,12 +22,14 @@ import unittest.mock as mock
 import sys
 import sqlite3
 
+from sqlite3 import Connection
+
 from typing import Optional
 
 import bbutil.lang.parser
 import bbutil.lang.parser.pyfile
 
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, Mock
 from bbutil.database.sqlite import SQLite
 from bbutil.utils import full_path
 
@@ -40,7 +42,8 @@ _index = {
     3: ["INFORM", "DEBUG1", "DEBUG2", "DEBUG3", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"]
 }
 
-mock_sub = mock.Mock(side_effect=sqlite3.OperationalError('Too much mems!'))
+crash_error = sqlite3.OperationalError('This did go boing!!')
+mock_sub = mock.Mock(side_effect=crash_error)
 
 
 class TestSQLite(unittest.TestCase):
@@ -55,6 +58,17 @@ class TestSQLite(unittest.TestCase):
         _log.register(console)
         _log.open()
         return _log
+
+    def _get_sqlite(self) -> SQLite:
+        _log = self.set_log()
+        _testfile = full_path("{0:s}/test.sqlite".format(os.getcwd()))
+        _name = "Test"
+
+        if os.path.exists(_testfile) is True:
+            os.remove(_testfile)
+
+        _sqlite = SQLite(filename=_testfile, name="Test", log=_log)
+        return _sqlite
 
     def tearDown(self):
         return
@@ -148,3 +162,54 @@ class TestSQLite(unittest.TestCase):
         self.assertFalse(_check2)
         return
 
+    def test_disconnect_01(self):
+        _sqlite = self._get_sqlite()
+
+        _check1 = _sqlite.connect()
+        _check2 = _sqlite.disconnect()
+
+        self.assertTrue(_check1)
+        self.assertTrue(_check2)
+        return
+
+    def test_disconnect_02(self):
+        _sqlite = self._get_sqlite()
+
+        _check1 = _sqlite.connect()
+        _check2 = _sqlite.disconnect()
+        _check3 = _sqlite.disconnect()
+
+        self.assertTrue(_check1)
+        self.assertTrue(_check2)
+        self.assertTrue(_check3)
+        return
+
+    def test_disconnect_03(self):
+        _sqlite = self._get_sqlite()
+
+        _check1 = _sqlite.connect()
+
+        _sqlite.commit = True
+
+        _check2 = _sqlite.disconnect()
+
+        self.assertTrue(_check1)
+        self.assertTrue(_check2)
+        return
+
+    def test_disconnect_04(self):
+        _sqlite = self._get_sqlite()
+
+        _check1 = _sqlite.connect()
+
+        _class_mock = Mock()
+        _class_mock.commit = Mock(side_effect=crash_error)
+
+        _sqlite.commit = True
+        _sqlite.connection = _class_mock
+
+        _check2 = _sqlite.disconnect()
+
+        self.assertTrue(_check1)
+        self.assertFalse(_check2)
+        return
