@@ -50,7 +50,14 @@ class SQLite(object):
     filename: str = ""
     lock: Optional[Lock] = None
 
+    def _check_log(self):
+        if self.log is None:
+            raise ValueError("Logging class is missing!")
+        return
+
     def connect(self) -> bool:
+        self._check_log()
+
         if self.name == "":
             self.log.error("Connection is unnamed!")
             return False
@@ -91,6 +98,8 @@ class SQLite(object):
         return True
 
     def disconnect(self) -> bool:
+        self._check_log()
+
         if self.connection is None:
             return True
 
@@ -124,6 +133,7 @@ class SQLite(object):
         return True
 
     def check_table(self, table_name: str) -> bool:
+        self._check_log()
 
         c = self.connection.cursor()
         command = "SELECT name FROM sqlite_master WHERE type='table' AND name='{0:s}';".format(table_name)
@@ -143,6 +153,7 @@ class SQLite(object):
         return True
 
     def count_table(self, table_name: str) -> int:
+        self._check_log()
 
         c = self.connection.cursor()
         command = "SELECT count(*) FROM {0:s};".format(table_name)
@@ -161,6 +172,8 @@ class SQLite(object):
         return count
 
     def prepare_table(self, table_name: str, column_list: list, unique_list: list) -> bool:
+        self._check_log()
+
         _check = self.check_table(table_name)
         if _check is True:
             return True
@@ -203,6 +216,8 @@ class SQLite(object):
         return True
 
     def insert(self, table_name: str, names: list, data: Data) -> bool:
+        self._check_log()
+
         c = self.connection.cursor()
 
         _data = []
@@ -229,6 +244,8 @@ class SQLite(object):
         return True
 
     def insertmany(self, table_name: str, names: list, data_list: List[Data]) -> int:
+        self._check_log()
+
         if self.connection is None:
             self.log.error("No valid database!")
             return 0
@@ -276,6 +293,8 @@ class SQLite(object):
         return _counter
 
     def update(self, table_name: str, names: list, data: Data, sql_filter: str, filter_value=None) -> bool:
+        self._check_log()
+
         c = self.connection.cursor()
 
         _sets = []
@@ -318,6 +337,8 @@ class SQLite(object):
         return True
 
     def select(self, table_name: str, sql_filter: str, names: list, data: list) -> Optional[list]:
+        self._check_log()
+
         c = self.connection.cursor()
 
         _selector = "*"

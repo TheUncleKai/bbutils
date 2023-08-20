@@ -60,13 +60,13 @@ class TestSQLite(unittest.TestCase):
         return _log
 
     @staticmethod
-    def _get_table_01(sqlite_object: SQLite):
+    def _get_table_01(sqlite_object: SQLite) -> Table:
         _table = Table(name="tester01", sqlite=sqlite_object)
         _table.add_column(name="testid", data_type=Types.integer, unique=True)
         _table.add_column(name="use_test", data_type=Types.bool)
         _table.add_column(name="testname", data_type=Types.string)
         _table.add_column(name="path", data_type=Types.string)
-        return
+        return _table
 
     def _get_sqlite(self, filename: str, path: str = os.getcwd(), clean: bool = False) -> SQLite:
         _log = self.set_log()
@@ -173,6 +173,18 @@ class TestSQLite(unittest.TestCase):
         self.assertFalse(_check2)
         return
 
+    def test_connect_07(self):
+        _testfile = full_path("{0:s}/test.sqlite".format(os.getcwd()))
+        _name = "Test"
+
+        if os.path.exists(_testfile) is True:
+            os.remove(_testfile)
+
+        _sqlite = SQLite(filename=_testfile, name="Test")
+
+        self.assertRaises(ValueError, _sqlite.connect)
+        return
+
     def test_disconnect_01(self):
         _sqlite = self._get_sqlite(filename="test.sqlite")
 
@@ -252,5 +264,19 @@ class TestSQLite(unittest.TestCase):
 
         self.assertTrue(_check1)
         self.assertFalse(_check2)
+        self.assertTrue(_check3)
+        return
+
+    def test_check_table_02(self):
+        _sqlite = self._get_sqlite(filename="test_check_table.sqlite", path="testdata/database")
+
+        _check1 = _sqlite.connect()
+
+        _check2 = _sqlite.check_table("tester01")
+
+        _check3 = _sqlite.disconnect()
+
+        self.assertTrue(_check1)
+        self.assertTrue(_check2)
         self.assertTrue(_check3)
         return
