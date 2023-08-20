@@ -18,7 +18,6 @@
 
 import os
 
-import datetime
 import sqlite3
 from unittest import mock as mock
 

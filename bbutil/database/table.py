@@ -191,12 +191,10 @@ class Table(object):
         return _result
 
     def store_item(self, data: Data) -> bool:
-        _check = self.sqlite.insert(self.name, self.names, data)
-        return _check
-
-    def old_store(self) -> int:
-        _ret = self.sqlite.insertmany(self.name, self.names, self.data)
-        return _ret
+        _count = self.sqlite.insert(self.name, self.names, data)
+        if _count == 1:
+            return True
+        return False
 
     @staticmethod
     def _split_list(data_list: List[Data], chunk_size: int) -> list:
@@ -241,7 +239,7 @@ class Table(object):
 
         for _item_list in _split_list:
             _counter += len(_item_list)
-            _stored += self.sqlite.insertmany(self.name, self.names, _item_list)
+            _stored += self.sqlite.insert(self.name, self.names, _item_list)
             _progress.inc()
 
         self.log.clear()
