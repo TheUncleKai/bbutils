@@ -327,55 +327,6 @@ class SQLite(object):
             self.commit = True
         return _counter
 
-    def insertmany(self, table_name: str, names: list, data_list: List[Data]) -> int:
-        self._check_log()
-
-        if self.connection is None:
-            self.log.error("No valid database!")
-            return 0
-
-        c = self.connection.cursor()
-
-        _data = []
-        _length = len(data_list)
-        _names = ", ".join(names)
-        _placeholder = ", ".join(['?'] * len(names))
-
-        sql = 'INSERT OR IGNORE INTO "{0:s}" ({1:s}) VALUES ({2:s});'.format(table_name, _names, _placeholder)
-
-        for _item in data_list:
-            _value = []
-            for _line in names:
-                _ret = getattr(_item, _line)
-                _value.append(_ret)
-            _data.append(_value)
-
-        try:
-            c.executemany(sql, _data)
-        except sqlite3.IntegrityError:
-            return c.rowcount
-        except sqlite3.OperationalError as e:
-            self.log.exception(e)
-            print(sql)
-            raise
-        except OverflowError as e:
-            self.log.exception(e)
-            print(sql)
-            print(_data)
-            raise
-        except sqlite3.InterfaceError as e:
-            self.log.exception(e)
-            print(sql)
-            print(_data)
-            raise
-        except Exception as e:
-            self.log.exception(e)
-            raise
-
-        _counter = c.rowcount
-        self.connection.commit()
-        return _counter
-
     def update(self, table_name: str, names: list, data: Data, sql_filter: str, filter_value=None) -> bool:
         self._check_log()
 
