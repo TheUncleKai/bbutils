@@ -19,7 +19,7 @@
 import sqlite3
 from dataclasses import dataclass, field
 from multiprocessing import Lock
-from typing import Optional, List
+from typing import Optional, List, Union
 
 from bbutil.logging import Logging
 from bbutil.database.types import Data
@@ -28,6 +28,13 @@ __all__ = [
     "Select",
     "SQLite"
 ]
+
+
+@dataclass
+class _Execute(object):
+
+    data: list = field(default_factory=list)
+    sql: str = ""
 
 
 @dataclass
@@ -136,6 +143,10 @@ class SQLite(object):
     def check_table(self, table_name: str) -> bool:
         self._check_log()
 
+        if self.connection is None:
+            self.log.error("No valid connection!")
+            return False
+
         c = self.connection.cursor()
         command = "SELECT name FROM sqlite_master WHERE type='table' AND name='{0:s}';".format(table_name)
 
@@ -156,6 +167,10 @@ class SQLite(object):
     def count_table(self, table_name: str) -> int:
         self._check_log()
 
+        if self.connection is None:
+            self.log.error("No valid connection!")
+            return False
+
         c = self.connection.cursor()
         command = "SELECT count(*) FROM {0:s};".format(table_name)
 
@@ -174,6 +189,10 @@ class SQLite(object):
 
     def prepare_table(self, table_name: str, column_list: list, unique_list: list) -> bool:
         self._check_log()
+
+        if self.connection is None:
+            self.log.error("No valid connection!")
+            return False
 
         _check = self.check_table(table_name)
         if _check is True:
@@ -212,11 +231,7 @@ class SQLite(object):
         self.connection.commit()
         return True
 
-    def insert(self, table_name: str, names: list, data: Data) -> bool:
-        self._check_log()
-
-        c = self.connection.cursor()
-
+    def _single_execute(self, table_name: str, names: list, data: Data) -> Optional[_Execute]:
         _data = []
         _names = ", ".join(names)
         _placeholder = ", ".join(['?'] * len(names))
@@ -229,29 +244,71 @@ class SQLite(object):
             except AttributeError as e:
                 self.log.exception(e)
                 self.log.error("Data format does not fit database table!")
-                return False
+                return None
+            _data.append(_value)
+        _execute = _Execute(sql=sql, data=_data)
+        return _execute
+
+    def _many_execute(self, table_name: str, names: list, data_list: List[Data]) -> Optional[_Execute]:
+        _data = []
+        _length = len(data_list)
+        _names = ", ".join(names)
+        _placeholder = ", ".join(['?'] * len(names))
+
+        sql = 'INSERT OR IGNORE INTO "{0:s}" ({1:s}) VALUES ({2:s});'.format(table_name, _names, _placeholder)
+
+        for _item in data_list:
+            _value = []
+            for _line in names:
+                try:
+                    _ret = getattr(_item, _line)
+                except AttributeError as e:
+                    self.log.exception(e)
+                    self.log.error("Data format does not fit database table!")
+                    return None
+                _value.append(_ret)
             _data.append(_value)
 
+        _execute = _Execute(sql=sql, data=_data)
+        return _execute
+
+    def insert(self, table_name: str, names: list, data: Union[Data, List[Data]]) -> bool:
+        self._check_log()
+
+        if self.connection is None:
+            self.log.error("No valid connection!")
+            return False
+
+        c = self.connection.cursor()
+
+        if type(data) is Data:
+            _execute = self._single_execute(table_name, names, data)
+        else:
+            _execute = self._many_execute(table_name, names, data)
+
+        if _execute is None:
+            return False
+
         try:
-            c.execute(sql, _data)
+            c.execute(_execute.sql, _execute.data)
         except sqlite3.InterfaceError as e:
             self.log.exception(e)
             self.log.error("One or more values is an invalid format!")
-            self.log.error("SQL:  " + str(sql))
-            self.log.error("DATA: " + str(_data))
+            self.log.error("SQL:  " + str(_execute.sql))
+            self.log.error("DATA: " + str(_execute.data))
             return False
         except OverflowError as e:
             self.log.exception(e)
             self.log.error("One or more values is too large!")
-            self.log.error("SQL:  " + str(sql))
-            self.log.error("DATA: " + str(_data))
+            self.log.error("SQL:  " + str(_execute.sql))
+            self.log.error("DATA: " + str(_execute.data))
             return False
         except sqlite3.IntegrityError:
             return False
         except Exception as e:
             self.log.exception(e)
-            self.log.error("SQL:  " + str(sql))
-            self.log.error("DATA: " + str(_data))
+            self.log.error("SQL:  " + str(_execute.sql))
+            self.log.error("DATA: " + str(_execute.data))
             return False
 
         self.commit = True
