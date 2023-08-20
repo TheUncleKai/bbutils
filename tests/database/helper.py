@@ -39,7 +39,8 @@ __all__ = [
     "get_data_02",
     "get_data_03",
     "get_data_04",
-    "get_data_05"
+    "get_data_05",
+    "get_data_06"
 ]
 
 _index = {
@@ -178,6 +179,31 @@ def get_data_05() -> list:
         [2, True, "Test02", "testers/"],
         [3, True, "Test03", "testers/"],
         [4, False, "Test04", "testXXs/"],
+        [5, True, "Test05", "testXXs/"],
+        [6, True, "Test06", "testXXs/"]
+    ]
+
+    _datas = []
+
+    for _value in _values:
+        _data = Data(_names, _value)
+        _datas.append(_data)
+    return _datas
+
+
+def get_data_06() -> list:
+    _names = [
+        "testid",
+        "use_test",
+        "testname",
+        "path"
+    ]
+
+    _values = [
+        [1, True, "Test01", "testers/"],
+        [2, True, "Test02", "testers/"],
+        [3, True, "Test03", "testers/"],
+        [4, False, "Test04"],
         [5, True, "Test05", "testXXs/"],
         [6, True, "Test06", "testXXs/"]
     ]
