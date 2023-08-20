@@ -220,7 +220,12 @@ class SQLite(object):
         sql = 'INSERT INTO "{0:s}" ({1:s}) VALUES ({2:s});'.format(table_name, _names, _placeholder)
 
         for _line in names:
-            _value = getattr(data, _line)
+            try:
+                _value = getattr(data, _line)
+            except AttributeError as e:
+                self.log.exception(e)
+                self.log.error("Data format does not fit database table!")
+                return False
             _data.append(_value)
 
         try:

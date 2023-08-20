@@ -32,7 +32,8 @@ __all__ = [
     "set_log",
     "get_sqlite",
     "get_table_01",
-    "get_data_01"
+    "get_data_01",
+    "get_data_02"
 ]
 
 _index = {
@@ -76,9 +77,29 @@ def get_table_01(sqlite_object: SQLite) -> Table:
     _table.add_column(name="path", data_type=Types.string)
     return _table
 
+
 def get_data_01() -> Data:
     _names = [
         "testid",
+        "use_test",
+        "testname",
+        "path"
+    ]
+
+    _values = [
+        1,
+        True,
+        "Test01",
+        "testers/"
+    ]
+
+    _data = Data(_names, _values)
+    return _data
+
+
+def get_data_02() -> Data:
+    _names = [
+        "testidx",
         "use_test",
         "testname",
         "path"
