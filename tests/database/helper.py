@@ -26,8 +26,10 @@ from bbutil.utils import full_path
 from bbutil.database import SQLite, Types, Table, Data
 
 __all__ = [
-    "sqlite_crash_error",
-    "mock_crash_error",
+    "sqlite_unknown_error",
+    "sqlite_operational_error",
+    "sqlite_integrity_error",
+    "mock_operational_error",
 
     "set_log",
     "get_sqlite",
@@ -44,8 +46,10 @@ _index = {
     3: ["INFORM", "DEBUG1", "DEBUG2", "DEBUG3", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"]
 }
 
-sqlite_crash_error = sqlite3.OperationalError('This did go boing!!')
-mock_crash_error = mock.Mock(side_effect=sqlite_crash_error)
+sqlite_unknown_error = Exception("Something strange did happen!")
+sqlite_operational_error = sqlite3.OperationalError('This did go boing!!')
+sqlite_integrity_error = sqlite3.IntegrityError('These values did go boing!!')
+mock_operational_error = mock.Mock(side_effect=sqlite_operational_error)
 
 
 def set_log() -> Logging:
@@ -126,8 +130,9 @@ def get_data_03() -> Data:
     ]
 
     _values = [
-        1,
+        15235670141346654134,
         True,
+        "Test01",
         "testers/"
     ]
 
