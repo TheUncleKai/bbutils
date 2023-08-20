@@ -47,6 +47,7 @@ class SQLite(object):
     commit: bool = False
     cursor: Optional[sqlite3.Cursor] = None
     use_memory: bool = False
+    use_scrict: bool = False
     filename: str = ""
     lock: Optional[Lock] = None
 
@@ -193,7 +194,10 @@ class SQLite(object):
             _uniques = ", ".join(unique_list)
             _constraint = ", CONSTRAINT constraint_{0:s} UNIQUE ({1:s})".format(table_name, _uniques)
 
-        command = 'CREATE TABLE "{0:s}" ({1:s}{2:s})'.format(table_name, _columns, _constraint)
+        if self.use_scrict is True:
+            command = 'CREATE TABLE "{0:s}" ({1:s}{2:s}) STRICT'.format(table_name, _columns, _constraint)
+        else:
+            command = 'CREATE TABLE "{0:s}" ({1:s}{2:s})'.format(table_name, _columns, _constraint)
 
         try:
             c.execute(command)

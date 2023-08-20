@@ -33,7 +33,8 @@ __all__ = [
     "get_sqlite",
     "get_table_01",
     "get_data_01",
-    "get_data_02"
+    "get_data_02",
+    "get_data_03"
 ]
 
 _index = {
@@ -116,11 +117,19 @@ def get_data_02() -> Data:
     return _data
 
 
-class Data01(object):
+def get_data_03() -> Data:
+    _names = [
+        "testid",
+        "use_test",
+        "testname",
+        "path"
+    ]
 
-    def __init__(self):
-        self.testid: int = 0
-        self.use_test: bool = False
-        self.testname: str = ""
-        self.path: str = ""
-        return
+    _values = [
+        1,
+        True,
+        "testers/"
+    ]
+
+    _data = Data(_names, _values)
+    return _data
