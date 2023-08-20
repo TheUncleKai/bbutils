@@ -302,3 +302,39 @@ class TestSQLite(unittest.TestCase):
         self.assertFalse(_check2)
         self.assertTrue(_check3)
         return
+
+    def test_count_table_01(self):
+        _sqlite = self._get_sqlite(filename="test_check_table.sqlite", path="testdata/database")
+
+        _check1 = _sqlite.connect()
+
+        _count = _sqlite.count_table("tester01")
+
+        _check2 = _sqlite.disconnect()
+
+        self.assertTrue(_check1)
+        self.assertEqual(_count, 0)
+        self.assertTrue(_check2)
+        return
+
+    def test_count_table_02(self):
+        _sqlite = self._get_sqlite(filename="test_check_table.sqlite", path="testdata/database")
+
+        _check1 = _sqlite.connect()
+
+        _cursor_mock = Mock()
+        _cursor_mock.execute = Mock(side_effect=crash_error)
+
+        _class_mock = Mock()
+        _class_mock.cursor = Mock(return_value=_cursor_mock)
+
+        _sqlite.connection = _class_mock
+
+        _count = _sqlite.count_table("tester01")
+
+        _check2 = _sqlite.disconnect()
+
+        self.assertTrue(_check1)
+        self.assertEqual(_count, -1)
+        self.assertTrue(_check2)
+        return
