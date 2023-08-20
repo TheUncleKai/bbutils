@@ -330,3 +330,28 @@ class TestSQLite(unittest.TestCase):
         self.assertEqual(_count, -1)
         self.assertTrue(_check2)
         return
+
+    def test_prepare_table_01(self):
+        _sqlite = self._get_sqlite(filename="test.sqlite", clean=True)
+        _table = self._get_table_01(_sqlite)
+
+        _columns = []
+        for _col in _table.columns:
+            _columns.append(_col.create)
+
+        _unique = []
+        for _col in _table.columns:
+            if _col.unique is False:
+                continue
+            _unique.append(_col.name)
+
+        _check1 = _sqlite.connect()
+
+        _check2 = _sqlite.prepare_table(_table.name, _columns, _unique)
+
+        _check3 = _sqlite.disconnect()
+
+        self.assertTrue(_check1)
+        self.assertTrue(_check2)
+        self.assertTrue(_check3)
+        return

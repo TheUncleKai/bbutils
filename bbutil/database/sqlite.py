@@ -193,14 +193,7 @@ class SQLite(object):
             _uniques = ", ".join(unique_list)
             _constraint = ", CONSTRAINT constraint_{0:s} UNIQUE ({1:s})".format(table_name, _uniques)
 
-        try:
-            command = 'CREATE TABLE "{0:s}" ({1:s}{2:s})'.format(table_name, _columns, _constraint)
-        except ValueError as e:
-            self.log.exception(e)
-            self.log.error(table_name)
-            self.log.error(_columns)
-            self.log.error(_constraint)
-            return False
+        command = 'CREATE TABLE "{0:s}" ({1:s}{2:s})'.format(table_name, _columns, _constraint)
 
         try:
             c.execute(command)
