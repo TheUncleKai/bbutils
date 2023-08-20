@@ -90,6 +90,7 @@ class TestSQLite(unittest.TestCase):
         self.assertEqual(_sqlite.filename, _testfile)
         self.assertTrue(_check1)
         self.assertTrue(_check2)
+        self.assertTrue(_sqlite.is_connected)
 
         if os.path.exists(_testfile) is True:
             os.remove(_testfile)
@@ -106,6 +107,7 @@ class TestSQLite(unittest.TestCase):
 
         self.assertEqual(_sqlite.name, _name)
         self.assertFalse(_check1)
+        self.assertFalse(_sqlite.is_connected)
         return
 
     def test_connect_03(self):
@@ -204,6 +206,23 @@ class TestSQLite(unittest.TestCase):
 
         _class_mock = Mock()
         _class_mock.commit = Mock(side_effect=crash_error)
+
+        _sqlite.commit = True
+        _sqlite.connection = _class_mock
+
+        _check2 = _sqlite.disconnect()
+
+        self.assertTrue(_check1)
+        self.assertFalse(_check2)
+        return
+
+    def test_disconnect_05(self):
+        _sqlite = self._get_sqlite()
+
+        _check1 = _sqlite.connect()
+
+        _class_mock = Mock()
+        _class_mock.close = Mock(side_effect=crash_error)
 
         _sqlite.commit = True
         _sqlite.connection = _class_mock
