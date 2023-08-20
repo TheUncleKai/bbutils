@@ -257,18 +257,22 @@
                 "test_check_table_01",
                 "test_check_table_02",
                 "test_check_table_03",
+                "test_check_table_04",
                 "test_count_table_01",
                 "test_count_table_02",
+                "test_count_table_03",
                 "test_prepare_table_01",
                 "test_prepare_table_02",
                 "test_prepare_table_03",
+                "test_prepare_table_04",
                 "test_insert_01",
                 "test_insert_02",
                 "test_insert_03",
                 "test_insert_04",
                 "test_insert_05",
                 "test_insert_06",
-                "test_insert_07"
+                "test_insert_07",
+                "test_insert_08"
             ]
         }
     ]

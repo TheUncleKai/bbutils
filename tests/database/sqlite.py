@@ -261,6 +261,22 @@ class TestSQLite(unittest.TestCase):
         self.assertTrue(_check3)
         return
 
+    def test_check_table_04(self):
+        _sqlite = get_sqlite(filename="test.sqlite")
+
+        _check1 = _sqlite.connect()
+
+        _sqlite.connection = None
+
+        _check2 = _sqlite.check_table("Test")
+
+        _check3 = _sqlite.disconnect()
+
+        self.assertTrue(_check1)
+        self.assertFalse(_check2)
+        self.assertTrue(_check3)
+        return
+
     def test_count_table_01(self):
         _sqlite = get_sqlite(filename="test_check_table.sqlite", path="testdata/database")
 
@@ -287,6 +303,21 @@ class TestSQLite(unittest.TestCase):
         _class_mock.cursor = Mock(return_value=_cursor_mock)
 
         _sqlite.connection = _class_mock
+
+        _count = _sqlite.count_table("tester01")
+
+        _check2 = _sqlite.disconnect()
+
+        self.assertTrue(_check1)
+        self.assertEqual(_count, -1)
+        self.assertTrue(_check2)
+        return
+
+    def test_count_table_03(self):
+        _sqlite = get_sqlite(filename="test_check_table.sqlite", path="testdata/database")
+
+        _check1 = _sqlite.connect()
+        _sqlite.connection = None
 
         _count = _sqlite.count_table("tester01")
 
@@ -347,6 +378,22 @@ class TestSQLite(unittest.TestCase):
 
         self.assertTrue(_check1)
         self.assertTrue(_check2)
+        self.assertTrue(_check3)
+        return
+
+    def test_prepare_table_04(self):
+        _sqlite = get_sqlite(filename="test.sqlite", clean=True)
+        _table = get_table_01(_sqlite)
+
+        _check1 = _sqlite.connect()
+        _sqlite.connection = None
+
+        _check2 = _sqlite.prepare_table(_table.name, _table.column_list, _table.unique_list)
+
+        _check3 = _sqlite.disconnect()
+
+        self.assertTrue(_check1)
+        self.assertFalse(_check2)
         self.assertTrue(_check3)
         return
 
@@ -496,5 +543,26 @@ class TestSQLite(unittest.TestCase):
         self.assertTrue(_check1)
         self.assertTrue(_check2)
         self.assertEqual(count, 6)
+        self.assertTrue(_check3)
+        return
+
+    def test_insert_08(self):
+        _sqlite = get_sqlite(filename="test.sqlite", clean=True)
+        _table = get_table_01(_sqlite)
+
+        _check1 = _sqlite.connect()
+
+        _check2 = _sqlite.prepare_table(_table.name, _table.column_list, _table.unique_list)
+
+        _data = get_data_05()
+        _sqlite.connection = None
+
+        count = _sqlite.insert(_table.name, _table.names, _data)
+
+        _check3 = _sqlite.disconnect()
+
+        self.assertTrue(_check1)
+        self.assertTrue(_check2)
+        self.assertEqual(count, -1)
         self.assertTrue(_check3)
         return
