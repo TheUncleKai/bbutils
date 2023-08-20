@@ -272,12 +272,12 @@ class SQLite(object):
         _execute = _Execute(sql=sql, data=_data)
         return _execute
 
-    def insert(self, table_name: str, names: list, data: Union[Data, List[Data]]) -> bool:
+    def insert(self, table_name: str, names: list, data: Union[Data, List[Data]]) -> int:
         self._check_log()
 
         if self.connection is None:
             self.log.error("No valid connection!")
-            return False
+            return -1
 
         c = self.connection.cursor()
 
@@ -287,7 +287,7 @@ class SQLite(object):
             _execute = self._many_execute(table_name, names, data)
 
         if _execute is None:
-            return False
+            return -1
 
         try:
             c.execute(_execute.sql, _execute.data)
@@ -296,23 +296,26 @@ class SQLite(object):
             self.log.error("One or more values is an invalid format!")
             self.log.error("SQL:  " + str(_execute.sql))
             self.log.error("DATA: " + str(_execute.data))
-            return False
+            return -1
         except OverflowError as e:
             self.log.exception(e)
             self.log.error("One or more values is too large!")
             self.log.error("SQL:  " + str(_execute.sql))
             self.log.error("DATA: " + str(_execute.data))
-            return False
+            return -1
         except sqlite3.IntegrityError:
-            return False
+            return -1
         except Exception as e:
             self.log.exception(e)
             self.log.error("SQL:  " + str(_execute.sql))
             self.log.error("DATA: " + str(_execute.data))
-            return False
+            return -1
 
-        self.commit = True
-        return True
+        _counter = c.rowcount
+
+        if _counter > 0:
+            self.commit = True
+        return _counter
 
     def insertmany(self, table_name: str, names: list, data_list: List[Data]) -> int:
         self._check_log()
