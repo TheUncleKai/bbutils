@@ -371,7 +371,7 @@ class SQLite(object):
             self.log.exception(e)
             self.log.error("SQL:  " + str(sql))
             self.log.error("DATA: " + str(_data))
-            raise
+            return False
 
         self.commit = True
         return True
