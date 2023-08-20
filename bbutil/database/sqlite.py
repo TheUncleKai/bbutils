@@ -281,7 +281,12 @@ class SQLite(object):
 
         c = self.connection.cursor()
 
+        _is_many = True
+
         if type(data) is Data:
+            _is_many = False
+
+        if _is_many is False:
             _execute = self._single_execute(table_name, names, data)
         else:
             _execute = self._many_execute(table_name, names, data)
@@ -289,8 +294,13 @@ class SQLite(object):
         if _execute is None:
             return -1
 
+        if _is_many is True:
+            command = c.executemany
+        else:
+            command = c.execute
+
         try:
-            c.execute(_execute.sql, _execute.data)
+            command(_execute.sql, _execute.data)
         except sqlite3.InterfaceError as e:
             self.log.exception(e)
             self.log.error("One or more values is an invalid format!")

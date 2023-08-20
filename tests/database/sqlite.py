@@ -495,6 +495,6 @@ class TestSQLite(unittest.TestCase):
 
         self.assertTrue(_check1)
         self.assertTrue(_check2)
-        self.assertEqual(count, 1)
+        self.assertEqual(count, 6)
         self.assertTrue(_check3)
         return

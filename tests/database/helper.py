@@ -164,7 +164,8 @@ def get_data_04() -> Data:
     _data = Data(_names, _values)
     return _data
 
-def get_data_05() -> Data:
+
+def get_data_05() -> list:
     _names = [
         "testid",
         "use_test",
@@ -173,11 +174,17 @@ def get_data_05() -> Data:
     ]
 
     _values = [
-        1,
-        True,
-        "Test01",
-        "testers/"
+        [1, True, "Test01", "testers/"],
+        [2, True, "Test02", "testers/"],
+        [3, True, "Test03", "testers/"],
+        [4, False, "Test04", "testXXs/"],
+        [5, True, "Test05", "testXXs/"],
+        [6, True, "Test06", "testXXs/"]
     ]
 
-    _data = Data(_names, _values)
-    return _data
+    _datas = []
+
+    for _value in _values:
+        _data = Data(_names, _value)
+        _datas.append(_data)
+    return _datas
