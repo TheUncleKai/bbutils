@@ -610,3 +610,124 @@ class TestSQLite(unittest.TestCase):
         self.assertEqual(count, 6)
         self.assertTrue(_check4)
         return
+
+    def test_update_02(self):
+        _sqlite = get_sqlite(filename="test.sqlite", clean=True)
+        _table = get_table_01(_sqlite)
+
+        _check1 = _sqlite.connect()
+
+        _check2 = _sqlite.prepare_table(_table.name, _table.column_list, _table.unique_list)
+
+        _data = get_data_05()
+        _new = get_data_07()
+        sql_filter = "testid = ?"
+
+        count = _sqlite.insert(_table.name, _table.names, _data)
+        _sqlite.connection = None
+        _check3 = _sqlite.update(_table.name, _table.names, _new, sql_filter, 4)
+
+        _check4 = _sqlite.disconnect()
+
+        self.assertTrue(_check1)
+        self.assertTrue(_check2)
+        self.assertFalse(_check3)
+        self.assertEqual(count, 6)
+        self.assertTrue(_check4)
+        return
+
+    def test_update_03(self):
+        _sqlite = get_sqlite(filename="test.sqlite", clean=True)
+        _table = get_table_01(_sqlite)
+
+        _check1 = _sqlite.connect()
+
+        _check2 = _sqlite.prepare_table(_table.name, _table.column_list, _table.unique_list)
+
+        _data = get_data_05()
+        _new = get_data_07()
+        sql_filter = "testid = ?"
+
+        count = _sqlite.insert(_table.name, _table.names, _data)
+
+        _cursor_mock = Mock()
+        _cursor_mock.execute = Mock(side_effect=sqlite_integrity_error)
+
+        _class_mock = Mock()
+        _class_mock.cursor = Mock(return_value=_cursor_mock)
+
+        _sqlite.connection = _class_mock
+        _check3 = _sqlite.update(_table.name, _table.names, _new, sql_filter, 4)
+
+        _check4 = _sqlite.disconnect()
+
+        self.assertTrue(_check1)
+        self.assertTrue(_check2)
+        self.assertFalse(_check3)
+        self.assertEqual(count, 6)
+        self.assertTrue(_check4)
+        return
+
+    def test_update_04(self):
+        _sqlite = get_sqlite(filename="test.sqlite", clean=True)
+        _table = get_table_01(_sqlite)
+
+        _check1 = _sqlite.connect()
+
+        _check2 = _sqlite.prepare_table(_table.name, _table.column_list, _table.unique_list)
+
+        _data = get_data_05()
+        _new = get_data_07()
+        sql_filter = "testid = ?"
+
+        count = _sqlite.insert(_table.name, _table.names, _data)
+
+        _cursor_mock = Mock()
+        _cursor_mock.execute = Mock(side_effect=sqlite_operational_error)
+
+        _class_mock = Mock()
+        _class_mock.cursor = Mock(return_value=_cursor_mock)
+
+        _sqlite.connection = _class_mock
+        _check3 = _sqlite.update(_table.name, _table.names, _new, sql_filter, 4)
+
+        _check4 = _sqlite.disconnect()
+
+        self.assertTrue(_check1)
+        self.assertTrue(_check2)
+        self.assertFalse(_check3)
+        self.assertEqual(count, 6)
+        self.assertTrue(_check4)
+        return
+
+    def test_update_05(self):
+        _sqlite = get_sqlite(filename="test.sqlite", clean=True)
+        _table = get_table_01(_sqlite)
+
+        _check1 = _sqlite.connect()
+
+        _check2 = _sqlite.prepare_table(_table.name, _table.column_list, _table.unique_list)
+
+        _data = get_data_05()
+        _new = get_data_07()
+        sql_filter = "testid = ?"
+
+        count = _sqlite.insert(_table.name, _table.names, _data)
+
+        _cursor_mock = Mock()
+        _cursor_mock.execute = Mock(side_effect=sqlite_unknown_error)
+
+        _class_mock = Mock()
+        _class_mock.cursor = Mock(return_value=_cursor_mock)
+
+        _sqlite.connection = _class_mock
+        _check3 = _sqlite.update(_table.name, _table.names, _new, sql_filter, 4)
+
+        _check4 = _sqlite.disconnect()
+
+        self.assertTrue(_check1)
+        self.assertTrue(_check2)
+        self.assertFalse(_check3)
+        self.assertEqual(count, 6)
+        self.assertTrue(_check4)
+        return

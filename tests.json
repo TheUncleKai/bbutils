@@ -274,7 +274,11 @@
                 "test_insert_07",
                 "test_insert_08",
                 "test_insert_09",
-                "test_update_01"
+                "test_update_01",
+                "test_update_02",
+                "test_update_03",
+                "test_update_04",
+                "test_update_05"
             ]
         }
     ]

@@ -330,6 +330,10 @@ class SQLite(object):
     def update(self, table_name: str, names: list, data: Data, sql_filter: str, filter_value=None) -> bool:
         self._check_log()
 
+        if self.connection is None:
+            self.log.error("No valid connection!")
+            return False
+
         c = self.connection.cursor()
 
         _sets = []
@@ -357,6 +361,7 @@ class SQLite(object):
             self.log.error("SQL:  " + str(sql))
             self.log.error("DATA: " + str(_data))
             self.log.exception(e)
+            return False
         except Exception as e:
             self.log.exception(e)
             self.log.error("SQL:  " + str(sql))
