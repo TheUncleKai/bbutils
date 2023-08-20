@@ -26,7 +26,7 @@ from bbutil.utils import full_path
 
 from tests.database.helper import (sqlite_operational_error, sqlite_integrity_error, sqlite_unknown_error,
                                    mock_operational_error, set_log,
-                                   get_sqlite, get_table_01, get_data_01, get_data_02, get_data_03)
+                                   get_sqlite, get_table_01, get_data_01, get_data_02, get_data_03, get_data_04)
 
 __all__ = [
     "TestSQLite"
@@ -450,6 +450,25 @@ class TestSQLite(unittest.TestCase):
         _check2 = _sqlite.prepare_table(_table.name, _table.column_list, _table.unique_list)
 
         _data = get_data_03()
+        _check3 = _sqlite.insert(_table.name, _table.names, _data)
+
+        _check4 = _sqlite.disconnect()
+
+        self.assertTrue(_check1)
+        self.assertTrue(_check2)
+        self.assertFalse(_check3)
+        self.assertTrue(_check4)
+        return
+
+    def test_insert_06(self):
+        _sqlite = get_sqlite(filename="test.sqlite", clean=True)
+        _table = get_table_01(_sqlite)
+
+        _check1 = _sqlite.connect()
+
+        _check2 = _sqlite.prepare_table(_table.name, _table.column_list, _table.unique_list)
+
+        _data = get_data_04()
         _check3 = _sqlite.insert(_table.name, _table.names, _data)
 
         _check4 = _sqlite.disconnect()

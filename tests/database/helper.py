@@ -18,6 +18,7 @@
 
 import os
 
+import datetime
 import sqlite3
 from unittest import mock as mock
 
@@ -36,7 +37,8 @@ __all__ = [
     "get_table_01",
     "get_data_01",
     "get_data_02",
-    "get_data_03"
+    "get_data_03",
+    "get_data_04"
 ]
 
 _index = {
@@ -134,6 +136,28 @@ def get_data_03() -> Data:
         True,
         "Test01",
         "testers/"
+    ]
+
+    _data = Data(_names, _values)
+    return _data
+
+
+def get_data_04() -> Data:
+    _names = [
+        "testid",
+        "use_test",
+        "testname",
+        "path"
+    ]
+
+    _values = [
+        1,
+        True,
+        "Test01",
+        [
+            "List1",
+            "List2"
+        ]
     ]
 
     _data = Data(_names, _values)

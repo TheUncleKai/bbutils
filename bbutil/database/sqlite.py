@@ -234,6 +234,12 @@ class SQLite(object):
 
         try:
             c.execute(sql, _data)
+        except sqlite3.InterfaceError as e:
+            self.log.exception(e)
+            self.log.error("One or more values is an invalid format!")
+            self.log.error("SQL:  " + str(sql))
+            self.log.error("DATA: " + str(_data))
+            return False
         except OverflowError as e:
             self.log.exception(e)
             self.log.error("One or more values is too large!")
