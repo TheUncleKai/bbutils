@@ -44,7 +44,23 @@ class Table(object):
     data: List[Data] = field(default_factory=list)
     index: Dict[Any, List[Data]] = field(default_factory=dict)
     columns: List[Column] = field(default_factory=list)
-    _datacolumns: List[str] = field(default_factory=list)
+    names: List[str] = field(default_factory=list)
+
+    @property
+    def column_list(self) -> list:
+        _columns = []
+        for _col in self.columns:
+            _columns.append(_col.create)
+        return _columns
+
+    @property
+    def unique_list(self) -> list:
+        _unique = []
+        for _col in self.columns:
+            if _col.unique is False:
+                continue
+            _unique.append(_col.name)
+        return _unique
 
     def new_data(self) -> Data:
         key_list = []
@@ -73,7 +89,7 @@ class Table(object):
             self.keyword = name
 
         if primarykey is False:
-            self._datacolumns.append(name)
+            self.names.append(name)
         return
 
     def select(self, data_filter: str = "", data_values=None, warn: bool = False, verbose: bool = False) -> List[Data]:
@@ -175,11 +191,11 @@ class Table(object):
         return _result
 
     def store_item(self, data: Data) -> bool:
-        _check = self.sqlite.insert(self.name, self._datacolumns, data)
+        _check = self.sqlite.insert(self.name, self.names, data)
         return _check
 
     def old_store(self) -> int:
-        _ret = self.sqlite.insertmany(self.name, self._datacolumns, self.data)
+        _ret = self.sqlite.insertmany(self.name, self.names, self.data)
         return _ret
 
     @staticmethod
@@ -225,7 +241,7 @@ class Table(object):
 
         for _item_list in _split_list:
             _counter += len(_item_list)
-            _stored += self.sqlite.insertmany(self.name, self._datacolumns, _item_list)
+            _stored += self.sqlite.insertmany(self.name, self.names, _item_list)
             _progress.inc()
 
         self.log.clear()
@@ -237,7 +253,7 @@ class Table(object):
         return _stored
 
     def update(self, data: Data, data_filter: str, filter_value=None) -> bool:
-        _check = self.sqlite.update(self.name, self._datacolumns, data, data_filter, filter_value)
+        _check = self.sqlite.update(self.name, self.names, data, data_filter, filter_value)
         return _check
 
     def init(self) -> bool:

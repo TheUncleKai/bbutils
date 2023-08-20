@@ -19,63 +19,26 @@
 import os
 import unittest
 import unittest.mock as mock
-import sqlite3
 
 from unittest.mock import Mock
-from bbutil.database import SQLite, Table, Types
+from bbutil.database import SQLite
 from bbutil.utils import full_path
 
-from bbutil.logging import Logging
+from tests.database.helper import sqlite_crash_error, mock_crash_error, set_log, get_sqlite, get_table_01, get_data_01
 
-_index = {
-    0: ["INFORM", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"],
-    1: ["INFORM", "DEBUG1", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"],
-    2: ["INFORM", "DEBUG1", "DEBUG2", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"],
-    3: ["INFORM", "DEBUG1", "DEBUG2", "DEBUG3", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"]
-}
-
-crash_error = sqlite3.OperationalError('This did go boing!!')
-mock_sub = mock.Mock(side_effect=crash_error)
+__all__ = [
+    "TestSQLite"
+]
 
 
 class TestSQLite(unittest.TestCase):
     """Testing class for locking module."""
 
-    @staticmethod
-    def set_log() -> Logging:
-        _log = Logging()
-        _log.setup(app="Test", level=2, index=_index)
-
-        console = _log.get_writer("console")
-        _log.register(console)
-        _log.open()
-        return _log
-
-    @staticmethod
-    def _get_table_01(sqlite_object: SQLite) -> Table:
-        _table = Table(name="tester01", sqlite=sqlite_object)
-        _table.add_column(name="testid", data_type=Types.integer, unique=True)
-        _table.add_column(name="use_test", data_type=Types.bool)
-        _table.add_column(name="testname", data_type=Types.string)
-        _table.add_column(name="path", data_type=Types.string)
-        return _table
-
-    def _get_sqlite(self, filename: str, path: str = os.getcwd(), clean: bool = False) -> SQLite:
-        _log = self.set_log()
-        _testfile = full_path("{0:s}/{1:s}".format(path, filename))
-        _name = "Test"
-
-        if (os.path.exists(_testfile) is True) and (clean is True):
-            os.remove(_testfile)
-
-        _sqlite = SQLite(filename=_testfile, name="Test", log=_log)
-        return _sqlite
-
     def tearDown(self):
         return
 
     def test_connect_01(self):
-        _log = self.set_log()
+        _log = set_log()
         _testfile = full_path("{0:s}/test.sqlite".format(os.getcwd()))
         _name = "Test"
 
@@ -99,7 +62,7 @@ class TestSQLite(unittest.TestCase):
 
     def test_connect_02(self):
 
-        _log = self.set_log()
+        _log = set_log()
         _name = "Test"
 
         _sqlite = SQLite(filename="", name="Test", log=_log)
@@ -113,7 +76,7 @@ class TestSQLite(unittest.TestCase):
 
     def test_connect_03(self):
 
-        _log = self.set_log()
+        _log = set_log()
 
         _sqlite = SQLite(filename="", name="", log=_log)
 
@@ -124,7 +87,7 @@ class TestSQLite(unittest.TestCase):
 
     def test_connect_04(self):
 
-        _log = self.set_log()
+        _log = set_log()
 
         _sqlite = SQLite(filename="", name="Test", log=_log, use_memory=True)
 
@@ -133,10 +96,10 @@ class TestSQLite(unittest.TestCase):
         self.assertTrue(_check1)
         return
 
-    @mock.patch('sqlite3.connect', new=mock_sub)
+    @mock.patch('sqlite3.connect', new=mock_crash_error)
     def test_connect_05(self):
 
-        _log = self.set_log()
+        _log = set_log()
 
         _sqlite = SQLite(filename="", name="Test", log=_log, use_memory=True)
 
@@ -145,9 +108,9 @@ class TestSQLite(unittest.TestCase):
         self.assertFalse(_check1)
         return
 
-    @mock.patch('sqlite3.connect', new=mock_sub)
+    @mock.patch('sqlite3.connect', new=mock_crash_error)
     def test_connect_06(self):
-        _log = self.set_log()
+        _log = set_log()
         _testfile = full_path("{0:s}/test.sqlite".format(os.getcwd()))
         _name = "Test"
 
@@ -178,7 +141,7 @@ class TestSQLite(unittest.TestCase):
         return
 
     def test_disconnect_01(self):
-        _sqlite = self._get_sqlite(filename="test.sqlite")
+        _sqlite = get_sqlite(filename="test.sqlite")
 
         _check1 = _sqlite.connect()
         _check2 = _sqlite.disconnect()
@@ -188,7 +151,7 @@ class TestSQLite(unittest.TestCase):
         return
 
     def test_disconnect_02(self):
-        _sqlite = self._get_sqlite(filename="test.sqlite")
+        _sqlite = get_sqlite(filename="test.sqlite")
 
         _check1 = _sqlite.connect()
         _check2 = _sqlite.disconnect()
@@ -200,7 +163,7 @@ class TestSQLite(unittest.TestCase):
         return
 
     def test_disconnect_03(self):
-        _sqlite = self._get_sqlite(filename="test.sqlite")
+        _sqlite = get_sqlite(filename="test.sqlite")
 
         _check1 = _sqlite.connect()
 
@@ -213,12 +176,12 @@ class TestSQLite(unittest.TestCase):
         return
 
     def test_disconnect_04(self):
-        _sqlite = self._get_sqlite(filename="test.sqlite")
+        _sqlite = get_sqlite(filename="test.sqlite")
 
         _check1 = _sqlite.connect()
 
         _class_mock = Mock()
-        _class_mock.commit = Mock(side_effect=crash_error)
+        _class_mock.commit = Mock(side_effect=sqlite_crash_error)
 
         _sqlite.commit = True
         _sqlite.connection = _class_mock
@@ -230,12 +193,12 @@ class TestSQLite(unittest.TestCase):
         return
 
     def test_disconnect_05(self):
-        _sqlite = self._get_sqlite(filename="test.sqlite")
+        _sqlite = get_sqlite(filename="test.sqlite")
 
         _check1 = _sqlite.connect()
 
         _class_mock = Mock()
-        _class_mock.close = Mock(side_effect=crash_error)
+        _class_mock.close = Mock(side_effect=sqlite_crash_error)
 
         _sqlite.commit = True
         _sqlite.connection = _class_mock
@@ -247,7 +210,7 @@ class TestSQLite(unittest.TestCase):
         return
 
     def test_check_table_01(self):
-        _sqlite = self._get_sqlite(filename="test.sqlite")
+        _sqlite = get_sqlite(filename="test.sqlite")
 
         _check1 = _sqlite.connect()
         _check2 = _sqlite.check_table("Test")
@@ -260,7 +223,7 @@ class TestSQLite(unittest.TestCase):
         return
 
     def test_check_table_02(self):
-        _sqlite = self._get_sqlite(filename="test_check_table.sqlite", path="testdata/database")
+        _sqlite = get_sqlite(filename="test_check_table.sqlite", path="testdata/database")
 
         _check1 = _sqlite.connect()
 
@@ -274,12 +237,12 @@ class TestSQLite(unittest.TestCase):
         return
 
     def test_check_table_03(self):
-        _sqlite = self._get_sqlite(filename="test_check_table.sqlite", path="testdata/database")
+        _sqlite = get_sqlite(filename="test_check_table.sqlite", path="testdata/database")
 
         _check1 = _sqlite.connect()
 
         _cursor_mock = Mock()
-        _cursor_mock.execute = Mock(side_effect=crash_error)
+        _cursor_mock.execute = Mock(side_effect=sqlite_crash_error)
 
         _class_mock = Mock()
         _class_mock.cursor = Mock(return_value=_cursor_mock)
@@ -296,7 +259,7 @@ class TestSQLite(unittest.TestCase):
         return
 
     def test_count_table_01(self):
-        _sqlite = self._get_sqlite(filename="test_check_table.sqlite", path="testdata/database")
+        _sqlite = get_sqlite(filename="test_check_table.sqlite", path="testdata/database")
 
         _check1 = _sqlite.connect()
 
@@ -310,12 +273,12 @@ class TestSQLite(unittest.TestCase):
         return
 
     def test_count_table_02(self):
-        _sqlite = self._get_sqlite(filename="test_check_table.sqlite", path="testdata/database")
+        _sqlite = get_sqlite(filename="test_check_table.sqlite", path="testdata/database")
 
         _check1 = _sqlite.connect()
 
         _cursor_mock = Mock()
-        _cursor_mock.execute = Mock(side_effect=crash_error)
+        _cursor_mock.execute = Mock(side_effect=sqlite_crash_error)
 
         _class_mock = Mock()
         _class_mock.cursor = Mock(return_value=_cursor_mock)
@@ -332,24 +295,70 @@ class TestSQLite(unittest.TestCase):
         return
 
     def test_prepare_table_01(self):
-        _sqlite = self._get_sqlite(filename="test.sqlite", clean=True)
-        _table = self._get_table_01(_sqlite)
-
-        _columns = []
-        for _col in _table.columns:
-            _columns.append(_col.create)
-
-        _unique = []
-        for _col in _table.columns:
-            if _col.unique is False:
-                continue
-            _unique.append(_col.name)
+        _sqlite = get_sqlite(filename="test.sqlite", clean=True)
+        _table = get_table_01(_sqlite)
 
         _check1 = _sqlite.connect()
 
-        _check2 = _sqlite.prepare_table(_table.name, _columns, _unique)
+        _check2 = _sqlite.prepare_table(_table.name, _table.column_list, _table.unique_list)
 
         _check3 = _sqlite.disconnect()
+
+        self.assertTrue(_check1)
+        self.assertTrue(_check2)
+        self.assertTrue(_check3)
+        return
+
+    def test_prepare_table_02(self):
+        _sqlite = get_sqlite(filename="test.sqlite", clean=True)
+        _table = get_table_01(_sqlite)
+
+        _check1 = _sqlite.connect()
+
+        _cursor_mock = Mock()
+        _cursor_mock.execute = Mock(side_effect=sqlite_crash_error)
+
+        _class_mock = Mock()
+        _class_mock.cursor = Mock(return_value=_cursor_mock)
+
+        _sqlite.connection = _class_mock
+
+        _check2 = _sqlite.prepare_table(_table.name, _table.column_list, _table.unique_list)
+
+        _check3 = _sqlite.disconnect()
+
+        self.assertTrue(_check1)
+        self.assertFalse(_check2)
+        self.assertTrue(_check3)
+        return
+
+    def test_prepare_table_03(self):
+        _sqlite = get_sqlite(filename="test_check_table.sqlite", path="testdata/database")
+        _table = get_table_01(_sqlite)
+
+        _check1 = _sqlite.connect()
+
+        _check2 = _sqlite.prepare_table(_table.name, _table.column_list, _table.unique_list)
+
+        _check3 = _sqlite.disconnect()
+
+        self.assertTrue(_check1)
+        self.assertTrue(_check2)
+        self.assertTrue(_check3)
+        return
+
+    def test_insert_01(self):
+        _sqlite = get_sqlite(filename="test.sqlite", clean=True)
+        _table = get_table_01(_sqlite)
+
+        _check1 = _sqlite.connect()
+
+        _check2 = _sqlite.prepare_table(_table.name, _table.column_list, _table.unique_list)
+
+        _data = get_data_01()
+        _check3 = _sqlite.insert(_table.name, _table.names, _data)
+
+        _check4 = _sqlite.disconnect()
 
         self.assertTrue(_check1)
         self.assertTrue(_check2)
