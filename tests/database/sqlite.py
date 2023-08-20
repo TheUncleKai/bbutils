@@ -19,17 +19,9 @@
 import os
 import unittest
 import unittest.mock as mock
-import sys
 import sqlite3
 
-from sqlite3 import Connection
-
-from typing import Optional
-
-import bbutil.lang.parser
-import bbutil.lang.parser.pyfile
-
-from unittest.mock import MagicMock, Mock
+from unittest.mock import Mock
 from bbutil.database import SQLite, Table, Types
 from bbutil.utils import full_path
 
