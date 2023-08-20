@@ -280,3 +280,25 @@ class TestSQLite(unittest.TestCase):
         self.assertTrue(_check2)
         self.assertTrue(_check3)
         return
+
+    def test_check_table_03(self):
+        _sqlite = self._get_sqlite(filename="test_check_table.sqlite", path="testdata/database")
+
+        _check1 = _sqlite.connect()
+
+        _cursor_mock = Mock()
+        _cursor_mock.execute = Mock(side_effect=crash_error)
+
+        _class_mock = Mock()
+        _class_mock.cursor = Mock(return_value=_cursor_mock)
+
+        _sqlite.connection = _class_mock
+
+        _check2 = _sqlite.check_table("tester01")
+
+        _check3 = _sqlite.disconnect()
+
+        self.assertTrue(_check1)
+        self.assertFalse(_check2)
+        self.assertTrue(_check3)
+        return

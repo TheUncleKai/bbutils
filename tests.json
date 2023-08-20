@@ -255,7 +255,8 @@
                 "test_disconnect_04",
                 "test_disconnect_05",
                 "test_check_table_01",
-                "test_check_table_02"
+                "test_check_table_02",
+                "test_check_table_03"
             ]
         }
     ]
