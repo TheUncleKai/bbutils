@@ -362,11 +362,6 @@ class SQLite(object):
             self.log.error("DATA: " + str(_data))
             self.log.exception(e)
             return False
-        except Exception as e:
-            self.log.exception(e)
-            self.log.error("SQL:  " + str(sql))
-            self.log.error("DATA: " + str(_data))
-            return False
         except OverflowError as e:
             self.log.exception(e)
             self.log.error("SQL:  " + str(sql))
@@ -378,6 +373,10 @@ class SQLite(object):
 
     def select(self, table_name: str, sql_filter: str, names: list, data: list) -> Optional[list]:
         self._check_log()
+
+        if self.connection is None:
+            self.log.error("No valid connection!")
+            return None
 
         c = self.connection.cursor()
 
