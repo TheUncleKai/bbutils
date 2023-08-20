@@ -32,21 +32,18 @@ __all__ = [
 
 @dataclass
 class _Execute(object):
-
     data: list = field(default_factory=list)
     sql: str = ""
 
 
 @dataclass
 class Select(object):
-
     number: int = -1
     data: list = field(default_factory=list)
 
 
 @dataclass
 class SQLite(object):
-
     log: Optional[Logging] = None
 
     name: str = ""
@@ -371,7 +368,15 @@ class SQLite(object):
         self.commit = True
         return True
 
-    def select(self, table_name: str, sql_filter: str, names: list, data: list) -> Optional[list]:
+    @staticmethod
+    def _select_execute(cursor: sqlite3.Cursor, command: str, data: list):
+        if len(data) == 0:
+            cursor.execute(command)
+        else:
+            cursor.execute(command, data)
+        return
+
+    def select(self, table_name: str, names: list, sql_filter: str, data: list) -> Optional[list]:
         self._check_log()
 
         if self.connection is None:
@@ -391,29 +396,20 @@ class SQLite(object):
 
         self.log.debug1(table_name, command)
 
-        if len(data) == 0:
-            try:
-                c.execute(command)
-            except sqlite3.OperationalError as e:
-                self.log.error("Unable to search table: {0:s}".format(table_name))
-                self.log.error(command)
-                self.log.exception(e)
-                return None
-        else:
-            try:
-                c.execute(command, data)
-            except sqlite3.OperationalError as e:
-                self.log.error("Unable to search table: {0:s}".format(table_name))
-                print(command)
-                print(data)
-                self.log.exception(e)
-                return None
-            except OverflowError as e:
-                self.log.error("Unable to search table: {0:s}".format(table_name))
-                print(command)
-                print(data)
-                self.log.exception(e)
-                raise
+        try:
+            self._select_execute(c, command, data)
+        except sqlite3.OperationalError as e:
+            self.log.error("Unable to search table: {0:s}".format(table_name))
+            self.log.exception(e)
+            self.log.error("SQL:  " + str(command))
+            self.log.error("DATA: " + str(data))
+            return None
+        except OverflowError as e:
+            self.log.error("Unable to search table due to overflow: {0:s}".format(table_name))
+            self.log.exception(e)
+            self.log.error("SQL:  " + str(command))
+            self.log.error("DATA: " + str(data))
+            return None
 
         _fetchlist = []
 
