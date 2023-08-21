@@ -449,3 +449,39 @@ class TestTable(unittest.TestCase):
         self.assertTrue(_check3)
         self.assertEqual(len(_list1), 1)
         return
+
+    def test_update_01(self):
+        _sqlite = get_sqlite(filename="test.sqlite", clean=True)
+        _table = get_table_04(sqlite_object=_sqlite)
+
+        _check1 = _sqlite.connect()
+        _check2 = _table.init()
+
+        _data1 = _table.new_data()
+        _data1.use_test = True
+        _data1.category = "TestMain"
+        _data1.testname = "Test01"
+        _data1.path = "path"
+
+        _table.add(_data1)
+        _check3 = _table.store()
+
+        _data2 = _table.new_data()
+        _data2.use_test = True
+        _data2.category = "TestMain"
+        _data2.testname = "Test02"
+        _data2.path = "path"
+
+        _check4 = _table.update(_data2, "testid = ?", 1)
+
+        _count = _table.count
+
+        _check5 = _sqlite.disconnect()
+
+        self.assertTrue(_check1)
+        self.assertTrue(_check2)
+        self.assertTrue(_check3)
+        self.assertTrue(_check4)
+        self.assertTrue(_check5)
+        self.assertEqual(_count, 1)
+        return
