@@ -18,11 +18,10 @@
 
 import unittest
 
-import bbutil
-
 from bbutil.database import Table, Types
 
-from tests.database.helper import get_sqlite, set_log
+from tests.database.helper import get_sqlite
+from tests.helper import set_log
 from tests.database.helper.table import TestData, get_table_01, get_table_02, get_table_03, get_table_04
 
 __all__ = [
@@ -34,12 +33,7 @@ class TestTable(unittest.TestCase):
     """Testing class for locking module."""
 
     def setUp(self):
-        if bbutil.log is None:
-            _log = set_log()
-            bbutil.set_log(_log)
-        return
-
-    def tearDown(self):
+        set_log()
         return
 
     def assertHasAttr(self, obj, intended_attr):

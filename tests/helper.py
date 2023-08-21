@@ -16,12 +16,32 @@
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
 
-__all__ = [
-    "lang",
-    "logging",
+import bbutil
 
-    "data",
-    "file",
-    "helper",
-    "utils"
+from bbutil.logging import Logging
+
+__all__ = [
+    "set_log"
 ]
+
+_index = {
+    0: ["INFORM", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"],
+    1: ["INFORM", "DEBUG1", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"],
+    2: ["INFORM", "DEBUG1", "DEBUG2", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"],
+    3: ["INFORM", "DEBUG1", "DEBUG2", "DEBUG3", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"]
+}
+
+
+def set_log():
+    if bbutil.log is not None:
+        return
+
+    _log = Logging()
+    _log.setup(app="Test", level=2, index=_index)
+
+    console = _log.get_writer("console")
+    _log.register(console)
+    _log.open()
+
+    bbutil.set_log(_log)
+    return

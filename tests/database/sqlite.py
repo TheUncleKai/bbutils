@@ -22,8 +22,6 @@ import unittest.mock as mock
 
 from unittest.mock import Mock
 
-import bbutil
-
 from bbutil.database import SQLite
 from bbutil.utils import full_path
 
@@ -31,7 +29,8 @@ from tests.database.helper.sqlite import (sqlite_operational_error, sqlite_integ
                                           mock_operational_error, get_table_01, get_data_01,
                                           get_data_02, get_data_03, get_data_04, get_data_05, get_data_06, get_data_07,
                                           get_data_08)
-from tests.database.helper import set_log, get_sqlite
+from tests.database.helper import get_sqlite
+from tests.helper import set_log
 
 __all__ = [
     "TestSQLite"
@@ -42,12 +41,7 @@ class TestSQLite(unittest.TestCase):
     """Testing class for locking module."""
 
     def setUp(self):
-        if bbutil.log is None:
-            _log = set_log()
-            bbutil.set_log(_log)
-        return
-
-    def tearDown(self):
+        set_log()
         return
 
     def test_connect_01(self):

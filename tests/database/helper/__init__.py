@@ -19,33 +19,14 @@
 import os
 
 from bbutil.database import SQLite
-from bbutil.logging import Logging
 from bbutil.utils import full_path
 
 __all__ = [
     "sqlite",
     "table",
 
-    "set_log",
     "get_sqlite"
 ]
-
-_index = {
-    0: ["INFORM", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"],
-    1: ["INFORM", "DEBUG1", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"],
-    2: ["INFORM", "DEBUG1", "DEBUG2", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"],
-    3: ["INFORM", "DEBUG1", "DEBUG2", "DEBUG3", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"]
-}
-
-
-def set_log() -> Logging:
-    _log = Logging()
-    _log.setup(app="Test", level=2, index=_index)
-
-    console = _log.get_writer("console")
-    _log.register(console)
-    _log.open()
-    return _log
 
 
 def get_sqlite(filename: str, path: str = os.getcwd(), clean: bool = False) -> SQLite:

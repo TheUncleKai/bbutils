@@ -22,9 +22,7 @@ import unittest.mock as mock
 
 from unittest.mock import Mock
 
-import bbutil
-
-from tests.database.helper import set_log
+from tests.helper import set_log
 from tests.database.helper.database import TestData
 
 from tests.database.helper.sqlite import (mock_operational_error, sqlite_operational_error)
@@ -38,12 +36,7 @@ class TestDatabase(unittest.TestCase):
     """Testing class for locking module."""
 
     def setUp(self):
-        if bbutil.log is None:
-            _log = set_log()
-            bbutil.set_log(_log)
-        return
-
-    def tearDown(self):
+        set_log()
         return
 
     def assertHasAttr(self, obj, intended_attr):
