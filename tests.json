@@ -309,7 +309,8 @@
                 "test_add_01",
                 "test_add_02",
                 "test_update_01",
-                "test_load_01"
+                "test_load_01",
+                "test_load_02"
             ]
         }
     ]

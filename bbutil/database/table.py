@@ -280,14 +280,13 @@ class Table(object):
         self.log.inform(self.name, "Load {0:s}...".format(self.name))
 
         _items = self.select()
-        if _items is None:
-            return False
+        _count = len(_items)
 
-        _max = len(_items) + 1
+        _max = _count + 1
         _progress = self.log.progress(_max, select_interval(_max))
 
         for _item in _items:
             self.add(_item)
             _progress.inc()
         self.log.clear()
-        return True
+        return _count

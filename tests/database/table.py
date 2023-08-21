@@ -488,11 +488,8 @@ class TestTable(unittest.TestCase):
 
     def _load_table(self, table: Table, limit: int):
         _sql_count = table.count
+        _data_count = table.load()
 
-        _check = table.load()
-        _data_count = len(table.data)
-
-        self.assertTrue(_check)
         self.assertEqual(_sql_count, limit)
         self.assertEqual(_data_count, limit)
         return
@@ -535,5 +532,24 @@ class TestTable(unittest.TestCase):
         _check_disconnect = _sqlite.disconnect()
 
         self.assertTrue(_check_connect)
+        self.assertTrue(_check_disconnect)
+        return
+
+    def test_load_02(self):
+        _sqlite = get_sqlite(filename="test_select.sqlite", path="testdata/database")
+
+        _table = get_table_01(sqlite_object=_sqlite)
+
+        _check_connect = _sqlite.connect()
+
+        _check_init = _table.init()
+        _sqlite.connection = None
+        _count = _table.load()
+
+        _check_disconnect = _sqlite.disconnect()
+
+        self.assertTrue(_check_connect)
+        self.assertTrue(_check_init)
+        self.assertEqual(_count, 0)
         self.assertTrue(_check_disconnect)
         return
