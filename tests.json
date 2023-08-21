@@ -325,7 +325,8 @@
                 "test_start_04",
                 "test_start_05",
                 "test_stop_01",
-                "test_stop_02"
+                "test_stop_02",
+                "test_store_01"
             ]
         }
     ]

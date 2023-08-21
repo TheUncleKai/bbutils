@@ -129,3 +129,43 @@ class TestDatabase(unittest.TestCase):
         self.assertTrue(_check1)
         self.assertFalse(_check2)
         return
+
+    def test_store_01(self):
+        _filename = "{0:s}/test.sqlite".format(os.getcwd())
+
+        if os.path.exists(_filename) is True:
+            os.remove(_filename)
+
+        _database = TestData(filename=_filename)
+
+        _check1 = _database.start()
+        self.assertIsNotNone(_database.table01)
+        self.assertIsNotNone(_database.table02)
+
+        _data = _database.table01.new_data()
+        _data.use_test = False
+        _data.testname = "01"
+        _data.path = "//"
+
+        _database.table01.add(_data)
+
+        _data = _database.table02.new_data()
+        _data.use_test = False
+        _data.category = "01"
+        _data.testname = "01"
+        _data.path = "//"
+
+        _database.table02.add(_data)
+
+        _database.store()
+
+        _count1 = _database.table01.count
+        _count2 = _database.table02.count
+
+        _check2 = _database.stop()
+
+        self.assertTrue(_check1)
+        self.assertTrue(_check2)
+        self.assertEqual(_count1, 1)
+        self.assertEqual(_count2, 1)
+        return
