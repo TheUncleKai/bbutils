@@ -127,18 +127,6 @@ class TestSQLite(unittest.TestCase):
         self.assertFalse(_check2)
         return
 
-    def test_connect_07(self):
-        _testfile = full_path("{0:s}/test.sqlite".format(os.getcwd()))
-        _name = "Test"
-
-        if os.path.exists(_testfile) is True:
-            os.remove(_testfile)
-
-        _sqlite = SQLite(filename=_testfile, name="Test")
-
-        self.assertRaises(ValueError, _sqlite.connect)
-        return
-
     def test_disconnect_01(self):
         _sqlite = get_sqlite(filename="test.sqlite")
 

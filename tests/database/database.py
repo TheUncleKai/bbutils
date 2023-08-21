@@ -22,6 +22,8 @@ import unittest.mock as mock
 
 from unittest.mock import Mock
 
+import bbutil
+
 from tests.database.helper import set_log
 from tests.database.helper.database import TestData
 
@@ -34,6 +36,12 @@ __all__ = [
 
 class TestDatabase(unittest.TestCase):
     """Testing class for locking module."""
+
+    def setUp(self):
+        if bbutil.log is None:
+            _log = set_log()
+            bbutil.set_log(_log)
+        return
 
     def tearDown(self):
         return
