@@ -320,7 +320,8 @@
             "classname": "TestDatabase",
             "tests": [
                 "test_start_01",
-                "test_start_02"
+                "test_start_02",
+                "test_start_03"
             ]
         }
     ]

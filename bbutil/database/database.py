@@ -98,6 +98,7 @@ class Database(metaclass=ABCMeta):
 
         _check = self.prepare()
         if _check is False:
+            self.log.error("Preparation of tables has failed!")
             return False
 
         _check = self._open()
@@ -106,10 +107,6 @@ class Database(metaclass=ABCMeta):
         return True
 
     def _open(self) -> bool:
-        if self.sqlite is None:
-            self.log.error("No SQLite connection established!")
-            return False
-
         _check = self.sqlite.connect()
         if _check is False:
             return False

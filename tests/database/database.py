@@ -63,3 +63,12 @@ class TestDatabase(unittest.TestCase):
 
         self.assertFalse(_check1)
         return
+
+    def test_start_03(self):
+        _filename = "{0:s}/test.sqlite".format(os.getcwd())
+        _database = TestData(filename=_filename, prepare_fail=True)
+
+        _check1 = _database.start()
+
+        self.assertFalse(_check1)
+        return
