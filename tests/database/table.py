@@ -26,7 +26,7 @@ from bbutil.database import SQLite, Table, Types
 from bbutil.utils import full_path
 
 from tests.database.helper import get_sqlite
-from tests.database.helper.table import get_table_01, get_table_02
+from tests.database.helper.table import get_table_01, get_table_02, get_table_03
 
 __all__ = [
     "TestTable"
@@ -320,4 +320,62 @@ class TestTable(unittest.TestCase):
         self.assertTrue(_check2)
         self.assertTrue(_check3)
         self.assertEqual(_count, 2)
+        return
+
+    def _check_store(self, table: Table, limit: int, check: int):
+        _range = range(0, limit)
+        n = 1
+        for _number in _range:
+            _data = table.new_data()
+            _data.use_test = True
+            _data.testname = "Test{0:d}".format(n)
+            _data.path = "path"
+            table.add(_data)
+            n += 1
+
+        _count1 = table.store()
+        _count2 = table.count
+        self.assertEqual(_count1, check)
+        self.assertEqual(_count2, check)
+        return
+
+    def test_store_04(self):
+        _sqlite = get_sqlite(filename="test.sqlite", clean=True)
+
+        _table0 = get_table_03("interval0", sqlite_object=_sqlite)
+        _table1 = get_table_03("interval1", sqlite_object=_sqlite)
+        _table2 = get_table_03("interval2", sqlite_object=_sqlite)
+        _table3 = get_table_03("interval3", sqlite_object=_sqlite)
+        _table4 = get_table_03("interval4", sqlite_object=_sqlite)
+        _table5 = get_table_03("interval5", sqlite_object=_sqlite)
+        _table6 = get_table_03("interval6", sqlite_object=_sqlite)
+
+        _check_connect = _sqlite.connect()
+
+        _tables = [
+            _table0,
+            _table1,
+            _table2,
+            _table3,
+            _table4,
+            _table5,
+            _table6
+        ]
+
+        for _table in _tables:
+            _check = _table.init()
+            self.assertTrue(_check)
+
+        self._check_store(_table0, 500, 500)
+        self._check_store(_table1, 1000, 1000)
+        self._check_store(_table2, 5000, 5000)
+        self._check_store(_table3, 10000, 10000)
+        self._check_store(_table4, 20000, 20000)
+        self._check_store(_table5, 50000, 50000)
+        self._check_store(_table6, 100000, 100000)
+
+        _check_disconnect = _sqlite.disconnect()
+
+        self.assertTrue(_check_connect)
+        self.assertTrue(_check_disconnect)
         return

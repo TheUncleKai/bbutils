@@ -17,7 +17,7 @@
 #
 
 from dataclasses import dataclass, field
-from typing import Optional, List, Dict, Any, Tuple, Union
+from typing import Optional, List, Dict, Any, Tuple
 
 from bbutil.logging import Logging
 
@@ -36,7 +36,7 @@ class Table(object):
     log: Optional[Logging] = None
 
     name: str = ""
-    counter: int = 0
+    _counter: int = 0
     keyword: str = ""
     sqlite: Optional[SQLite] = None
     data: List[Data] = field(default_factory=list)
@@ -44,6 +44,11 @@ class Table(object):
     columns: List[Column] = field(default_factory=list)
     names: List[str] = field(default_factory=list)
     suppress_warnings: bool = False
+
+    @property
+    def count(self) -> int:
+        self._counter = self.sqlite.count_table(self.name)
+        return self._counter
 
     @property
     def column_list(self) -> list:
@@ -249,7 +254,7 @@ class Table(object):
         if _check is False:
             return False
 
-        self.counter = self.sqlite.count_table(self.name)
+        self._counter = self.sqlite.count_table(self.name)
         return True
 
     def add(self, item: Data):

@@ -21,7 +21,8 @@ from bbutil.database import SQLite, Table, Types
 
 __all__ = [
     "get_table_01",
-    "get_table_02"
+    "get_table_02",
+    "get_table_03"
 ]
 
 
@@ -41,4 +42,13 @@ def get_table_02(sqlite_object: SQLite) -> Table:
     _table.add_column(name="testname", data_type=Types.string)
     _table.add_column(name="path", data_type=Types.string)
     _table.add_column(name="file", data_type=Types.string)
+    return _table
+
+
+def get_table_03(name: str, sqlite_object: SQLite) -> Table:
+    _table = Table(name=name, sqlite=sqlite_object, log=sqlite_object.log)
+    _table.add_column(name="testid", data_type=Types.integer, primarykey=True)
+    _table.add_column(name="use_test", data_type=Types.bool)
+    _table.add_column(name="testname", data_type=Types.string)
+    _table.add_column(name="path", data_type=Types.string)
     return _table
