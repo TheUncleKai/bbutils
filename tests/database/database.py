@@ -16,12 +16,13 @@
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
 
+import os
 import unittest
 
 from bbutil.database import Table, Types
 
 from tests.database.helper import get_sqlite
-from tests.database.helper.table import TestData, get_table_01, get_table_02, get_table_03, get_table_04
+from tests.database.helper.database import TestData
 
 __all__ = [
     "TestDatabase"
@@ -40,4 +41,25 @@ class TestDatabase(unittest.TestCase):
         self.assertTrue(_testBool, msg=f'obj lacking an attribute. {obj=}, {intended_attr=}')
         return
 
+    def test_start_01(self):
+        _filename = "{0:s}/test.sqlite".format(os.getcwd())
 
+        _database = TestData(filename=_filename)
+
+        _check1 = _database.start()
+        self.assertIsNotNone(_database.table01)
+        self.assertIsNotNone(_database.table02)
+
+        _check2 = _database.stop()
+
+        self.assertTrue(_check1)
+        self.assertTrue(_check2)
+        return
+
+    def test_start_02(self):
+        _database = TestData(filename="")
+
+        _check1 = _database.start()
+
+        self.assertFalse(_check1)
+        return

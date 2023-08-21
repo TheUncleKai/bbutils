@@ -313,6 +313,15 @@
                 "test_load_02",
                 "test_clear_01"
             ]
+        },
+        {
+            "id": "Database.Database",
+            "path": "tests.database.database",
+            "classname": "TestDatabase",
+            "tests": [
+                "test_start_01",
+                "test_start_02"
+            ]
         }
     ]
 }

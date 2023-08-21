@@ -32,6 +32,7 @@ class TestData(Database):
 
     table01: Optional[Table] = None
     table02: Optional[Table] = None
+    prepare_fail: bool = False
 
     def init(self):
         self.log = set_log()
@@ -39,6 +40,9 @@ class TestData(Database):
         return
 
     def prepare(self, **kwargs) -> bool:
+        if self.prepare_fail is True:
+            return False
+
         _table = Table(name="tester01", sqlite=self.sqlite, log=self.log)
         _table.add_column(name="testid", data_type=Types.integer, primarykey=True)
         _table.add_column(name="use_test", data_type=Types.bool)
@@ -55,7 +59,7 @@ class TestData(Database):
         self.table02 = _table
         return True
 
-    def clear(self):
-        self.table01.clear()
-        self.table02.clear()
+    def clear_data(self):
+        self.table01 = None
+        self.table02 = None
         return

@@ -72,8 +72,15 @@ class Database(metaclass=ABCMeta):
         pass
 
     @abc.abstractmethod
-    def clear(self):
+    def clear_data(self):
         pass
+
+    def clear(self):
+        for _table in self.tables:
+            _table.clear()
+
+        self.clear_data()
+        return
 
     def store(self):
         for _table in self.tables:
@@ -84,7 +91,7 @@ class Database(metaclass=ABCMeta):
         self.init()
 
         if (self.name == "") or (self.filename == ""):
-            self.log.error("Filename or database name is missing!")
+            self.log.error("File- or database-name is missing!")
             return False
 
         self.sqlite = SQLite(name=self.name, filename=self.filename, log=self.log)
@@ -114,7 +121,7 @@ class Database(metaclass=ABCMeta):
 
         return True
 
-    def close(self) -> bool:
+    def stop(self) -> bool:
         if self.sqlite is None:
             self.log.error("No SQLite connection established!")
             return False
@@ -126,5 +133,6 @@ class Database(metaclass=ABCMeta):
 
         del self.sqlite
         self.sqlite = None
-        self.tables.clear()
+
+        self.clear()
         return True
