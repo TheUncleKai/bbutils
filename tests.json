@@ -297,7 +297,10 @@
                 "test_new_data_01",
                 "test_init_01",
                 "test_init_02",
-                "test_init_03"
+                "test_init_03",
+                "test_select_01",
+                "test_select_02",
+                "test_select_03"
             ]
         }
     ]

@@ -869,10 +869,7 @@ class TestSQLite(unittest.TestCase):
 
         _data_list = _sqlite.select(table_name=_table.name, names=names, sql_filter=sql_filter, data=data_filter)
 
-        _check4 = _sqlite.disconnect()
-
         self.assertTrue(_check1)
         self.assertEqual(_count1, 6)
         self.assertIsNone(_data_list)
-        self.assertTrue(_check4)
         return

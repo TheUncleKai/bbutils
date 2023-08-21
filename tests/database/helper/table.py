@@ -25,7 +25,7 @@ __all__ = [
 
 
 def get_table_01(sqlite_object: SQLite) -> Table:
-    _table = Table(name="test01", sqlite=sqlite_object, log=sqlite_object.log)
+    _table = Table(name="tester01", sqlite=sqlite_object, log=sqlite_object.log)
     _table.add_column(name="testid", data_type=Types.integer, unique=True, keyword=True)
     _table.add_column(name="use_test", data_type=Types.bool)
     _table.add_column(name="testname", data_type=Types.string)
