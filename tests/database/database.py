@@ -18,11 +18,13 @@
 
 import os
 import unittest
+import unittest.mock as mock
 
-from bbutil.database import Table, Types
+from unittest.mock import Mock
 
-from tests.database.helper import get_sqlite
 from tests.database.helper.database import TestData
+
+from tests.database.helper.sqlite import (mock_operational_error, sqlite_operational_error)
 
 __all__ = [
     "TestDatabase"
@@ -67,6 +69,32 @@ class TestDatabase(unittest.TestCase):
     def test_start_03(self):
         _filename = "{0:s}/test.sqlite".format(os.getcwd())
         _database = TestData(filename=_filename, prepare_fail=True)
+
+        _check1 = _database.start()
+
+        self.assertFalse(_check1)
+        return
+
+    @mock.patch('sqlite3.connect', new=mock_operational_error)
+    def test_start_04(self):
+        _filename = "{0:s}/test.sqlite".format(os.getcwd())
+        _database = TestData(filename=_filename)
+
+        _check1 = _database.start()
+
+        self.assertFalse(_check1)
+        return
+
+    def test_start_05(self):
+        _filename = "{0:s}/test.sqlite".format(os.getcwd())
+
+        _cursor_mock = Mock()
+        _cursor_mock.execute = Mock(side_effect=sqlite_operational_error)
+
+        _class_mock = Mock()
+        _class_mock.cursor = Mock(return_value=_cursor_mock)
+
+        _database = TestData(filename=_filename, mock_connection=_class_mock)
 
         _check1 = _database.start()
 

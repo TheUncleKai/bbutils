@@ -60,6 +60,14 @@ class SQLite(object):
             raise ValueError("Logging class is missing!")
         return
 
+    def _lock(self):
+        if self.lock is None:
+            self.lock = Lock()
+
+        self.log.debug1(self.name, "Acquire Lock")
+        self.lock.acquire()
+        return
+
     def connect(self) -> bool:
         self._check_log()
 
@@ -71,11 +79,10 @@ class SQLite(object):
             self.log.error("No filename given!")
             return False
 
-        if self.lock is None:
-            self.lock = Lock()
+        self._lock()
 
-        self.log.debug1(self.name, "Acquire Lock")
-        self.lock.acquire()
+        if self.connection is not None:
+            return True
 
         if self.use_memory is True:
             try:
