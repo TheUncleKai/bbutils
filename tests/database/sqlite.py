@@ -24,11 +24,10 @@ from unittest.mock import Mock
 from bbutil.database import SQLite
 from bbutil.utils import full_path
 
-from tests.database.helper import (sqlite_operational_error, sqlite_integrity_error, sqlite_unknown_error,
-                                   mock_operational_error, set_log,
-                                   get_sqlite, get_table_01,
-                                   get_data_01, get_data_02, get_data_03, get_data_04, get_data_05, get_data_06,
-                                   get_data_07, get_data_08)
+from tests.database.helper.sqlite import (sqlite_operational_error, sqlite_integrity_error, sqlite_unknown_error,
+                                          mock_operational_error, set_log, get_sqlite, get_table_01, get_data_01,
+                                          get_data_02, get_data_03, get_data_04, get_data_05, get_data_06, get_data_07,
+                                          get_data_08)
 
 __all__ = [
     "TestSQLite"
