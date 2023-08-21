@@ -21,7 +21,7 @@ import unittest
 from bbutil.database import Table, Types
 
 from tests.database.helper import get_sqlite
-from tests.database.helper.table import get_table_01, get_table_02, get_table_03, get_table_04
+from tests.database.helper.table import TestData, get_table_01, get_table_02, get_table_03, get_table_04
 
 __all__ = [
     "TestTable"
@@ -414,4 +414,38 @@ class TestTable(unittest.TestCase):
         self.assertTrue(_check3)
         self.assertEqual(len(_list1), 2)
         self.assertEqual(len(_list2), 1)
+        return
+
+    def test_add_02(self):
+        _sqlite = get_sqlite(filename="test.sqlite", clean=True)
+        _table = get_table_04(sqlite_object=_sqlite)
+
+        _check1 = _sqlite.connect()
+        _check2 = _table.init()
+
+        _data1 = _table.new_data()
+        _data1.use_test = True
+        _data1.category = "TestMain"
+        _data1.testname = "Test01"
+        _data1.path = "path"
+
+        _data2 = TestData()
+        _data2.use_test = True
+        _data2.xcategory = "TestMain"
+        _data2.testname = "Test01"
+        _data2.path = "path"
+
+        _table.add(_data1)
+
+        # noinspection PyTypeChecker
+        self.assertRaises(Exception, _table.add, _data2)
+
+        _list1 = _table.index["TestMain"]
+
+        _check3 = _sqlite.disconnect()
+
+        self.assertTrue(_check1)
+        self.assertTrue(_check2)
+        self.assertTrue(_check3)
+        self.assertEqual(len(_list1), 1)
         return

@@ -19,6 +19,8 @@
 from bbutil.database import SQLite, Table, Types
 
 __all__ = [
+    "TestData",
+
     "get_table_01",
     "get_table_02",
     "get_table_03",
@@ -62,3 +64,14 @@ def get_table_04(sqlite_object: SQLite) -> Table:
     _table.add_column(name="testname", data_type=Types.string)
     _table.add_column(name="path", data_type=Types.string)
     return _table
+
+
+class TestData(object):
+
+    def __init__(self):
+        self.testid: int = 0
+        self.use_test: bool = False
+        self.xcategory: str = ""
+        self.testname: str = ""
+        self.path: str = ""
+        return
