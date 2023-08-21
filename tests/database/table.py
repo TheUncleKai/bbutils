@@ -228,3 +228,26 @@ class TestTable(unittest.TestCase):
         self.assertTrue(_check3)
         self.assertEqual(_count, 0)
         return
+
+    def test_store_01(self):
+
+        _sqlite = get_sqlite(filename="test.sqlite", clean=True)
+        _table = get_table_01(sqlite_object=_sqlite)
+
+        _check1 = _sqlite.connect()
+        _check2 = _table.init()
+
+        _data = _table.new_data()
+        _data.use_test = True
+        _data.testname = "Test01"
+        _data.path = "path"
+
+        _count = _table.store(_data)
+
+        _check3 = _sqlite.disconnect()
+
+        self.assertTrue(_check1)
+        self.assertTrue(_check2)
+        self.assertTrue(_check3)
+        self.assertEqual(_count, 1)
+        return

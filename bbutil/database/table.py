@@ -17,7 +17,7 @@
 #
 
 from dataclasses import dataclass, field
-from typing import Optional, List, Dict, Any, Tuple
+from typing import Optional, List, Dict, Any, Tuple, Union
 
 from bbutil.logging import Logging
 
@@ -163,11 +163,35 @@ class Table(object):
 
         return _result
 
-    def store_item(self, data: Data) -> bool:
+    def _store(self) -> int:
+        _chunk_size = self._get_chunk_size(len(self.data))
+        _split_list = self._split_list(self.data, _chunk_size)
+        _max = len(_split_list) + 1
+        _progress = self.log.progress(_max)
+
+        _counter = 0
+        _stored = 0
+
+        for _item_list in _split_list:
+            _counter += len(_item_list)
+            _stored += self.sqlite.insert(self.name, self.names, _item_list)
+            _progress.inc()
+
+        self.log.clear()
+        if _counter != _stored:
+            self.log.warn(self.name, "Entries {0:d}, Stored {1:d}".format(_counter, _stored))
+        else:
+            self.log.inform(self.name, "Stored {0:d}".format(_counter))
+
+        return _stored
+
+    def store(self, data: Data = None) -> int:
+        if data is None:
+            _check = self._store()
+            return _check
+
         _count = self.sqlite.insert(self.name, self.names, data)
-        if _count == 1:
-            return True
-        return False
+        return _count
 
     @staticmethod
     def _split_list(data_list: List[Data], chunk_size: int) -> list:
@@ -200,28 +224,6 @@ class Table(object):
             interval = 500
 
         return interval
-
-    def store(self) -> int:
-        _chunk_size = self._get_chunk_size(len(self.data))
-        _split_list = self._split_list(self.data, _chunk_size)
-        _max = len(_split_list) + 1
-        _progress = self.log.progress(_max)
-
-        _counter = 0
-        _stored = 0
-
-        for _item_list in _split_list:
-            _counter += len(_item_list)
-            _stored += self.sqlite.insert(self.name, self.names, _item_list)
-            _progress.inc()
-
-        self.log.clear()
-        if _counter != _stored:
-            self.log.warn(self.name, "Entries {0:d}, Stored {1:d}".format(_counter, _stored))
-        else:
-            self.log.inform(self.name, "Stored {0:d}".format(_counter))
-
-        return _stored
 
     def update(self, data: Data, data_filter: str, filter_value=None) -> bool:
         _check = self.sqlite.update(self.name, self.names, data, data_filter, filter_value)
