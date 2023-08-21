@@ -45,6 +45,11 @@ class Table(object):
     names: List[str] = field(default_factory=list)
     suppress_warnings: bool = False
 
+    def clear(self):
+        self.data.clear()
+        self.index.clear()
+        return
+
     @property
     def count(self) -> int:
         self._counter = self.sqlite.count_table(self.name)

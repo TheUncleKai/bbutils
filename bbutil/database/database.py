@@ -64,6 +64,10 @@ class Database(metaclass=ABCMeta):
         return
 
     @abc.abstractmethod
+    def init(self):
+        pass
+
+    @abc.abstractmethod
     def prepare(self, **kwargs) -> bool:
         pass
 
@@ -77,11 +81,13 @@ class Database(metaclass=ABCMeta):
         return
 
     def start(self) -> bool:
+        self.init()
+
         if (self.name == "") or (self.filename == ""):
             self.log.error("Filename or database name is missing!")
             return False
 
-        self.sqlite = SQLite(name=self.name, filename=self.filename)
+        self.sqlite = SQLite(name=self.name, filename=self.filename, log=self.log)
 
         _check = self.prepare()
         if _check is False:
