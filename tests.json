@@ -303,7 +303,8 @@
                 "test_select_03",
                 "test_select_04",
                 "test_store_01",
-                "test_store_02"
+                "test_store_02",
+                "test_store_03"
             ]
         }
     ]
