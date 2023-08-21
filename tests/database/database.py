@@ -22,6 +22,7 @@ import unittest.mock as mock
 
 from unittest.mock import Mock
 
+from tests.database.helper import set_log
 from tests.database.helper.database import TestData
 
 from tests.database.helper.sqlite import (mock_operational_error, sqlite_operational_error)
@@ -97,6 +98,16 @@ class TestDatabase(unittest.TestCase):
         _database = TestData(filename=_filename, mock_connection=_class_mock)
 
         _check1 = _database.start()
+
+        self.assertFalse(_check1)
+        return
+
+    def test_stop_01(self):
+        _filename = "{0:s}/test.sqlite".format(os.getcwd())
+
+        _database = TestData(filename=_filename, log=set_log())
+
+        _check1 = _database.stop()
 
         self.assertFalse(_check1)
         return
