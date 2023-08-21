@@ -286,6 +286,15 @@
                 "test_select_05",
                 "test_select_06"
             ]
+        },
+        {
+            "id": "Database.Table",
+            "path": "tests.database.table",
+            "classname": "TestTable",
+            "tests": [
+                "test_add_column_01",
+                "test_add_column_02"
+            ]
         }
     ]
 }

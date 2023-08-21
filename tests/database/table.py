@@ -21,10 +21,12 @@ import unittest
 import unittest.mock as mock
 
 from unittest.mock import Mock
-from bbutil.database import Table
+
+from bbutil.database import SQLite, Table, Types
 from bbutil.utils import full_path
 
-from tests.database.helper import set_log, get_sqlite
+from tests.database.helper import get_sqlite
+from tests.database.helper.table import get_table_01
 
 __all__ = [
     "TestTable"
@@ -37,25 +39,54 @@ class TestTable(unittest.TestCase):
     def tearDown(self):
         return
 
-    def test_connect_01(self):
-        _log = set_log()
-        _testfile = full_path("{0:s}/test.sqlite".format(os.getcwd()))
-        _name = "Test"
+    def test_add_column_01(self):
 
-        if os.path.exists(_testfile) is True:
-            os.remove(_testfile)
+        _sqlite = get_sqlite(filename="test.sqlite", clean=True)
 
-        _sqlite = SQLite(filename=_testfile, name="Test", log=_log)
+        _table = Table(name="test01", sqlite=_sqlite, log=_sqlite.log)
+        _table.add_column(name="testid", data_type=Types.integer, unique=True, keyword=True)
+        _table.add_column(name="use_test", data_type=Types.bool)
+        _table.add_column(name="testname", data_type=Types.string)
+        _table.add_column(name="path", data_type=Types.string)
 
-        _check1 = _sqlite.connect()
-        _check2 = os.path.exists(_testfile)
+        _names = [
+            "testid",
+            "use_test",
+            "testname",
+            "path"
+        ]
 
-        self.assertEqual(_sqlite.name, _name)
-        self.assertEqual(_sqlite.filename, _testfile)
-        self.assertTrue(_check1)
-        self.assertTrue(_check2)
-        self.assertTrue(_sqlite.is_connected)
+        _column_list = [
+            '"testid" INTEGER',
+            '"use_test" BOOLEAN',
+            '"testname" TEXT',
+            '"path" TEXT'
+        ]
 
-        if os.path.exists(_testfile) is True:
-            os.remove(_testfile)
+        _unique_list = [
+            "testid"
+        ]
+
+        _count1 = len(_table.names)
+        _count2 = len(_table.columns)
+
+        self.assertEqual(_table.keyword, "testid")
+        self.assertEqual(_count1, 4)
+        self.assertEqual(_count2, 4)
+        self.assertListEqual(_names, _table.names)
+        self.assertListEqual(_column_list, _table.column_list)
+        self.assertListEqual(_unique_list, _table.unique_list)
+        return
+
+    def test_add_column_02(self):
+
+        _sqlite = get_sqlite(filename="test.sqlite", clean=True)
+
+        _table = Table(name="test01", sqlite=_sqlite, log=_sqlite.log)
+        _table.add_column(name="testid", data_type=Types.integer, unique=True, keyword=True)
+        _table.add_column(name="testid", data_type=Types.integer)
+
+        _count1 = len(_table.names)
+
+        self.assertEqual(_count1, 1)
         return
