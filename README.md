@@ -208,7 +208,7 @@ if __name__ == '__main__':
     log.inform("PROGRESS", "count from 1000 to 0 in 10 interval, set the value via set()")
     count2 = 1000
     progress2 = log.progress(1000, 10)
-    progress2.counter = 1000
+    progress2._counter = 1000
 
     while True:
         progress2.set(count2)
