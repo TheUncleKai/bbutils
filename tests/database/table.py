@@ -335,7 +335,7 @@ class TestTable(unittest.TestCase):
         return
 
     def test_store_04(self):
-        _sqlite = get_sqlite(filename="test.sqlite", clean=True)
+        _sqlite = get_sqlite(filename="test_bulk.sqlite", clean=True)
 
         _table0 = get_table_03("interval0", sqlite_object=_sqlite)
         _table1 = get_table_03("interval1", sqlite_object=_sqlite)
