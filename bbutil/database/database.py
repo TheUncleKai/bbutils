@@ -42,27 +42,6 @@ class Database(metaclass=ABCMeta):
     tables: List[Table] = field(default_factory=list)
     filename: str = ""
 
-    def add(self, table: str, data: Data):
-        for _table in self.tables:
-            if _table.name == table:
-                _table.add(data)
-                return
-        return
-
-    def get_table(self, table_id: str) -> Optional[Table]:
-        for _table in self.tables:
-            if _table.name == table_id:
-                return _table
-
-        return None
-
-    def info(self):
-        for _table in self.tables:
-            _count = len(_table.data)
-            _line = "{0:s}: {1:d}".format(_table.name, _count)
-            self.log.inform(self.name, _line)
-        return
-
     @abc.abstractmethod
     def init(self):
         pass

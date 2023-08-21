@@ -111,3 +111,21 @@ class TestDatabase(unittest.TestCase):
 
         self.assertFalse(_check1)
         return
+
+    def test_stop_02(self):
+        _filename = "{0:s}/test.sqlite".format(os.getcwd())
+
+        _connection_mock = Mock()
+        _connection_mock.close = Mock(side_effect=sqlite_operational_error)
+
+        _database = TestData(filename=_filename)
+
+        _check1 = _database.start()
+
+        _database.sqlite.connection = _connection_mock
+
+        _check2 = _database.stop()
+
+        self.assertTrue(_check1)
+        self.assertFalse(_check2)
+        return
