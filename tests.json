@@ -293,7 +293,8 @@
             "classname": "TestTable",
             "tests": [
                 "test_add_column_01",
-                "test_add_column_02"
+                "test_add_column_02",
+                "test_new_data_01"
             ]
         }
     ]

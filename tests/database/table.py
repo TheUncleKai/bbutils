@@ -39,6 +39,12 @@ class TestTable(unittest.TestCase):
     def tearDown(self):
         return
 
+    def assertHasAttr(self, obj, intended_attr):
+        _testBool = hasattr(obj, intended_attr)
+
+        self.assertTrue(_testBool, msg=f'obj lacking an attribute. {obj=}, {intended_attr=}')
+        return
+
     def test_add_column_01(self):
 
         _sqlite = get_sqlite(filename="test.sqlite", clean=True)
@@ -89,4 +95,16 @@ class TestTable(unittest.TestCase):
         _count1 = len(_table.names)
 
         self.assertEqual(_count1, 1)
+        return
+
+    def test_new_data_01(self):
+
+        _sqlite = get_sqlite(filename="test.sqlite", clean=True)
+        _table = get_table_01(sqlite_object=_sqlite)
+
+        _data = _table.new_data()
+        self.assertHasAttr(_data, "testid")
+        self.assertHasAttr(_data, "use_test")
+        self.assertHasAttr(_data, "testname")
+        self.assertHasAttr(_data, "path")
         return

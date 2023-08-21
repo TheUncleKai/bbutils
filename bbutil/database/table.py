@@ -16,10 +16,8 @@
 #    Copyright (C) 2023, Kai Raphahn <kai.raphahn@laburec.de>
 #
 
-import sys
-
 from dataclasses import dataclass, field
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, Tuple
 
 from bbutil.logging import Logging
 
@@ -45,6 +43,7 @@ class Table(object):
     index: Dict[Any, List[Data]] = field(default_factory=dict)
     columns: List[Column] = field(default_factory=list)
     names: List[str] = field(default_factory=list)
+    suppress_warnings: bool = False
 
     @property
     def column_list(self) -> list:
@@ -92,69 +91,26 @@ class Table(object):
             self.names.append(name)
         return
 
-    def select(self, data_filter: str = "", data_values=None, warn: bool = False, verbose: bool = False) -> List[Data]:
-        if data_values is None:
-            data_values = []
-
-        _result = []
-
-        _data_list = self.sqlite.select(table_name=self.name, sql_filter=data_filter, names=[], data=data_values)
-        if _data_list is None:
-            if warn is True:
+    def _process_datalist(self, data_list: List[Tuple], verbose: bool = True) -> Optional[List[Data]]:
+        if data_list is None:
+            if (self.suppress_warnings is False) and (verbose is True):
                 self.log.warn(self.name, "No data!")
-            return _result
+            return None
 
-        _count = len(_data_list)
+        _count = len(data_list)
         if _count == 0:
-            if warn is True:
+            if (self.suppress_warnings is False) and (verbose is True):
                 self.log.warn(self.name, "No data!")
-            return _result
+            return None
 
+        progress = None
         if verbose is True:
             self.log.inform("Table", "Load {0:d} from {1:s}".format(_count, self.name))
+            progress = self.log.progress(_count, select_interval(_count))
 
-        progress = self.log.progress(_count, select_interval(_count))
-
-        for _data in _data_list:
-            _number = 0
-
-            key_list = []
-            value_list = []
-
-            for _col in self.columns:
-                _value = _data[_number]
-
-                key_list.append(_col.name)
-                value_list.append(_value)
-                _number += 1
-
-            _entry = Data(keys=key_list, values=value_list)
-            _result.append(_entry)
-            if verbose is True:
-                progress.inc()
-
-        if verbose is True:
-            self.log.clear()
-        return _result
-
-    def select_all(self) -> List[Data]:
         _result = []
-
-        _data_list = self.sqlite.select(table_name=self.name, sql_filter="", names=[], data=[])
-        if _data_list is None:
-            self.log.warn(self.name, "No data!")
-            return _result
-
-        _count = len(_data_list)
-        if _count == 0:
-            self.log.warn(self.name, "No data!")
-            return _result
-
-        self.log.inform("Table", "Load {0:d} from {1:s}".format(_count, self.name))
-        progress = self.log.progress(_count, select_interval(_count))
-
         _count = 0
-        for _data in _data_list:
+        for _data in data_list:
             _number = 0
 
             key_list = []
@@ -167,8 +123,7 @@ class Table(object):
                     self.log.error("Problem with data item {0:d}!".format(_count))
                     self.log.error("Column {0:d} ({1:s}) not found!".format(_number, _col.name))
                     self.log.exception(e)
-                    print(_data)
-                    sys.exit(1)
+                    return None
 
                 key_list.append(_col.name)
 
@@ -185,9 +140,27 @@ class Table(object):
 
             _entry = Data(keys=key_list, values=value_list)
             _result.append(_entry)
-            progress.inc()
 
-        self.log.clear()
+            if progress is not None:
+                progress.inc()
+
+        if verbose is True:
+            self.log.clear()
+        return _result
+
+    def select(self, sql_filter: str = "", names=None, data_values=None, verbose: bool = False) -> List[Data]:
+        if names is None:
+            names = []
+
+        if data_values is None:
+            data_values = []
+
+        _data_list = self.sqlite.select(table_name=self.name, sql_filter=sql_filter, names=names, data=data_values)
+        _result = self._process_datalist(_data_list, verbose)
+
+        if _result is None:
+            return []
+
         return _result
 
     def store_item(self, data: Data) -> bool:
@@ -302,7 +275,7 @@ class Table(object):
         _all = kwargs.get("all", False)
 
         if _all is True:
-            _items = self.select_all()
+            _items = self.select()
         else:
             _items = self.select(**kwargs)
 
