@@ -18,9 +18,11 @@
 
 import unittest
 
+import bbutil
+
 from bbutil.database import Table, Types
 
-from tests.database.helper import get_sqlite
+from tests.database.helper import get_sqlite, set_log
 from tests.database.helper.table import TestData, get_table_01, get_table_02, get_table_03, get_table_04
 
 __all__ = [
@@ -30,6 +32,12 @@ __all__ = [
 
 class TestTable(unittest.TestCase):
     """Testing class for locking module."""
+
+    def setUp(self):
+        if bbutil.log is None:
+            _log = set_log()
+            bbutil.set_log(_log)
+        return
 
     def tearDown(self):
         return
@@ -44,7 +52,7 @@ class TestTable(unittest.TestCase):
 
         _sqlite = get_sqlite(filename="test.sqlite", clean=True)
 
-        _table = Table(name="test01", sqlite=_sqlite, log=_sqlite.log)
+        _table = Table(name="test01", sqlite=_sqlite)
         _table.add_column(name="testid", data_type=Types.integer, unique=True, keyword=True)
         _table.add_column(name="use_test", data_type=Types.bool)
         _table.add_column(name="testname", data_type=Types.string)
@@ -83,7 +91,7 @@ class TestTable(unittest.TestCase):
 
         _sqlite = get_sqlite(filename="test.sqlite", clean=True)
 
-        _table = Table(name="test01", sqlite=_sqlite, log=_sqlite.log)
+        _table = Table(name="test01", sqlite=_sqlite)
         _table.add_column(name="testid", data_type=Types.integer, unique=True, keyword=True)
         _table.add_column(name="testid", data_type=Types.integer)
 
@@ -121,7 +129,7 @@ class TestTable(unittest.TestCase):
     def test_init_02(self):
 
         _sqlite = get_sqlite(filename="test_check_table.sqlite", path="testdata/database")
-        _table = Table(name="test01", sqlite=_sqlite, log=_sqlite.log)
+        _table = Table(name="test01", sqlite=_sqlite)
 
         _check1 = _sqlite.connect()
         _check2 = _table.init()

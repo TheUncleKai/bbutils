@@ -21,7 +21,8 @@ from dataclasses import dataclass, field
 from multiprocessing import Lock
 from typing import Optional, List, Union
 
-from bbutil.logging import Logging
+import bbutil
+
 from bbutil.database.types import Data
 
 __all__ = [
@@ -44,7 +45,6 @@ class Select(object):
 
 @dataclass
 class SQLite(object):
-    log: Optional[Logging] = None
 
     name: str = ""
     connection: Optional[sqlite3.Connection] = None
@@ -55,28 +55,21 @@ class SQLite(object):
     filename: str = ""
     lock: Optional[Lock] = None
 
-    def _check_log(self):
-        if self.log is None:
-            raise ValueError("Logging class is missing!")
-        return
-
     def _lock(self):
         if self.lock is None:
             self.lock = Lock()
 
-        self.log.debug1(self.name, "Acquire Lock")
+        bbutil.log.debug1(self.name, "Acquire Lock")
         self.lock.acquire()
         return
 
     def connect(self) -> bool:
-        self._check_log()
-
         if self.name == "":
-            self.log.error("Connection is unnamed!")
+            bbutil.log.error("Connection is unnamed!")
             return False
 
         if (self.filename == "") and (self.use_memory is False):
-            self.log.error("No filename given!")
+            bbutil.log.error("No filename given!")
             return False
 
         self._lock()
@@ -89,29 +82,27 @@ class SQLite(object):
                 self.connection = sqlite3.connect(':memory:',
                                                   detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
             except sqlite3.OperationalError as e:
-                self.log.error("Unable to create database in memory!")
-                self.log.exception(e)
+                bbutil.log.error("Unable to create database in memory!")
+                bbutil.log.exception(e)
                 return False
 
             self.filename = "memory"
 
             return True
 
-        self.log.inform(self.name, "Connect to {0:s}".format(self.filename))
+        bbutil.log.inform(self.name, "Connect to {0:s}".format(self.filename))
 
         try:
             self.connection = sqlite3.connect(self.filename,
                                               detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
         except sqlite3.OperationalError as e:
-            self.log.error("Unable to create database: {0:s}".format(self.filename))
-            self.log.exception(e)
+            bbutil.log.error("Unable to create database: {0:s}".format(self.filename))
+            bbutil.log.exception(e)
             return False
 
         return True
 
     def disconnect(self) -> bool:
-        self._check_log()
-
         if self.connection is None:
             return True
 
@@ -119,19 +110,19 @@ class SQLite(object):
             try:
                 self.connection.commit()
             except sqlite3.OperationalError as e:
-                self.log.error("Unable to commit to database!")
-                self.log.exception(e)
+                bbutil.log.error("Unable to commit to database!")
+                bbutil.log.exception(e)
                 return False
 
             self.commit = False
 
-        self.log.debug1(self.name, "Close {0:s}".format(self.filename))
+        bbutil.log.debug1(self.name, "Close {0:s}".format(self.filename))
 
         try:
             self.connection.close()
         except sqlite3.OperationalError as e:
-            self.log.error("Unable to close connection!")
-            self.log.exception(e)
+            bbutil.log.error("Unable to close connection!")
+            bbutil.log.exception(e)
             return False
 
         self.connection = None
@@ -145,22 +136,20 @@ class SQLite(object):
         return True
 
     def check_table(self, table_name: str) -> bool:
-        self._check_log()
-
         if self.connection is None:
-            self.log.error("No valid connection!")
+            bbutil.log.error("No valid connection!")
             return False
 
         c = self.connection.cursor()
         command = "SELECT name FROM sqlite_master WHERE type='table' AND name='{0:s}';".format(table_name)
 
-        self.log.debug1(self.name, "Check for table: {0:s}".format(table_name))
+        bbutil.log.debug1(self.name, "Check for table: {0:s}".format(table_name))
 
         try:
             c.execute(command)
         except sqlite3.OperationalError as e:
-            self.log.error("Unable to check for table: {0:s}".format(table_name))
-            self.log.exception(e)
+            bbutil.log.error("Unable to check for table: {0:s}".format(table_name))
+            bbutil.log.exception(e)
             return False
 
         result = c.fetchone()
@@ -169,10 +158,8 @@ class SQLite(object):
         return True
 
     def count_table(self, table_name: str) -> int:
-        self._check_log()
-
         if self.connection is None:
-            self.log.error("No valid connection!")
+            bbutil.log.error("No valid connection!")
             return -1
 
         c = self.connection.cursor()
@@ -181,21 +168,19 @@ class SQLite(object):
         try:
             c.execute(command)
         except sqlite3.OperationalError as e:
-            self.log.error("Unable to count rows: {0:s}".format(table_name))
-            self.log.exception(e)
+            bbutil.log.error("Unable to count rows: {0:s}".format(table_name))
+            bbutil.log.exception(e)
             return -1
 
         result = c.fetchall()
         (count,) = result[0]
 
-        self.log.debug1(self.name, "Count table: {0:s}, {1:d}".format(table_name, count))
+        bbutil.log.debug1(self.name, "Count table: {0:s}, {1:d}".format(table_name, count))
         return count
 
     def prepare_table(self, table_name: str, column_list: list, unique_list: list) -> bool:
-        self._check_log()
-
         if self.connection is None:
-            self.log.error("No valid connection!")
+            bbutil.log.error("No valid connection!")
             return False
 
         _check = self.check_table(table_name)
@@ -225,17 +210,18 @@ class SQLite(object):
         try:
             c.execute(command)
         except sqlite3.OperationalError as e:
-            self.log.error("Unable to create table: {0:s}".format(table_name))
-            self.log.exception(e)
+            bbutil.log.error("Unable to create table: {0:s}".format(table_name))
+            bbutil.log.exception(e)
             print(command)
             return False
 
-        self.log.debug1(self.name, "Create table: {0:s}".format(table_name))
+        bbutil.log.debug1(self.name, "Create table: {0:s}".format(table_name))
 
         self.connection.commit()
         return True
 
-    def _single_execute(self, table_name: str, names: list, data: Data) -> Optional[_Execute]:
+    @staticmethod
+    def _single_execute(table_name: str, names: list, data: Data) -> Optional[_Execute]:
         _data = []
         _names = ", ".join(names)
         _placeholder = ", ".join(['?'] * len(names))
@@ -246,14 +232,15 @@ class SQLite(object):
             try:
                 _value = getattr(data, _line)
             except AttributeError as e:
-                self.log.exception(e)
-                self.log.error("Data format does not fit database table!")
+                bbutil.log.exception(e)
+                bbutil.log.error("Data format does not fit database table!")
                 return None
             _data.append(_value)
         _execute = _Execute(sql=sql, data=_data)
         return _execute
 
-    def _many_execute(self, table_name: str, names: list, data_list: List[Data]) -> Optional[_Execute]:
+    @staticmethod
+    def _many_execute(table_name: str, names: list, data_list: List[Data]) -> Optional[_Execute]:
         _data = []
         _length = len(data_list)
         _names = ", ".join(names)
@@ -267,8 +254,8 @@ class SQLite(object):
                 try:
                     _ret = getattr(_item, _line)
                 except AttributeError as e:
-                    self.log.exception(e)
-                    self.log.error("Data format does not fit database table!")
+                    bbutil.log.exception(e)
+                    bbutil.log.error("Data format does not fit database table!")
                     return None
                 _value.append(_ret)
             _data.append(_value)
@@ -277,10 +264,8 @@ class SQLite(object):
         return _execute
 
     def insert(self, table_name: str, names: list, data: Union[Data, List[Data]]) -> int:
-        self._check_log()
-
         if self.connection is None:
-            self.log.error("No valid connection!")
+            bbutil.log.error("No valid connection!")
             return -1
 
         c = self.connection.cursor()
@@ -306,23 +291,23 @@ class SQLite(object):
         try:
             command(_execute.sql, _execute.data)
         except sqlite3.InterfaceError as e:
-            self.log.exception(e)
-            self.log.error("One or more values is an invalid format!")
-            self.log.error("SQL:  " + str(_execute.sql))
-            self.log.error("DATA: " + str(_execute.data))
+            bbutil.log.exception(e)
+            bbutil.log.error("One or more values is an invalid format!")
+            bbutil.log.error("SQL:  " + str(_execute.sql))
+            bbutil.log.error("DATA: " + str(_execute.data))
             return -1
         except OverflowError as e:
-            self.log.exception(e)
-            self.log.error("One or more values is too large!")
-            self.log.error("SQL:  " + str(_execute.sql))
-            self.log.error("DATA: " + str(_execute.data))
+            bbutil.log.exception(e)
+            bbutil.log.error("One or more values is too large!")
+            bbutil.log.error("SQL:  " + str(_execute.sql))
+            bbutil.log.error("DATA: " + str(_execute.data))
             return -1
         except sqlite3.IntegrityError:
             return -1
         except Exception as e:
-            self.log.exception(e)
-            self.log.error("SQL:  " + str(_execute.sql))
-            self.log.error("DATA: " + str(_execute.data))
+            bbutil.log.exception(e)
+            bbutil.log.error("SQL:  " + str(_execute.sql))
+            bbutil.log.error("DATA: " + str(_execute.data))
             return -1
 
         _counter = c.rowcount
@@ -332,10 +317,8 @@ class SQLite(object):
         return _counter
 
     def update(self, table_name: str, names: list, data: Data, sql_filter: str, filter_value=None) -> bool:
-        self._check_log()
-
         if self.connection is None:
-            self.log.error("No valid connection!")
+            bbutil.log.error("No valid connection!")
             return False
 
         c = self.connection.cursor()
@@ -362,14 +345,14 @@ class SQLite(object):
         except sqlite3.IntegrityError:
             return False
         except sqlite3.OperationalError as e:
-            self.log.error("SQL:  " + str(sql))
-            self.log.error("DATA: " + str(_data))
-            self.log.exception(e)
+            bbutil.log.error("SQL:  " + str(sql))
+            bbutil.log.error("DATA: " + str(_data))
+            bbutil.log.exception(e)
             return False
         except OverflowError as e:
-            self.log.exception(e)
-            self.log.error("SQL:  " + str(sql))
-            self.log.error("DATA: " + str(_data))
+            bbutil.log.exception(e)
+            bbutil.log.error("SQL:  " + str(sql))
+            bbutil.log.error("DATA: " + str(_data))
             return False
 
         self.commit = True
@@ -384,10 +367,8 @@ class SQLite(object):
         return
 
     def select(self, table_name: str, names: list, sql_filter: str, data: list) -> Optional[list]:
-        self._check_log()
-
         if self.connection is None:
-            self.log.error("No valid connection!")
+            bbutil.log.error("No valid connection!")
             return None
 
         c = self.connection.cursor()
@@ -401,21 +382,21 @@ class SQLite(object):
         if sql_filter != "":
             command = "SELECT {0:s} FROM {1:s} WHERE {2:s};".format(_selector, table_name, sql_filter)
 
-        self.log.debug1(table_name, command)
+        bbutil.log.debug1(table_name, command)
 
         try:
             self._select_execute(c, command, data)
         except sqlite3.OperationalError as e:
-            self.log.error("Unable to search table: {0:s}".format(table_name))
-            self.log.exception(e)
-            self.log.error("SQL:  " + str(command))
-            self.log.error("DATA: " + str(data))
+            bbutil.log.error("Unable to search table: {0:s}".format(table_name))
+            bbutil.log.exception(e)
+            bbutil.log.error("SQL:  " + str(command))
+            bbutil.log.error("DATA: " + str(data))
             return None
         except OverflowError as e:
-            self.log.error("Unable to search table due to overflow: {0:s}".format(table_name))
-            self.log.exception(e)
-            self.log.error("SQL:  " + str(command))
-            self.log.error("DATA: " + str(data))
+            bbutil.log.error("Unable to search table due to overflow: {0:s}".format(table_name))
+            bbutil.log.exception(e)
+            bbutil.log.error("SQL:  " + str(command))
+            bbutil.log.error("DATA: " + str(data))
             return None
 
         _fetchlist = []

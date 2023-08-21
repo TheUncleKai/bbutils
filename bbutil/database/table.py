@@ -19,7 +19,7 @@
 from dataclasses import dataclass, field
 from typing import Optional, List, Dict, Any, Tuple
 
-from bbutil.logging import Logging
+import bbutil
 
 from bbutil.database import Column, Types, Data, DataType, select_interval
 from bbutil.database.sqlite import SQLite
@@ -32,8 +32,6 @@ __all__ = [
 
 @dataclass
 class Table(object):
-
-    log: Optional[Logging] = None
 
     name: str = ""
     _counter: int = 0
@@ -109,19 +107,19 @@ class Table(object):
     def _process_datalist(self, data_list: List[Tuple], verbose: bool = True) -> Optional[List[Data]]:
         if data_list is None:
             if (self.suppress_warnings is False) and (verbose is True):
-                self.log.warn(self.name, "No data!")
+                bbutil.log.warn(self.name, "No data!")
             return None
 
         _count = len(data_list)
         if _count == 0:
             if (self.suppress_warnings is False) and (verbose is True):
-                self.log.warn(self.name, "No data!")
+                bbutil.log.warn(self.name, "No data!")
             return None
 
         progress = None
         if verbose is True:
-            self.log.inform("Table", "Load {0:d} from {1:s}".format(_count, self.name))
-            progress = self.log.progress(_count, select_interval(_count))
+            bbutil.log.inform("Table", "Load {0:d} from {1:s}".format(_count, self.name))
+            progress = bbutil.log.progress(_count, select_interval(_count))
 
         _result = []
         _count = 0
@@ -135,9 +133,9 @@ class Table(object):
                 try:
                     _value = _data[_number]
                 except IndexError as e:
-                    self.log.error("Problem with data item {0:d}!".format(_count))
-                    self.log.error("Column {0:d} ({1:s}) not found!".format(_number, _col.name))
-                    self.log.exception(e)
+                    bbutil.log.error("Problem with data item {0:d}!".format(_count))
+                    bbutil.log.error("Column {0:d} ({1:s}) not found!".format(_number, _col.name))
+                    bbutil.log.exception(e)
                     return None
 
                 key_list.append(_col.name)
@@ -160,7 +158,7 @@ class Table(object):
                 progress.inc()
 
         if verbose is True:
-            self.log.clear()
+            bbutil.log.clear()
         return _result
 
     def select(self, sql_filter: str = "", names=None, data_values=None, verbose: bool = True) -> List[Data]:
@@ -182,7 +180,7 @@ class Table(object):
         _chunk_size = self._get_chunk_size(len(self.data))
         _split_list = self._split_list(self.data, _chunk_size)
         _max = len(_split_list) + 1
-        _progress = self.log.progress(_max)
+        _progress = bbutil.log.progress(_max)
 
         _counter = 0
         _stored = 0
@@ -192,11 +190,11 @@ class Table(object):
             _stored += self.sqlite.insert(self.name, self.names, _item_list)
             _progress.inc()
 
-        self.log.clear()
+        bbutil.log.clear()
         if _counter != _stored:
-            self.log.warn(self.name, "Entries {0:d}, Stored {1:d}".format(_counter, _stored))
+            bbutil.log.warn(self.name, "Entries {0:d}, Stored {1:d}".format(_counter, _stored))
         else:
-            self.log.inform(self.name, "Stored {0:d}".format(_counter))
+            bbutil.log.inform(self.name, "Stored {0:d}".format(_counter))
 
         return _stored
 
@@ -245,11 +243,11 @@ class Table(object):
         return _check
 
     def init(self) -> bool:
-        if self.log is None:
+        if bbutil.log is None:
             return False
 
         if len(self.columns) == 0:
-            self.log.error("No columns: {0:s}".format(self.name))
+            bbutil.log.error("No columns: {0:s}".format(self.name))
             return False
 
         _columns = []
@@ -289,16 +287,16 @@ class Table(object):
         return
 
     def load(self) -> int:
-        self.log.inform(self.name, "Load {0:s}...".format(self.name))
+        bbutil.log.inform(self.name, "Load {0:s}...".format(self.name))
 
         _items = self.select()
         _count = len(_items)
 
         _max = _count + 1
-        _progress = self.log.progress(_max, select_interval(_max))
+        _progress = bbutil.log.progress(_max, select_interval(_max))
 
         for _item in _items:
             self.add(_item)
             _progress.inc()
-        self.log.clear()
+        bbutil.log.clear()
         return _count

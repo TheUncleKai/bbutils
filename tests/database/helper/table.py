@@ -29,7 +29,7 @@ __all__ = [
 
 
 def get_table_01(sqlite_object: SQLite) -> Table:
-    _table = Table(name="tester01", sqlite=sqlite_object, log=sqlite_object.log)
+    _table = Table(name="tester01", sqlite=sqlite_object)
     _table.add_column(name="testid", data_type=Types.integer, unique=True, keyword=True)
     _table.add_column(name="use_test", data_type=Types.bool)
     _table.add_column(name="testname", data_type=Types.string)
@@ -38,7 +38,7 @@ def get_table_01(sqlite_object: SQLite) -> Table:
 
 
 def get_table_02(sqlite_object: SQLite) -> Table:
-    _table = Table(name="tester01", sqlite=sqlite_object, log=sqlite_object.log)
+    _table = Table(name="tester01", sqlite=sqlite_object)
     _table.add_column(name="testid", data_type=Types.integer, unique=True, keyword=True)
     _table.add_column(name="use_test", data_type=Types.bool)
     _table.add_column(name="testname", data_type=Types.string)
@@ -48,7 +48,7 @@ def get_table_02(sqlite_object: SQLite) -> Table:
 
 
 def get_table_03(name: str, sqlite_object: SQLite) -> Table:
-    _table = Table(name=name, sqlite=sqlite_object, log=sqlite_object.log)
+    _table = Table(name=name, sqlite=sqlite_object)
     _table.add_column(name="testid", data_type=Types.integer, primarykey=True)
     _table.add_column(name="use_test", data_type=Types.bool)
     _table.add_column(name="testname", data_type=Types.string)
@@ -57,7 +57,7 @@ def get_table_03(name: str, sqlite_object: SQLite) -> Table:
 
 
 def get_table_04(sqlite_object: SQLite) -> Table:
-    _table = Table(name="tester01", sqlite=sqlite_object, log=sqlite_object.log)
+    _table = Table(name="tester01", sqlite=sqlite_object)
     _table.add_column(name="testid", data_type=Types.integer, primarykey=True)
     _table.add_column(name="use_test", data_type=Types.bool)
     _table.add_column(name="category", data_type=Types.string, keyword=True)
