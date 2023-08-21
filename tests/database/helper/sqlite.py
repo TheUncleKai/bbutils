@@ -16,13 +16,9 @@
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
 
-import os
-
 import sqlite3
 from unittest import mock as mock
 
-from bbutil.logging import Logging
-from bbutil.utils import full_path
 from bbutil.database import SQLite, Types, Table, Data
 
 __all__ = [
@@ -31,8 +27,6 @@ __all__ = [
     "sqlite_integrity_error",
     "mock_operational_error",
 
-    "set_log",
-    "get_sqlite",
     "get_table_01",
     "get_data_01",
     "get_data_02",
@@ -44,39 +38,10 @@ __all__ = [
     "get_data_08"
 ]
 
-_index = {
-    0: ["INFORM", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"],
-    1: ["INFORM", "DEBUG1", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"],
-    2: ["INFORM", "DEBUG1", "DEBUG2", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"],
-    3: ["INFORM", "DEBUG1", "DEBUG2", "DEBUG3", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"]
-}
-
 sqlite_unknown_error = Exception("Something strange did happen!")
 sqlite_operational_error = sqlite3.OperationalError('This did go boing!!')
 sqlite_integrity_error = sqlite3.IntegrityError('These values did go boing!!')
 mock_operational_error = mock.Mock(side_effect=sqlite_operational_error)
-
-
-def set_log() -> Logging:
-    _log = Logging()
-    _log.setup(app="Test", level=2, index=_index)
-
-    console = _log.get_writer("console")
-    _log.register(console)
-    _log.open()
-    return _log
-
-
-def get_sqlite(filename: str, path: str = os.getcwd(), clean: bool = False) -> SQLite:
-    _log = set_log()
-    _testfile = full_path("{0:s}/{1:s}".format(path, filename))
-    _name = "Test"
-
-    if (os.path.exists(_testfile) is True) and (clean is True):
-        os.remove(_testfile)
-
-    _sqlite = SQLite(filename=_testfile, name="Test", log=_log)
-    return _sqlite
 
 
 def get_table_01(sqlite_object: SQLite) -> Table:
