@@ -105,7 +105,7 @@ class TestDatabase(unittest.TestCase):
     def test_stop_01(self):
         _filename = "{0:s}/test.sqlite".format(os.getcwd())
 
-        _database = TestData(filename=_filename, log=set_log())
+        _database = TestData(filename=_filename)
 
         _check1 = _database.stop()
 

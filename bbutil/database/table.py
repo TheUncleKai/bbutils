@@ -245,6 +245,8 @@ class Table(object):
         return _check
 
     def init(self) -> bool:
+        if self.log is None:
+            return False
 
         if len(self.columns) == 0:
             self.log.error("No columns: {0:s}".format(self.name))

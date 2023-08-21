@@ -24,7 +24,6 @@ from typing import Optional, List
 from bbutil.logging import Logging
 
 from bbutil.database.sqlite import SQLite
-from bbutil.database.types import Data
 from bbutil.database.table import Table
 
 __all__ = [
@@ -68,6 +67,9 @@ class Database(metaclass=ABCMeta):
 
     def start(self) -> bool:
         self.init()
+
+        if self.log:
+            return False
 
         if (self.name == "") or (self.filename == ""):
             self.log.error("File- or database-name is missing!")

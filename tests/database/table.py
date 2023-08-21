@@ -145,6 +145,14 @@ class TestTable(unittest.TestCase):
         self.assertFalse(_check2)
         return
 
+    def test_init_04(self):
+        _table = Table(name="Testos")
+
+        _check1 = _table.init()
+
+        self.assertFalse(_check1)
+        return
+
     def test_select_01(self):
 
         _sqlite = get_sqlite(filename="test_select.sqlite", path="testdata/database")
