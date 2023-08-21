@@ -16,17 +16,12 @@
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
 
-import os
 import unittest
-import unittest.mock as mock
 
-from unittest.mock import Mock
-
-from bbutil.database import SQLite, Table, Types
-from bbutil.utils import full_path
+from bbutil.database import Table, Types
 
 from tests.database.helper import get_sqlite
-from tests.database.helper.table import get_table_01, get_table_02, get_table_03
+from tests.database.helper.table import get_table_01, get_table_02, get_table_03, get_table_04
 
 __all__ = [
     "TestTable"
@@ -378,4 +373,45 @@ class TestTable(unittest.TestCase):
 
         self.assertTrue(_check_connect)
         self.assertTrue(_check_disconnect)
+        return
+
+    def test_add_01(self):
+        _sqlite = get_sqlite(filename="test.sqlite", clean=True)
+        _table = get_table_04(sqlite_object=_sqlite)
+
+        _check1 = _sqlite.connect()
+        _check2 = _table.init()
+
+        _data1 = _table.new_data()
+        _data1.use_test = True
+        _data1.category = "TestMain"
+        _data1.testname = "Test01"
+        _data1.path = "path"
+
+        _data2 = _table.new_data()
+        _data2.use_test = True
+        _data2.category = "TestMain"
+        _data2.testname = "Test02"
+        _data2.path = "path"
+
+        _data3 = _table.new_data()
+        _data3.use_test = True
+        _data3.category = "TestOther"
+        _data3.testname = "Test02"
+        _data3.path = "path"
+
+        _table.add(_data1)
+        _table.add(_data2)
+        _table.add(_data3)
+
+        _list1 = _table.index["TestMain"]
+        _list2 = _table.index["TestOther"]
+
+        _check3 = _sqlite.disconnect()
+
+        self.assertTrue(_check1)
+        self.assertTrue(_check2)
+        self.assertTrue(_check3)
+        self.assertEqual(len(_list1), 2)
+        self.assertEqual(len(_list2), 1)
         return
