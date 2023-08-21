@@ -25,6 +25,7 @@ __all__ = [
     "lang",
 
     "data",
+    "file",
     "utils",
 
     "log",

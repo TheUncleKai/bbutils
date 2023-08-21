@@ -16,5 +16,23 @@
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
 
+import unittest
+
+from bbutil.file import File
+
+from tests.helper import set_log
+
 __all__ = [
+    "TestFile"
 ]
+
+
+class TestFile(unittest.TestCase):
+    """Testing class for locking module."""
+
+    def setUp(self):
+        set_log()
+        return
+
+    def test_file_01(self):
+        return
