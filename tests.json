@@ -294,7 +294,10 @@
             "tests": [
                 "test_add_column_01",
                 "test_add_column_02",
-                "test_new_data_01"
+                "test_new_data_01",
+                "test_init_01",
+                "test_init_02",
+                "test_init_03"
             ]
         }
     ]

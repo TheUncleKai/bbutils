@@ -148,7 +148,7 @@ class Table(object):
             self.log.clear()
         return _result
 
-    def select(self, sql_filter: str = "", names=None, data_values=None, verbose: bool = False) -> List[Data]:
+    def select(self, sql_filter: str = "", names=None, data_values=None, verbose: bool = True) -> List[Data]:
         if names is None:
             names = []
 

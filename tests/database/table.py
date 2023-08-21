@@ -108,3 +108,44 @@ class TestTable(unittest.TestCase):
         self.assertHasAttr(_data, "testname")
         self.assertHasAttr(_data, "path")
         return
+
+    def test_init_01(self):
+
+        _sqlite = get_sqlite(filename="test_check_table.sqlite", path="testdata/database")
+        _table = get_table_01(sqlite_object=_sqlite)
+
+        _check1 = _sqlite.connect()
+        _check2 = _table.init()
+        _check3 = _sqlite.disconnect()
+
+        self.assertTrue(_check1)
+        self.assertTrue(_check2)
+        self.assertTrue(_check3)
+        return
+
+    def test_init_02(self):
+
+        _sqlite = get_sqlite(filename="test_check_table.sqlite", path="testdata/database")
+        _table = Table(name="test01", sqlite=_sqlite, log=_sqlite.log)
+
+        _check1 = _sqlite.connect()
+        _check2 = _table.init()
+        _check3 = _sqlite.disconnect()
+
+        self.assertTrue(_check1)
+        self.assertFalse(_check2)
+        self.assertTrue(_check3)
+        return
+
+    def test_init_03(self):
+
+        _sqlite = get_sqlite(filename="test_check_table.sqlite", path="testdata/database")
+        _table = get_table_01(sqlite_object=_sqlite)
+
+        _check1 = _sqlite.connect()
+        _sqlite.connection = None
+        _check2 = _table.init()
+
+        self.assertTrue(_check1)
+        self.assertFalse(_check2)
+        return
