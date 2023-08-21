@@ -335,7 +335,7 @@ class TestTable(unittest.TestCase):
         return
 
     def test_store_04(self):
-        _sqlite = get_sqlite(filename="test_bulk.sqlite", clean=True)
+        _sqlite = get_sqlite(filename="test.sqlite", clean=True)
 
         _table0 = get_table_03("interval0", sqlite_object=_sqlite)
         _table1 = get_table_03("interval1", sqlite_object=_sqlite)
@@ -484,4 +484,56 @@ class TestTable(unittest.TestCase):
         self.assertTrue(_check4)
         self.assertTrue(_check5)
         self.assertEqual(_count, 1)
+        return
+
+    def _load_table(self, table: Table, limit: int):
+        _sql_count = table.count
+
+        _check = table.load()
+        _data_count = len(table.data)
+
+        self.assertTrue(_check)
+        self.assertEqual(_sql_count, limit)
+        self.assertEqual(_data_count, limit)
+        return
+
+    def test_load_01(self):
+        _sqlite = get_sqlite(filename="test_bulk.sqlite", path="testdata/database")
+
+        _table0 = get_table_03("interval0", sqlite_object=_sqlite)
+        _table1 = get_table_03("interval1", sqlite_object=_sqlite)
+        _table2 = get_table_03("interval2", sqlite_object=_sqlite)
+        _table3 = get_table_03("interval3", sqlite_object=_sqlite)
+        _table4 = get_table_03("interval4", sqlite_object=_sqlite)
+        _table5 = get_table_03("interval5", sqlite_object=_sqlite)
+        _table6 = get_table_03("interval6", sqlite_object=_sqlite)
+
+        _check_connect = _sqlite.connect()
+
+        _tables = [
+            _table0,
+            _table1,
+            _table2,
+            _table3,
+            _table4,
+            _table5,
+            _table6
+        ]
+
+        for _table in _tables:
+            _check = _table.init()
+            self.assertTrue(_check)
+
+        self._load_table(_table0, 500)
+        self._load_table(_table1, 1000)
+        self._load_table(_table2, 5000)
+        self._load_table(_table3, 10000)
+        self._load_table(_table4, 20000)
+        self._load_table(_table5, 50000)
+        self._load_table(_table6, 100000)
+
+        _check_disconnect = _sqlite.disconnect()
+
+        self.assertTrue(_check_connect)
+        self.assertTrue(_check_disconnect)
         return

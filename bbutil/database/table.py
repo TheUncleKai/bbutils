@@ -276,15 +276,12 @@ class Table(object):
         _list.append(item)
         return
 
-    def load(self, **kwargs):
-        self.log.inform("Data", "Load {0:s}...".format(self.name))
+    def load(self) -> bool:
+        self.log.inform(self.name, "Load {0:s}...".format(self.name))
 
-        _all = kwargs.get("all", False)
-
-        if _all is True:
-            _items = self.select()
-        else:
-            _items = self.select(**kwargs)
+        _items = self.select()
+        if _items is None:
+            return False
 
         _max = len(_items) + 1
         _progress = self.log.progress(_max, select_interval(_max))
@@ -293,4 +290,4 @@ class Table(object):
             self.add(_item)
             _progress.inc()
         self.log.clear()
-        return
+        return True
