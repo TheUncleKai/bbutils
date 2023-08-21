@@ -51,6 +51,11 @@ class Table(object):
         return
 
     @property
+    def data_count(self) -> int:
+        _counter = len(self.data)
+        return _counter
+
+    @property
     def count(self) -> int:
         self._counter = self.sqlite.count_table(self.name)
         return self._counter
@@ -281,7 +286,7 @@ class Table(object):
         _list.append(item)
         return
 
-    def load(self) -> bool:
+    def load(self) -> int:
         self.log.inform(self.name, "Load {0:s}...".format(self.name))
 
         _items = self.select()

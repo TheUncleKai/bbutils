@@ -553,3 +553,25 @@ class TestTable(unittest.TestCase):
         self.assertEqual(_count, 0)
         self.assertTrue(_check_disconnect)
         return
+
+    def test_clear_01(self):
+        _sqlite = get_sqlite(filename="test_select.sqlite", path="testdata/database")
+
+        _table = get_table_01(sqlite_object=_sqlite)
+
+        _check_connect = _sqlite.connect()
+
+        _check_init = _table.init()
+        _count1 = _table.load()
+
+        _table.clear()
+
+        _count2 = _table.data_count
+        _check_disconnect = _sqlite.disconnect()
+
+        self.assertTrue(_check_connect)
+        self.assertTrue(_check_init)
+        self.assertEqual(_count1, 6)
+        self.assertEqual(_count2, 0)
+        self.assertTrue(_check_disconnect)
+        return
