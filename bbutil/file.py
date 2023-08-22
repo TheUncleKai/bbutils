@@ -90,13 +90,7 @@ class Base(metaclass=ABCMeta):
     def create(self) -> bool:
         pass
 
-    def remove(self) -> bool:
-        if self.valid is False:
-            return True
-
-        if self.exists is False:
-            return True
-
+    def _remove_file(self) -> bool:
         try:
             os.remove(self.fullpath)
         except OSError as e:
@@ -108,6 +102,33 @@ class Base(metaclass=ABCMeta):
             return False
 
         return True
+
+    def _remove_folder(self) -> bool:
+        try:
+            os.rmdir(self.fullpath)
+        except OSError as e:
+            bbutil.log.exception(e)
+            return False
+
+        if self.exists is True:
+            bbutil.log.error("Unable to remove file!")
+            return False
+
+        return True
+
+    def remove(self) -> bool:
+        if self.valid is False:
+            return True
+
+        if self.exists is False:
+            return True
+
+        if os.path.isdir(self.fullpath) is True:
+            _check = self._remove_folder()
+        else:
+            _check = self._remove_file()
+
+        return _check
 
 
 class File(Base):
@@ -138,7 +159,11 @@ class Folder(Base):
 
     def create(self) -> bool:
         if self.exists is False:
-            os.mkdir(self.fullpath)
+            try:
+                os.mkdir(self.fullpath)
+            except OSError as e:
+                bbutil.log.exception(e)
+                return False
 
         if self.exists is False:
             bbutil.log.error("Unable to create: {0:s}".format(self.fullpath))

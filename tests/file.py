@@ -22,7 +22,7 @@ import unittest
 import unittest.mock as mock
 
 from bbutil.utils import full_path
-from bbutil.file import File
+from bbutil.file import File, Folder
 
 from tests.helper import set_log
 from tests.helper.file import create_file
@@ -220,4 +220,103 @@ class TestFile(unittest.TestCase):
         self.assertTrue(_file.init())
         self.assertTrue(_file.init())
         self.assertTrue(_file.create())
+        return
+
+    def test_folder_01(self):
+        _basename = "testfolder"
+        _path = os.getcwd()
+        _testfolder = full_path("{0:s}/{1:s}".format(_path, _basename))
+
+        if os.path.exists(_testfolder):
+            os.rmdir(_testfolder)
+
+        _folder = Folder(path=_path, basename=_basename)
+
+        _check = _folder.create()
+        self.assertTrue(_check)
+
+        os.rmdir(_testfolder)
+        return
+
+    def test_folder_02(self):
+        _basename = "testfolder"
+        _path = os.getcwd()
+        _testfolder = full_path("{0:s}/{1:s}".format(_path, _basename))
+
+        if os.path.exists(_testfolder):
+            os.rmdir(_testfolder)
+
+        _folder = Folder(path=_path, basename=_basename)
+
+        _check = _folder.create()
+        self.assertTrue(_check)
+
+        _check = _folder.remove()
+        self.assertTrue(_check)
+        return
+
+    @mock.patch('os.rmdir', new=mock_oserror)
+    def test_folder_03(self):
+        _basename = "testfolder"
+        _path = os.getcwd()
+        _testfolder = full_path("{0:s}/{1:s}".format(_path, _basename))
+
+        if os.path.exists(_testfolder):
+            os.rmdir(_testfolder)
+
+        _folder = Folder(path=_path, basename=_basename)
+
+        _check = _folder.create()
+        self.assertTrue(_check)
+
+        _check = _folder.remove()
+        self.assertFalse(_check)
+        return
+
+    @mock.patch('os.rmdir', new=mock_remove)
+    def test_folder_04(self):
+        _basename = "testfolder"
+        _path = os.getcwd()
+        _testfolder = full_path("{0:s}/{1:s}".format(_path, _basename))
+
+        if os.path.exists(_testfolder):
+            os.rmdir(_testfolder)
+
+        _folder = Folder(path=_path, basename=_basename)
+
+        _check = _folder.create()
+        self.assertTrue(_check)
+
+        _check = _folder.remove()
+        self.assertFalse(_check)
+        return
+
+    @mock.patch('os.mkdir', new=mock_oserror)
+    def test_folder_05(self):
+        _basename = "testfolder"
+        _path = os.getcwd()
+        _testfolder = full_path("{0:s}/{1:s}".format(_path, _basename))
+
+        if os.path.exists(_testfolder):
+            os.rmdir(_testfolder)
+
+        _folder = Folder(path=_path, basename=_basename)
+
+        _check = _folder.create()
+        self.assertFalse(_check)
+        return
+
+    @mock.patch('os.mkdir', new=mock_remove)
+    def test_folder_06(self):
+        _basename = "testfolder"
+        _path = os.getcwd()
+        _testfolder = full_path("{0:s}/{1:s}".format(_path, _basename))
+
+        if os.path.exists(_testfolder):
+            os.rmdir(_testfolder)
+
+        _folder = Folder(path=_path, basename=_basename)
+
+        _check = _folder.create()
+        self.assertFalse(_check)
         return
