@@ -328,6 +328,16 @@
                 "test_stop_02",
                 "test_store_01"
             ]
+        },
+        {
+            "id": "File.File",
+            "path": "tests.file",
+            "classname": "TestFile",
+            "tests": [
+                "test_file_01",
+                "test_file_02",
+                "test_file_03"
+            ]
         }
     ]
 }

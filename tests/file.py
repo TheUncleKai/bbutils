@@ -38,7 +38,37 @@ class TestFile(unittest.TestCase):
         return
 
     def test_file_01(self):
-        _testfile = full_path("{0:s}/testfiles.txt".format(os.getcwd()))
+        _basename = "testfiles.txt"
+        _path = os.getcwd()
+
+        _testfile = full_path("{0:s}/{1:s}".format(_path, _basename))
         _check1 = create_file(_testfile)
 
+        self.assertTrue(_check1)
+
+        _file = File(path=_path, basename=_basename)
+
+        self.assertTrue(_file.valid)
+        self.assertEqual(_file.fullpath, _testfile)
+        self.assertTrue(_file.exists)
+
+        os.remove(_file.fullpath)
+
+        self.assertFalse(_file.exists)
+        return
+
+    def test_file_02(self):
+        _basename = "testfiles.txt"
+
+        _file = File(basename=_basename)
+
+        self.assertFalse(_file.valid)
+        return
+
+    def test_file_03(self):
+        _path = os.getcwd()
+
+        _file = File(path=_path)
+
+        self.assertFalse(_file.valid)
         return
