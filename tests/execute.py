@@ -16,24 +16,20 @@
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
 
-import os
 import unittest
 
 import unittest.mock as mock
 
-from bbutil.utils import full_path
 from bbutil.execute import Execute
 
 from tests.helper import set_log
-from tests.helper.execute import MockPopen, CatchBacks
+from tests.helper.execute import CatchBacks, MockPopen1, MockPopen2, MockPopen3
 
 __all__ = [
     "TestExecute"
 ]
 
 
-mock_popen1 = MockPopen()
-mock_popen2 = MockPopen(returncode=1, has_error=True)
 oserror = OSError("Something strange did happen!")
 mock_oserror = mock.Mock(side_effect=oserror)
 mock_remove = mock.Mock()
@@ -76,7 +72,7 @@ class TestExecute(unittest.TestCase):
         self.assertGreater(len(_execute.messages), 1)
         return
 
-    @mock.patch('subprocess.Popen', new=mock_popen1)
+    @mock.patch('subprocess.Popen', new=MockPopen1)
     def test_setup_03(self):
 
         _execute = Execute()
@@ -93,7 +89,7 @@ class TestExecute(unittest.TestCase):
         self.assertGreater(len(_execute.messages), 1)
         return
 
-    @mock.patch('subprocess.Popen', new=mock_popen2)
+    @mock.patch('subprocess.Popen', new=MockPopen2)
     def test_setup_04(self):
 
         _callbacks = CatchBacks()
@@ -114,4 +110,27 @@ class TestExecute(unittest.TestCase):
         self.assertGreater(len(_execute.messages), 1)
         self.assertEqual(len(_callbacks.stdout), 22)
         self.assertEqual(len(_callbacks.stderr), 11)
+        return
+
+    @mock.patch('subprocess.Popen', new=MockPopen3)
+    def test_setup_05(self):
+
+        _callbacks = CatchBacks()
+
+        _execute = Execute()
+        _commands = [
+            "/usr/bin/ls"
+        ]
+
+        _execute.setup(name="Test", desc="Print ls", commands=_commands,
+                       call_stdout=_callbacks.add_stdout, call_stderr=_callbacks.add_stderr)
+
+        _check = _execute.execute()
+
+        self.assertFalse(_check)
+        self.assertEqual(_execute.returncode, 1)
+        self.assertIsNone(_execute.errors)
+        self.assertGreater(len(_execute.messages), 1)
+        self.assertEqual(len(_callbacks.stdout), 22)
+        self.assertEqual(len(_callbacks.stderr), 0)
         return

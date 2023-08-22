@@ -21,7 +21,9 @@ from unittest.mock import Mock
 
 __all__ = [
     "CatchBacks",
-    "MockPopen"
+    "MockPopen1",
+    "MockPopen2",
+    "MockPopen3"
 ]
 
 
@@ -45,35 +47,78 @@ class CatchBacks(object):
         return
 
 
-class MockPopen(Mock):
+def get_stdout() -> list:
 
-    def __init__(self, **kwargs):
-        Mock.__init__(self, **kwargs)
-        _line1 = "TEST"
-        _line3 = "ERROR!"
+    _line1 = "TEST"
 
-        _excec = UnicodeDecodeError('funnycodec', _line1.encode(), 1, 2, 'This is just a fake reason!')
+    _excec = UnicodeDecodeError('funnycodec', _line1.encode(), 1, 2, 'This is just a fake reason!')
 
-        _line2 = Mock()
-        _line2.decode = Mock(side_effect=_excec)
+    _line2 = Mock()
+    _line2.decode = Mock(side_effect=_excec)
 
-        _stdout = [
-            _line1.encode(),
-            _line2,
-            None
-        ]
+    _stdout = [
+        _line1.encode(),
+        _line2,
+        None
+    ]
+    return _stdout
 
-        has_error = self.returncode = kwargs.get("has_error", False)
 
-        _stderr = []
+def get_stderr() -> list:
+    _line1 = "ERROR!"
 
-        if has_error is True:
-            _stderr.append(_line3.encode())
+    _stderr = [
+        _line1.encode(),
+        None
+    ]
+
+    return _stderr
+
+
+class MockPopen1(object):
+
+    def __init__(self, commands, stdout, stderr, stdin=None):
 
         self._poll = 0
-        self.stdout = _stdout
-        self.stderr = _stderr
-        self.returncode = kwargs.get("returncode", 0)
+        self.stdout = get_stdout()
+        self.stderr = []
+        self.returncode = 0
+        return
+
+    def poll(self) -> Optional[int]:
+        if self._poll == 10:
+            self._poll = 0
+            return 1
+        self._poll += 1
+        return None
+
+
+class MockPopen2(object):
+
+    def __init__(self, commands, stdout, stderr, stdin=None):
+
+        self._poll = 0
+        self.stdout = get_stdout()
+        self.stderr = get_stderr()
+        self.returncode = 1
+        return
+
+    def poll(self) -> Optional[int]:
+        if self._poll == 10:
+            self._poll = 0
+            return 1
+        self._poll += 1
+        return None
+
+
+class MockPopen3(object):
+
+    def __init__(self, commands, stdout, stderr, stdin=None):
+
+        self._poll = 0
+        self.stdout = get_stdout()
+        self.stderr = []
+        self.returncode = 1
         return
 
     def poll(self) -> Optional[int]:
