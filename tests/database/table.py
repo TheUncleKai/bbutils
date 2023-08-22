@@ -20,9 +20,8 @@ import unittest
 
 from bbutil.database import Table, Types
 
-from tests.database.helper import get_sqlite
-from tests.helper import set_log
-from tests.database.helper.table import TestData, get_table_01, get_table_02, get_table_03, get_table_04
+from tests.helper import get_sqlite, set_log
+from tests.helper.table import TestData, get_table_01, get_table_02, get_table_03, get_table_04
 
 __all__ = [
     "TestTable"

@@ -16,11 +16,21 @@
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
 
-import bbutil
+import os
 
-from bbutil.logging import Logging
+import bbutil
+from bbutil import Logging
+
+from bbutil.database import SQLite
+from bbutil.utils import full_path
 
 __all__ = [
+    "database",
+    "file",
+    "sqlite",
+    "table",
+
+    "get_sqlite",
     "set_log"
 ]
 
@@ -30,6 +40,17 @@ _index = {
     2: ["INFORM", "DEBUG1", "DEBUG2", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"],
     3: ["INFORM", "DEBUG1", "DEBUG2", "DEBUG3", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"]
 }
+
+
+def get_sqlite(filename: str, path: str = os.getcwd(), clean: bool = False) -> SQLite:
+    _testfile = full_path("{0:s}/{1:s}".format(path, filename))
+    _name = "Test"
+
+    if (os.path.exists(_testfile) is True) and (clean is True):
+        os.remove(_testfile)
+
+    _sqlite = SQLite(filename=_testfile, name="Test")
+    return _sqlite
 
 
 def set_log():

@@ -17,11 +17,12 @@
 #
 
 __all__ = [
+    "database",
+    "helper",
     "lang",
     "logging",
 
     "data",
     "file",
-    "helper",
     "utils"
 ]

@@ -16,25 +16,21 @@
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
 
-import os
-
-from bbutil.database import SQLite
-from bbutil.utils import full_path
+import os.path
 
 __all__ = [
-    "sqlite",
-    "table",
-
-    "get_sqlite"
+    "create_file"
 ]
 
 
-def get_sqlite(filename: str, path: str = os.getcwd(), clean: bool = False) -> SQLite:
-    _testfile = full_path("{0:s}/{1:s}".format(path, filename))
-    _name = "Test"
+def create_file(filename: str) -> bool:
+    _path = os.path.dirname(filename)
+    if os.path.exists(_path) is False:
+        return False
 
-    if (os.path.exists(_testfile) is True) and (clean is True):
-        os.remove(_testfile)
+    f = open(file=filename, mode="w")
 
-    _sqlite = SQLite(filename=_testfile, name="Test")
-    return _sqlite
+    f.write("TEST!\n")
+
+    f.close()
+    return True

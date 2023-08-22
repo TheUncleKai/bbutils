@@ -23,9 +23,9 @@ import unittest.mock as mock
 from unittest.mock import Mock
 
 from tests.helper import set_log
-from tests.database.helper.database import TestData
+from tests.helper.database import TestData
 
-from tests.database.helper.sqlite import (mock_operational_error, sqlite_operational_error)
+from tests.helper.sqlite import (mock_operational_error, sqlite_operational_error)
 
 __all__ = [
     "TestDatabase"

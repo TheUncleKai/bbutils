@@ -16,11 +16,14 @@
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
 
+import os
 import unittest
 
+from bbutil.utils import full_path
 from bbutil.file import File
 
 from tests.helper import set_log
+from tests.helper.file import create_file
 
 __all__ = [
     "TestFile"
@@ -35,4 +38,7 @@ class TestFile(unittest.TestCase):
         return
 
     def test_file_01(self):
+        _testfile = full_path("{0:s}/testfiles.txt".format(os.getcwd()))
+        _check1 = create_file(_testfile)
+
         return
