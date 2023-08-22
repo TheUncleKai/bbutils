@@ -133,3 +133,20 @@ class TestFile(unittest.TestCase):
         self.assertTrue(_check2)
         self.assertFalse(_check3)
         return
+
+    def test_file_08(self):
+        _basename = "testfiles.txt"
+        _path = os.getcwd()
+        _testfile = full_path("{0:s}/{1:s}".format(_path, _basename))
+
+        _check = create_file(_testfile)
+        self.assertTrue(_check)
+
+        _file = File()
+
+        _check = _file.open(_testfile)
+        self.assertTrue(_check)
+
+        _check = _file.remove()
+        self.assertTrue(_check)
+        return
