@@ -363,7 +363,9 @@
             "tests": [
                 "test_worker_01",
                 "test_worker_02",
-                "test_worker_03"
+                "test_worker_03",
+                "test_worker_04",
+                "test_worker_05"
             ]
         }
     ]

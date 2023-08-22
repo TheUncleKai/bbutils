@@ -16,12 +16,9 @@
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
 
-import os
 import unittest
 
 import unittest.mock as mock
-
-from bbutil.utils import full_path
 
 from tests.helper import set_log
 from tests.helper.worker import Worker01
@@ -60,6 +57,22 @@ class TestWorker(unittest.TestCase):
 
     def test_worker_03(self):
         _worker = Worker01(id="Worker01", exit_prepare=False)
+
+        _check = _worker.execute()
+        self.assertFalse(_check)
+        self.assertTrue(_worker.error)
+        return
+
+    def test_worker_04(self):
+        _worker = Worker01(id="Worker01", exit_run=False)
+
+        _check = _worker.execute()
+        self.assertFalse(_check)
+        self.assertTrue(_worker.error)
+        return
+
+    def test_worker_05(self):
+        _worker = Worker01(id="Worker01", exit_close=False)
 
         _check = _worker.execute()
         self.assertFalse(_check)
