@@ -320,3 +320,11 @@ class TestFile(unittest.TestCase):
         _check = _folder.create()
         self.assertFalse(_check)
         return
+
+    def test_folder_07(self):
+        _folder = Folder()
+        _folder.clear()
+
+        self.assertTrue(_folder.init())
+        self.assertTrue(_folder.open_file())
+        return
