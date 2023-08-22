@@ -361,7 +361,8 @@
             "path": "tests.worker",
             "classname": "TestWorker",
             "tests": [
-                "test_file_01"
+                "test_worker_01",
+                "test_worker_02"
             ]
         }
     ]

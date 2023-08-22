@@ -41,7 +41,7 @@ class Worker(metaclass=ABCMeta):
     use_thread: bool = False
 
     _callback: Callback = Callback()
-    _error: bool = True
+    _error: bool = False
     _running: bool = True
 
     @property
@@ -101,17 +101,19 @@ class Worker(metaclass=ABCMeta):
 
         if self.use_thread is False:
             self._execute()
-            return self._error
+        else:
+            _t = threading.Thread(target=self._execute)
 
-        _t = threading.Thread(target=self._execute)
+            _t.start()
+            _run = True
 
-        _t.start()
-        _run = True
+            while _run is True:
+                time.sleep(self.interval)
 
-        while _run is True:
-            time.sleep(self.interval)
+                if self._running is False:
+                    _run = False
 
-            if self._running is False:
-                _run = False
+        if self._error is True:
+            return False
 
-        return self._error
+        return True

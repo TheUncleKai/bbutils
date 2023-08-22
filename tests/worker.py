@@ -24,7 +24,7 @@ import unittest.mock as mock
 from bbutil.utils import full_path
 
 from tests.helper import set_log
-from tests.helper.file import create_file
+from tests.helper.worker import Worker01
 
 __all__ = [
     "TestWorker"
@@ -42,22 +42,18 @@ class TestWorker(unittest.TestCase):
         set_log()
         return
 
-    def test_file_01(self):
-        _basename = "testfiles.txt"
-        _path = os.getcwd()
+    def test_worker_01(self):
+        _worker = Worker01()
 
-        _testfile = full_path("{0:s}/{1:s}".format(_path, _basename))
-        _check1 = create_file(_testfile)
+        _check = _worker.execute()
+        self.assertTrue(_check)
+        self.assertFalse(_worker.error)
+        return
 
-        self.assertTrue(_check1)
+    def test_worker_02(self):
+        _worker = Worker01(use_thread=True)
 
-        _file = File(path=_path, basename=_basename)
-
-        self.assertTrue(_file.valid)
-        self.assertEqual(_file.fullpath, _testfile)
-        self.assertTrue(_file.exists)
-
-        os.remove(_file.fullpath)
-
-        self.assertFalse(_file.exists)
+        _check = _worker.execute()
+        self.assertTrue(_check)
+        self.assertFalse(_worker.error)
         return
