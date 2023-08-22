@@ -36,7 +36,7 @@ __all__ = [
 class Worker(metaclass=ABCMeta):
 
     id: str = ""
-    abort: bool = True
+    abort: bool = False
     interval: float = 0.01
     use_thread: bool = False
 
@@ -66,8 +66,12 @@ class Worker(metaclass=ABCMeta):
 
     def _do_step(self, step: str, function, callback_func):
         if self.abort is True:
+            self._running = False
             self.abort = False
+            self._callback.do_abort()
             return
+
+        bbutil.log.inform(self.id, "Run {0:s}".format(step))
 
         callback_func()
 
@@ -75,6 +79,9 @@ class Worker(metaclass=ABCMeta):
         if _check is False:
             self._error = True
             bbutil.log.error("{0:s}: {1:s} failed!".format(self.id, step))
+
+        if self._error is True:
+            self._running = False
         return
 
     def _execute(self):
@@ -82,16 +89,16 @@ class Worker(metaclass=ABCMeta):
         self._callback.do_start()
 
         self._do_step("prepare", self.prepare, self._callback.do_prepare)
-        if self._error is True:
-            self._running = False
+        if self._running is False:
             return
 
         self._do_step("run", self.run, self._callback.do_run)
-        if self._error is True:
-            self._running = False
+        if self._running is False:
             return
 
         self._do_step("close", self.close, self._callback.do_close)
+        if self._running is False:
+            return
 
         self._callback.do_close()
         self._running = False

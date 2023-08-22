@@ -43,7 +43,7 @@ class TestWorker(unittest.TestCase):
         return
 
     def test_worker_01(self):
-        _worker = Worker01()
+        _worker = Worker01(id="Worker01")
 
         _check = _worker.execute()
         self.assertTrue(_check)
@@ -51,9 +51,17 @@ class TestWorker(unittest.TestCase):
         return
 
     def test_worker_02(self):
-        _worker = Worker01(use_thread=True)
+        _worker = Worker01(id="Worker01", use_thread=True)
 
         _check = _worker.execute()
         self.assertTrue(_check)
         self.assertFalse(_worker.error)
+        return
+
+    def test_worker_03(self):
+        _worker = Worker01(id="Worker01", exit_prepare=False)
+
+        _check = _worker.execute()
+        self.assertFalse(_check)
+        self.assertTrue(_worker.error)
         return
