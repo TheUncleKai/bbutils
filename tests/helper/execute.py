@@ -20,16 +20,37 @@ from typing import Optional
 from unittest.mock import Mock
 
 __all__ = [
+    "CatchBacks",
     "MockPopen"
 ]
+
+
+class CatchBacks(object):
+
+    def __init__(self):
+        self.stdout = []
+        self.stderr = []
+        return
+
+    def add_stdout(self, data):
+        if data is None:
+            return
+        self.stdout.append(data)
+        return
+
+    def add_stderr(self, data):
+        if data is None:
+            return
+        self.stderr.append(data)
+        return
 
 
 class MockPopen(Mock):
 
     def __init__(self, **kwargs):
         Mock.__init__(self, **kwargs)
-
         _line1 = "TEST"
+        _line3 = "ERROR!"
 
         _excec = UnicodeDecodeError('funnycodec', _line1.encode(), 1, 2, 'This is just a fake reason!')
 
@@ -42,10 +63,17 @@ class MockPopen(Mock):
             None
         ]
 
+        has_error = self.returncode = kwargs.get("has_error", False)
+
+        _stderr = []
+
+        if has_error is True:
+            _stderr.append(_line3.encode())
+
         self._poll = 0
         self.stdout = _stdout
-        self.stderr = _stdout
-        self.returncode = 0
+        self.stderr = _stderr
+        self.returncode = kwargs.get("returncode", 0)
         return
 
     def poll(self) -> Optional[int]:

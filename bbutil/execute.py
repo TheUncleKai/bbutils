@@ -117,7 +117,11 @@ class Execute(object):
                     if line is None:
                         continue
                     data = self._convert_line(line)
-                    self.messages.append(data)
+
+                    if self.errors is None:
+                        self.errors = []
+
+                    self.errors.append(data)
 
                     if self.call_stderr is not None:
                         self.call_stderr(data)

@@ -25,14 +25,15 @@ from bbutil.utils import full_path
 from bbutil.execute import Execute
 
 from tests.helper import set_log
-from tests.helper.execute import MockPopen
+from tests.helper.execute import MockPopen, CatchBacks
 
 __all__ = [
     "TestExecute"
 ]
 
 
-mock_popen = MockPopen()
+mock_popen1 = MockPopen()
+mock_popen2 = MockPopen(returncode=1, has_error=True)
 oserror = OSError("Something strange did happen!")
 mock_oserror = mock.Mock(side_effect=oserror)
 mock_remove = mock.Mock()
@@ -75,7 +76,7 @@ class TestExecute(unittest.TestCase):
         self.assertGreater(len(_execute.messages), 1)
         return
 
-    @mock.patch('subprocess.Popen', new=mock_popen)
+    @mock.patch('subprocess.Popen', new=mock_popen1)
     def test_setup_03(self):
 
         _execute = Execute()
@@ -90,4 +91,27 @@ class TestExecute(unittest.TestCase):
         self.assertEqual(_execute.returncode, 0)
         self.assertIsNone(_execute.errors)
         self.assertGreater(len(_execute.messages), 1)
+        return
+
+    @mock.patch('subprocess.Popen', new=mock_popen2)
+    def test_setup_04(self):
+
+        _callbacks = CatchBacks()
+
+        _execute = Execute()
+        _commands = [
+            "/usr/bin/ls"
+        ]
+
+        _execute.setup(name="Test", desc="Print ls", commands=_commands,
+                       call_stdout=_callbacks.add_stdout, call_stderr=_callbacks.add_stderr)
+
+        _check = _execute.execute()
+
+        self.assertFalse(_check)
+        self.assertEqual(_execute.returncode, 1)
+        self.assertIsNotNone(_execute.errors)
+        self.assertGreater(len(_execute.messages), 1)
+        self.assertEqual(len(_callbacks.stdout), 22)
+        self.assertEqual(len(_callbacks.stderr), 11)
         return
