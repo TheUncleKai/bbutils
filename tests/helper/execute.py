@@ -79,6 +79,9 @@ class MockPopen1(object):
 
     def __init__(self, commands, stdout, stderr, stdin=None):
 
+        self.test_stdout = stdout
+        self.test_stderr = stderr
+        self.test_stdin = stdin
         self._poll = 0
         self.stdout = get_stdout()
         self.stderr = []
@@ -97,6 +100,9 @@ class MockPopen2(object):
 
     def __init__(self, commands, stdout, stderr, stdin=None):
 
+        self.test_stdout = stdout
+        self.test_stderr = stderr
+        self.test_stdin = stdin
         self._poll = 0
         self.stdout = get_stdout()
         self.stderr = get_stderr()
@@ -115,6 +121,9 @@ class MockPopen3(object):
 
     def __init__(self, commands, stdout, stderr, stdin=None):
 
+        self.test_stdout = stdout
+        self.test_stderr = stderr
+        self.test_stdin = stdin
         self._poll = 0
         self.stdout = get_stdout()
         self.stderr = []

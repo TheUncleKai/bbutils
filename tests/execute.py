@@ -77,10 +77,12 @@ class TestExecute(unittest.TestCase):
 
         _execute = Execute()
         _commands = [
-            "/usr/bin/ls"
+            "/usr/bin/ls",
+            "-lA"
         ]
 
-        _execute.setup(name="Test", desc="Print ls", commands=_commands)
+        _execute.setup(name="Test", desc="Print ls", commands=_commands, stdout="TEST", stderr="TEST", stdin="TEST")
+        _execute.show_command()
 
         _check = _execute.execute()
         self.assertTrue(_check)
