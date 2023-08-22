@@ -38,7 +38,6 @@ class Worker(metaclass=ABCMeta):
     id: str = ""
     abort: bool = False
     interval: float = 0.01
-    use_thread: bool = False
 
     _callback: Callback = Callback()
     _error: bool = False
@@ -104,21 +103,27 @@ class Worker(metaclass=ABCMeta):
         self._running = False
         return
 
+    def start(self):
+        _t = threading.Thread(target=self._execute)
+        _t.start()
+        return
+
+    @property
+    def is_running(self):
+        return self._running
+
+    def wait(self):
+        _run = True
+
+        while _run is True:
+            time.sleep(self.interval)
+
+            if self._running is False:
+                _run = False
+        return
+
     def execute(self) -> bool:
-
-        if self.use_thread is False:
-            self._execute()
-        else:
-            _t = threading.Thread(target=self._execute)
-
-            _t.start()
-            _run = True
-
-            while _run is True:
-                time.sleep(self.interval)
-
-                if self._running is False:
-                    _run = False
+        self._execute()
 
         if self._error is True:
             return False

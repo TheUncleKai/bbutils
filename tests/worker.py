@@ -21,7 +21,7 @@ import unittest
 import unittest.mock as mock
 
 from tests.helper import set_log
-from tests.helper.worker import Worker01
+from tests.helper.worker import Worker01, Worker02
 
 __all__ = [
     "TestWorker"
@@ -48,10 +48,11 @@ class TestWorker(unittest.TestCase):
         return
 
     def test_worker_02(self):
-        _worker = Worker01(id="Worker01", use_thread=True)
+        _worker = Worker01(id="Worker01")
 
-        _check = _worker.execute()
-        self.assertTrue(_check)
+        _worker.start()
+        _worker.wait()
+
         self.assertFalse(_worker.error)
         return
 
@@ -77,4 +78,26 @@ class TestWorker(unittest.TestCase):
         _check = _worker.execute()
         self.assertFalse(_check)
         self.assertTrue(_worker.error)
+        return
+
+    def test_worker_06(self):
+        _worker = Worker01(id="Worker01")
+
+        _worker.start()
+        _check = _worker.is_running
+        _worker.wait()
+
+        self.assertTrue(_check)
+        self.assertFalse(_worker.error)
+        return
+
+    def test_worker_07(self):
+        _worker = Worker02(id="Worker02")
+
+        _worker.start()
+        _check1 = _worker.is_running
+        _worker.abort = True
+
+        _worker.wait()
+        self.assertFalse(_worker.error)
         return

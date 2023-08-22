@@ -16,12 +16,16 @@
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
 
-from dataclasses import dataclass
+from typing import List
+from dataclasses import dataclass, field
+
+import bbutil
 
 from bbutil.worker import Worker
 
 __all__ = [
-    "Worker01"
+    "Worker01",
+    "Worker02"
 ]
 
 
@@ -40,3 +44,47 @@ class Worker01(Worker):
 
     def close(self) -> bool:
         return self.exit_close
+
+
+@dataclass
+class Worker02(Worker):
+
+    iterate_list: List[int] = field(default_factory=list)
+
+    def prepare(self) -> bool:
+        _max = 50000
+        _range = range(0, _max)
+        _progress = bbutil.log.progress(_max)
+
+        for n in _range:
+            self.iterate_list.append(n)
+            _progress.inc()
+
+        bbutil.log.clear()
+        return True
+
+    def run(self) -> bool:
+        _max = len(self.iterate_list)
+        _progress = bbutil.log.progress(_max)
+
+        n = 0
+        for x in self.iterate_list:
+            self.iterate_list[n] = x + 1
+            _progress.inc()
+            n += 1
+
+        bbutil.log.clear()
+        return True
+
+    def close(self) -> bool:
+        _max = len(self.iterate_list)
+        _progress = bbutil.log.progress(_max)
+
+        n = 0
+        for x in self.iterate_list:
+            self.iterate_list[n] = x - 1
+            _progress.inc()
+            n += 1
+
+        bbutil.log.clear()
+        return True
