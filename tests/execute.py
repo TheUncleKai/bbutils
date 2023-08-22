@@ -16,15 +16,27 @@
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
 
-__all__ = [
-    "database",
-    "helper",
-    "lang",
-    "logging",
+import os
+import unittest
 
-    "data",
-    "execute",
-    "file",
-    "utils",
-    "worker"
+import unittest.mock as mock
+
+from bbutil.utils import full_path
+
+from tests.helper import set_log
+
+__all__ = [
+    "TestExecute"
 ]
+
+oserror = OSError("Something strange did happen!")
+mock_oserror = mock.Mock(side_effect=oserror)
+mock_remove = mock.Mock()
+
+
+class TestExecute(unittest.TestCase):
+    """Testing class for locking module."""
+
+    def setUp(self):
+        set_log()
+        return
