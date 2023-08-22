@@ -19,6 +19,8 @@
 import os
 import unittest
 
+import unittest.mock as mock
+
 from bbutil.utils import full_path
 from bbutil.file import File
 
@@ -28,6 +30,10 @@ from tests.helper.file import create_file
 __all__ = [
     "TestFile"
 ]
+
+oserror = OSError("Something strange did happen!")
+mock_oserror = mock.Mock(side_effect=oserror)
+mock_remove = mock.Mock()
 
 
 class TestFile(unittest.TestCase):
@@ -149,4 +155,69 @@ class TestFile(unittest.TestCase):
 
         _check = _file.remove()
         self.assertTrue(_check)
+        return
+
+    def test_file_09(self):
+        _basename = "testfiles.txt"
+        _path = os.getcwd()
+        _testfile = full_path("{0:s}/{1:s}".format(_path, _basename))
+
+        if os.path.exists(_testfile) is True:
+            os.remove(_testfile)
+
+        _file = File(path=_path, basename=_basename)
+
+        _check = _file.remove()
+        self.assertTrue(_check)
+        return
+
+    def test_file_10(self):
+        _file = File()
+
+        _check = _file.remove()
+        self.assertTrue(_check)
+        return
+
+    @mock.patch('os.remove', new=mock_oserror)
+    def test_file_11(self):
+        _basename = "testfiles.txt"
+        _path = os.getcwd()
+        _testfile = full_path("{0:s}/{1:s}".format(_path, _basename))
+
+        _check = create_file(_testfile)
+        self.assertTrue(_check)
+
+        _file = File()
+
+        _check = _file.open(_testfile)
+        self.assertTrue(_check)
+
+        _check = _file.remove()
+        self.assertFalse(_check)
+        return
+
+    @mock.patch('os.remove', new=mock_remove)
+    def test_file_12(self):
+        _basename = "testfiles.txt"
+        _path = os.getcwd()
+        _testfile = full_path("{0:s}/{1:s}".format(_path, _basename))
+
+        _check = create_file(_testfile)
+        self.assertTrue(_check)
+
+        _file = File()
+
+        _check = _file.open(_testfile)
+        self.assertTrue(_check)
+
+        _check = _file.remove()
+        self.assertFalse(_check)
+        return
+
+    def test_file_13(self):
+        _file = File()
+
+        self.assertTrue(_file.init())
+        self.assertTrue(_file.init())
+        self.assertTrue(_file.create())
         return

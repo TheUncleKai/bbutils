@@ -103,16 +103,17 @@ class Base(metaclass=ABCMeta):
             bbutil.log.exception(e)
             return False
 
-        if self.exists is False:
-            return True
+        if self.exists is True:
+            bbutil.log.error("Unable to remove file!")
+            return False
 
-        return False
+        return True
 
 
 class File(Base):
 
     def init(self) -> bool:
-        pass
+        return True
 
     def clear_object(self):
         return
@@ -121,7 +122,7 @@ class File(Base):
         return True
 
     def create(self) -> bool:
-        pass
+        return True
 
 
 class Folder(Base):
