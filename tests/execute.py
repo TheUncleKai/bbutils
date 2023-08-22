@@ -25,10 +25,12 @@ from bbutil.utils import full_path
 from bbutil.execute import Execute
 
 from tests.helper import set_log
+from tests.helper.execute import get_mock_stdout
 
 __all__ = [
     "TestExecute"
 ]
+
 
 oserror = OSError("Something strange did happen!")
 mock_oserror = mock.Mock(side_effect=oserror)
@@ -50,6 +52,39 @@ class TestExecute(unittest.TestCase):
         ]
 
         _execute.setup(name="Test", desc="Print ls", commands=_commands)
+
+        _check = _execute.execute()
+        self.assertTrue(_check)
+        self.assertEqual(_execute.returncode, 0)
+        self.assertIsNone(_execute.errors)
+        self.assertGreater(len(_execute.messages), 1)
+        return
+
+    def test_setup_02(self):
+        _commands = [
+            "/usr/bin/ls"
+        ]
+
+        _execute = Execute(name="Test", desc="Print ls", commands=_commands)
+
+        _check = _execute.execute()
+        self.assertTrue(_check)
+        self.assertEqual(_execute.returncode, 0)
+        self.assertIsNone(_execute.errors)
+        self.assertGreater(len(_execute.messages), 1)
+        return
+
+    @mock.patch('subprocess.Popen', new=mock.Mock())
+    def test_setup_03(self):
+
+        _execute = Execute()
+        _commands = [
+            "/usr/bin/ls"
+        ]
+
+        _stdout = get_mock_stdout()
+
+        _execute.setup(name="Test", desc="Print ls", commands=_commands, stdout=_stdout)
 
         _check = _execute.execute()
         self.assertTrue(_check)

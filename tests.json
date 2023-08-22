@@ -376,7 +376,9 @@
             "path": "tests.execute",
             "classname": "TestExecute",
             "tests": [
-                "test_setup_01"
+                "test_setup_01",
+                "test_setup_02",
+                "test_setup_03"
             ]
         }
     ]

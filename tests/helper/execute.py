@@ -16,5 +16,26 @@
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
 
+from unittest.mock import Mock
+
 __all__ = [
+    "get_mock_stdout"
 ]
+
+
+def get_mock_stdout() -> list:
+    _stdout = []
+
+    _line1 = "TEST"
+
+    _excec = UnicodeDecodeError('funnycodec', _line1.encode(), 1, 2, 'This is just a fake reason!')
+
+    _line2 = Mock()
+    _line2.decode = Mock(side_effect=_excec)
+
+    _stdout = [
+        _line1.encode(),
+        _line2
+    ]
+
+    return _stdout
