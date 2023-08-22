@@ -57,6 +57,7 @@ class Base(metaclass=ABCMeta):
         self.clear_object()
         return
 
+    @property
     def check(self) -> bool:
         if self.valid is False:
             bbutil.log.error("Given filename is not valid!")
@@ -71,8 +72,7 @@ class Base(metaclass=ABCMeta):
         self.basename = os.path.basename(filename)
         self.path = os.path.dirname(filename)
 
-        _check = self.check()
-        if _check is False:
+        if self.check is False:
             return False
 
         _check = self.open_file()
@@ -112,7 +112,7 @@ class Base(metaclass=ABCMeta):
 class File(Base):
 
     def init(self) -> bool:
-        return True
+        pass
 
     def clear_object(self):
         return
@@ -121,7 +121,7 @@ class File(Base):
         return True
 
     def create(self) -> bool:
-        return True
+        pass
 
 
 class Folder(Base):

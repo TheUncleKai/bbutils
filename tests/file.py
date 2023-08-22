@@ -72,3 +72,64 @@ class TestFile(unittest.TestCase):
 
         self.assertFalse(_file.valid)
         return
+
+    def test_file_04(self):
+        _basename = "testfiles.txt"
+        _path = os.getcwd()
+
+        _testfile = full_path("{0:s}/{1:s}".format(_path, _basename))
+
+        _file = File(path=_path, basename=_basename)
+
+        self.assertTrue(_file.valid)
+
+        _file.clear()
+
+        self.assertFalse(_file.valid)
+        self.assertFalse(_file.check)
+        return
+
+    def test_file_05(self):
+        _basename = "testfiles.txt"
+        _path = os.getcwd()
+
+        _testfile = full_path("{0:s}/{1:s}".format(_path, _basename))
+        _file = File(path=_path, basename=_basename)
+
+        self.assertTrue(_file.valid)
+        self.assertFalse(_file.check)
+        return
+
+    def test_file_06(self):
+        _basename = "testfiles.txt"
+        _path = os.getcwd()
+        _testfile = full_path("{0:s}/{1:s}".format(_path, _basename))
+
+        _file = File(path=_path, basename=_basename)
+
+        _check1 = create_file(_testfile)
+        self.assertTrue(_check1)
+
+        self.assertTrue(_file.valid)
+        self.assertTrue(_file.check)
+        return
+
+    def test_file_07(self):
+        _basename = "testfiles.txt"
+        _path = os.getcwd()
+        _testfile = full_path("{0:s}/{1:s}".format(_path, _basename))
+
+        _check1 = create_file(_testfile)
+        self.assertTrue(_check1)
+
+        _file = File()
+
+        _check2 = _file.open(_testfile)
+
+        os.remove(_testfile)
+
+        _check3 = _file.open(_testfile)
+
+        self.assertTrue(_check2)
+        self.assertFalse(_check3)
+        return

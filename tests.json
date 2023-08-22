@@ -336,7 +336,11 @@
             "tests": [
                 "test_file_01",
                 "test_file_02",
-                "test_file_03"
+                "test_file_03",
+                "test_file_04",
+                "test_file_05",
+                "test_file_06",
+                "test_file_07"
             ]
         }
     ]
