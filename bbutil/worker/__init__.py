@@ -19,8 +19,10 @@
 import abc
 import threading
 import time
+
 from abc import ABCMeta
 from dataclasses import dataclass
+from typing import Optional
 
 import bbutil
 from bbutil.worker.callback import Callback
@@ -39,7 +41,7 @@ class Worker(metaclass=ABCMeta):
     abort: bool = False
     interval: float = 0.01
 
-    _callback: Callback = Callback()
+    _callback: Optional[Callback] = None
     _error: bool = False
     _running: bool = True
 
@@ -60,6 +62,9 @@ class Worker(metaclass=ABCMeta):
         pass
 
     def set_callback(self, **kwargs):
+        if self._callback is None:
+            self._callback = Callback()
+
         self._callback.set_callback(**kwargs)
         return
 
@@ -68,9 +73,8 @@ class Worker(metaclass=ABCMeta):
             self._running = False
             self.abort = False
             self._callback.do_abort()
+            bbutil.log.warn(self.id, "Abort {0:s}".format(step))
             return
-
-        bbutil.log.inform(self.id, "Run {0:s}".format(step))
 
         callback_func()
 
@@ -84,6 +88,9 @@ class Worker(metaclass=ABCMeta):
         return
 
     def _execute(self):
+        if self._callback is None:
+            self._callback = Callback()
+
         self._running = True
         self._callback.do_start()
 

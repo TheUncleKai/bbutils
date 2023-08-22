@@ -16,22 +16,21 @@
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
 
-from dataclasses import dataclass
-
 __all__ = [
     "Callback"
 ]
 
 
-@dataclass
 class Callback(object):
 
-    start = None
-    stop = None
-    prepare = None
-    run = None
-    close = None
-    abort = None
+    def __init__(self):
+        self.start = None
+        self.stop = None
+        self.prepare = None
+        self.run = None
+        self.close = None
+        self.abort = None
+        return
 
     def set_callback(self, **kwargs):
         _value = kwargs.get("start", None)

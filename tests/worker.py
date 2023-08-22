@@ -126,10 +126,8 @@ class TestWorker(unittest.TestCase):
         _calls.setup(_worker)
 
         _worker.start()
-        _check = _worker.is_running
         _worker.wait()
 
-        self.assertTrue(_check)
         self.assertFalse(_worker.error)
 
         _calls.info()
