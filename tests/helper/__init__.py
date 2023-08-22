@@ -29,6 +29,7 @@ __all__ = [
     "file",
     "sqlite",
     "table",
+    "worker",
 
     "get_sqlite",
     "set_log"
