@@ -370,6 +370,14 @@
                 "test_worker_07",
                 "test_worker_08"
             ]
+        },
+        {
+            "id": "Execute",
+            "path": "tests.execute",
+            "classname": "TestExecute",
+            "tests": [
+                "test_setup_01"
+            ]
         }
     ]
 }

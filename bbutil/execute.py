@@ -17,7 +17,7 @@ __all__ = [
 
 class Execute(object):
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         self.name: str = ""
         self.desc: str = ""
         self.commands: List[str] = []
@@ -30,6 +30,8 @@ class Execute(object):
         self.stdin: Optional[subprocess.PIPE] = None
         self.call_stdout = None
         self.call_stderr = None
+
+        self.setup(**kwargs)
         return
 
     def show_command(self):
@@ -55,6 +57,10 @@ class Execute(object):
         return new
 
     def setup(self, **kwargs):
+        item = kwargs.get("commands", None)
+        if item is not None:
+            self.commands = item
+
         item = kwargs.get("name", None)
         if item is not None:
             self.name = item

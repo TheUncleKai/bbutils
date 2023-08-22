@@ -22,6 +22,7 @@ import unittest
 import unittest.mock as mock
 
 from bbutil.utils import full_path
+from bbutil.execute import Execute
 
 from tests.helper import set_log
 
@@ -39,4 +40,20 @@ class TestExecute(unittest.TestCase):
 
     def setUp(self):
         set_log()
+        return
+
+    def test_setup_01(self):
+        _execute = Execute()
+
+        _commands = [
+            "/usr/bin/ls"
+        ]
+
+        _execute.setup(name="Test", desc="Print ls", commands=_commands)
+
+        _check = _execute.execute()
+        self.assertTrue(_check)
+        self.assertEqual(_execute.returncode, 0)
+        self.assertIsNone(_execute.errors)
+        self.assertGreater(len(_execute.messages), 1)
         return
