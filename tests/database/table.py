@@ -20,8 +20,8 @@ import unittest
 
 from bbutil.database import Table, Types
 
-from tests.database.helper import get_sqlite
-from tests.database.helper.table import TestData, get_table_01, get_table_02, get_table_03, get_table_04
+from tests.helper import get_sqlite, set_log
+from tests.helper.table import TestData, get_table_01, get_table_02, get_table_03, get_table_04
 
 __all__ = [
     "TestTable"
@@ -31,7 +31,8 @@ __all__ = [
 class TestTable(unittest.TestCase):
     """Testing class for locking module."""
 
-    def tearDown(self):
+    def setUp(self):
+        set_log()
         return
 
     def assertHasAttr(self, obj, intended_attr):
@@ -44,7 +45,7 @@ class TestTable(unittest.TestCase):
 
         _sqlite = get_sqlite(filename="test.sqlite", clean=True)
 
-        _table = Table(name="test01", sqlite=_sqlite, log=_sqlite.log)
+        _table = Table(name="test01", sqlite=_sqlite)
         _table.add_column(name="testid", data_type=Types.integer, unique=True, keyword=True)
         _table.add_column(name="use_test", data_type=Types.bool)
         _table.add_column(name="testname", data_type=Types.string)
@@ -83,7 +84,7 @@ class TestTable(unittest.TestCase):
 
         _sqlite = get_sqlite(filename="test.sqlite", clean=True)
 
-        _table = Table(name="test01", sqlite=_sqlite, log=_sqlite.log)
+        _table = Table(name="test01", sqlite=_sqlite)
         _table.add_column(name="testid", data_type=Types.integer, unique=True, keyword=True)
         _table.add_column(name="testid", data_type=Types.integer)
 
@@ -121,7 +122,7 @@ class TestTable(unittest.TestCase):
     def test_init_02(self):
 
         _sqlite = get_sqlite(filename="test_check_table.sqlite", path="testdata/database")
-        _table = Table(name="test01", sqlite=_sqlite, log=_sqlite.log)
+        _table = Table(name="test01", sqlite=_sqlite)
 
         _check1 = _sqlite.connect()
         _check2 = _table.init()
@@ -143,6 +144,14 @@ class TestTable(unittest.TestCase):
 
         self.assertTrue(_check1)
         self.assertFalse(_check2)
+        return
+
+    def test_init_04(self):
+        _table = Table(name="Testos")
+
+        _check1 = _table.init()
+
+        self.assertFalse(_check1)
         return
 
     def test_select_01(self):

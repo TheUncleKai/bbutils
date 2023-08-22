@@ -248,7 +248,6 @@
                 "test_connect_04",
                 "test_connect_05",
                 "test_connect_06",
-                "test_connect_07",
                 "test_disconnect_01",
                 "test_disconnect_02",
                 "test_disconnect_03",
@@ -298,6 +297,7 @@
                 "test_init_01",
                 "test_init_02",
                 "test_init_03",
+                "test_init_04",
                 "test_select_01",
                 "test_select_02",
                 "test_select_03",
@@ -327,6 +327,33 @@
                 "test_stop_01",
                 "test_stop_02",
                 "test_store_01"
+            ]
+        },
+        {
+            "id": "File.File",
+            "path": "tests.file",
+            "classname": "TestFile",
+            "tests": [
+                "test_file_01",
+                "test_file_02",
+                "test_file_03",
+                "test_file_04",
+                "test_file_05",
+                "test_file_06",
+                "test_file_07",
+                "test_file_08",
+                "test_file_09",
+                "test_file_10",
+                "test_file_11",
+                "test_file_12",
+                "test_file_13",
+                "test_folder_01",
+                "test_folder_02",
+                "test_folder_03",
+                "test_folder_04",
+                "test_folder_05",
+                "test_folder_06",
+                "test_folder_07"
             ]
         }
     ]

@@ -21,7 +21,6 @@ from typing import Optional
 
 from unittest.mock import Mock
 
-from tests.database.helper import set_log
 from bbutil.database import Types, Table, Database
 
 __all__ = [
@@ -38,7 +37,6 @@ class TestData(Database):
     mock_connection: Optional[Mock] = None
 
     def init(self):
-        self.log = set_log()
         self.name = "Testos"
         return
 
@@ -49,7 +47,7 @@ class TestData(Database):
         if self.mock_connection is not None:
             self.sqlite.connection = self.mock_connection
 
-        _table = Table(name="tester01", sqlite=self.sqlite, log=self.log)
+        _table = Table(name="tester01", sqlite=self.sqlite)
         _table.add_column(name="testid", data_type=Types.integer, primarykey=True)
         _table.add_column(name="use_test", data_type=Types.bool)
         _table.add_column(name="testname", data_type=Types.string)
@@ -57,7 +55,7 @@ class TestData(Database):
         self.tables.append(_table)
         self.table01 = _table
 
-        _table = Table(name="tester02", sqlite=self.sqlite, log=self.log)
+        _table = Table(name="tester02", sqlite=self.sqlite)
         _table.add_column(name="testid", data_type=Types.integer, primarykey=True)
         _table.add_column(name="use_test", data_type=Types.bool)
         _table.add_column(name="category", data_type=Types.string, keyword=True)

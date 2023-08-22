@@ -16,13 +16,21 @@
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
 
+from typing import Optional
+from bbutil.logging import Logging
+
 __all__ = [
     "database",
     "logging",
     "lang",
 
     "data",
-    "utils"
+    "file",
+    "utils",
+
+    "log",
+
+    "set_log"
 ]
 
 
@@ -67,3 +75,12 @@ __version__ = "{0:d}.{1:d}.{2:d}.{3:d}".format(__milestone__, __major__, __minor
 
 #: package maintainer
 __maintainer__ = __author__
+
+
+log: Optional[Logging] = None
+
+
+def set_log(module: Logging):
+    global log
+    log = module
+    return

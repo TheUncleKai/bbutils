@@ -22,10 +22,10 @@ import unittest.mock as mock
 
 from unittest.mock import Mock
 
-from tests.database.helper import set_log
-from tests.database.helper.database import TestData
+from tests.helper import set_log
+from tests.helper.database import TestData
 
-from tests.database.helper.sqlite import (mock_operational_error, sqlite_operational_error)
+from tests.helper.sqlite import (mock_operational_error, sqlite_operational_error)
 
 __all__ = [
     "TestDatabase"
@@ -35,7 +35,8 @@ __all__ = [
 class TestDatabase(unittest.TestCase):
     """Testing class for locking module."""
 
-    def tearDown(self):
+    def setUp(self):
+        set_log()
         return
 
     def assertHasAttr(self, obj, intended_attr):
@@ -105,7 +106,7 @@ class TestDatabase(unittest.TestCase):
     def test_stop_01(self):
         _filename = "{0:s}/test.sqlite".format(os.getcwd())
 
-        _database = TestData(filename=_filename, log=set_log())
+        _database = TestData(filename=_filename)
 
         _check1 = _database.stop()
 

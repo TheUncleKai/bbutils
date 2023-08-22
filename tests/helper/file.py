@@ -16,13 +16,21 @@
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
 
-__all__ = [
-    "database",
-    "helper",
-    "lang",
-    "logging",
+import os.path
 
-    "data",
-    "file",
-    "utils"
+__all__ = [
+    "create_file"
 ]
+
+
+def create_file(filename: str) -> bool:
+    _path = os.path.dirname(filename)
+    if os.path.exists(_path) is False:
+        return False
+
+    f = open(file=filename, mode="w")
+
+    f.write("TEST!\n")
+
+    f.close()
+    return True

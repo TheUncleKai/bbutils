@@ -21,10 +21,9 @@ from abc import ABCMeta
 from dataclasses import dataclass, field
 from typing import Optional, List
 
-from bbutil.logging import Logging
+import bbutil
 
 from bbutil.database.sqlite import SQLite
-from bbutil.database.types import Data
 from bbutil.database.table import Table
 
 __all__ = [
@@ -34,8 +33,6 @@ __all__ = [
 
 @dataclass
 class Database(metaclass=ABCMeta):
-
-    log: Optional[Logging] = None
 
     name: str = ""
     sqlite: Optional[SQLite] = None
@@ -70,14 +67,14 @@ class Database(metaclass=ABCMeta):
         self.init()
 
         if (self.name == "") or (self.filename == ""):
-            self.log.error("File- or database-name is missing!")
+            bbutil.log.error("File- or database-name is missing!")
             return False
 
-        self.sqlite = SQLite(name=self.name, filename=self.filename, log=self.log)
+        self.sqlite = SQLite(name=self.name, filename=self.filename)
 
         _check = self.prepare()
         if _check is False:
-            self.log.error("Preparation of tables has failed!")
+            bbutil.log.error("Preparation of tables has failed!")
             return False
 
         _check = self._open()
@@ -99,10 +96,10 @@ class Database(metaclass=ABCMeta):
 
     def stop(self) -> bool:
         if self.sqlite is None:
-            self.log.error("No SQLite connection established!")
+            bbutil.log.error("No SQLite connection established!")
             return False
 
-        self.log.inform(self.name, "Close connection!")
+        bbutil.log.inform(self.name, "Close connection!")
         _check = self.sqlite.disconnect()
         if _check is False:
             return False

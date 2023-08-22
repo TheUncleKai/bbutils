@@ -21,14 +21,16 @@ import unittest
 import unittest.mock as mock
 
 from unittest.mock import Mock
+
 from bbutil.database import SQLite
 from bbutil.utils import full_path
 
-from tests.database.helper.sqlite import (sqlite_operational_error, sqlite_integrity_error, sqlite_unknown_error,
-                                          mock_operational_error, get_table_01, get_data_01,
-                                          get_data_02, get_data_03, get_data_04, get_data_05, get_data_06, get_data_07,
-                                          get_data_08)
-from tests.database.helper import set_log, get_sqlite
+from tests.helper.sqlite import (sqlite_operational_error, sqlite_integrity_error, sqlite_unknown_error,
+                                 mock_operational_error, get_table_01, get_data_01,
+                                 get_data_02, get_data_03, get_data_04, get_data_05, get_data_06, get_data_07,
+                                 get_data_08)
+
+from tests.helper import get_sqlite, set_log
 
 __all__ = [
     "TestSQLite"
@@ -38,18 +40,18 @@ __all__ = [
 class TestSQLite(unittest.TestCase):
     """Testing class for locking module."""
 
-    def tearDown(self):
+    def setUp(self):
+        set_log()
         return
 
     def test_connect_01(self):
-        _log = set_log()
         _testfile = full_path("{0:s}/test.sqlite".format(os.getcwd()))
         _name = "Test"
 
         if os.path.exists(_testfile) is True:
             os.remove(_testfile)
 
-        _sqlite = SQLite(filename=_testfile, name="Test", log=_log)
+        _sqlite = SQLite(filename=_testfile, name="Test")
 
         _check1 = _sqlite.connect()
         _check2 = os.path.exists(_testfile)
@@ -65,11 +67,8 @@ class TestSQLite(unittest.TestCase):
         return
 
     def test_connect_02(self):
-
-        _log = set_log()
         _name = "Test"
-
-        _sqlite = SQLite(filename="", name="Test", log=_log)
+        _sqlite = SQLite(filename="", name="Test")
 
         _check1 = _sqlite.connect()
 
@@ -79,10 +78,7 @@ class TestSQLite(unittest.TestCase):
         return
 
     def test_connect_03(self):
-
-        _log = set_log()
-
-        _sqlite = SQLite(filename="", name="", log=_log)
+        _sqlite = SQLite(filename="", name="")
 
         _check1 = _sqlite.connect()
 
@@ -90,10 +86,7 @@ class TestSQLite(unittest.TestCase):
         return
 
     def test_connect_04(self):
-
-        _log = set_log()
-
-        _sqlite = SQLite(filename="", name="Test", log=_log, use_memory=True)
+        _sqlite = SQLite(filename="", name="Test", use_memory=True)
 
         _check1 = _sqlite.connect()
 
@@ -102,10 +95,7 @@ class TestSQLite(unittest.TestCase):
 
     @mock.patch('sqlite3.connect', new=mock_operational_error)
     def test_connect_05(self):
-
-        _log = set_log()
-
-        _sqlite = SQLite(filename="", name="Test", log=_log, use_memory=True)
+        _sqlite = SQLite(filename="", name="Test", use_memory=True)
 
         _check1 = _sqlite.connect()
 
@@ -114,25 +104,6 @@ class TestSQLite(unittest.TestCase):
 
     @mock.patch('sqlite3.connect', new=mock_operational_error)
     def test_connect_06(self):
-        _log = set_log()
-        _testfile = full_path("{0:s}/test.sqlite".format(os.getcwd()))
-        _name = "Test"
-
-        if os.path.exists(_testfile) is True:
-            os.remove(_testfile)
-
-        _sqlite = SQLite(filename=_testfile, name="Test", log=_log)
-
-        _check1 = _sqlite.connect()
-        _check2 = os.path.exists(_testfile)
-
-        self.assertEqual(_sqlite.name, _name)
-        self.assertEqual(_sqlite.filename, _testfile)
-        self.assertFalse(_check1)
-        self.assertFalse(_check2)
-        return
-
-    def test_connect_07(self):
         _testfile = full_path("{0:s}/test.sqlite".format(os.getcwd()))
         _name = "Test"
 
@@ -141,7 +112,13 @@ class TestSQLite(unittest.TestCase):
 
         _sqlite = SQLite(filename=_testfile, name="Test")
 
-        self.assertRaises(ValueError, _sqlite.connect)
+        _check1 = _sqlite.connect()
+        _check2 = os.path.exists(_testfile)
+
+        self.assertEqual(_sqlite.name, _name)
+        self.assertEqual(_sqlite.filename, _testfile)
+        self.assertFalse(_check1)
+        self.assertFalse(_check2)
         return
 
     def test_disconnect_01(self):
