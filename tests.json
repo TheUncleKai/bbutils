@@ -330,7 +330,7 @@
             ]
         },
         {
-            "id": "File.File",
+            "id": "File",
             "path": "tests.file",
             "classname": "TestFile",
             "tests": [
@@ -354,6 +354,14 @@
                 "test_folder_05",
                 "test_folder_06",
                 "test_folder_07"
+            ]
+        },
+        {
+            "id": "Worker",
+            "path": "tests.worker",
+            "classname": "TestWorker",
+            "tests": [
+                "test_file_01"
             ]
         }
     ]
