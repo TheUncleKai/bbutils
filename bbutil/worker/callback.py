@@ -16,14 +16,15 @@
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
 
-__all__ = [
-]
-
 from dataclasses import dataclass
+
+__all__ = [
+    "Callback"
+]
 
 
 @dataclass
-class _Callback(object):
+class Callback(object):
 
     start = None
     stop = None
@@ -31,6 +32,32 @@ class _Callback(object):
     run = None
     close = None
     abort = None
+
+    def set_callback(self, **kwargs):
+        _value = kwargs.get("start", None)
+        if _value is not None:
+            self.start = _value
+
+        _value = kwargs.get("stop", None)
+        if _value is not None:
+            self.stop = _value
+
+        _value = kwargs.get("prepare", None)
+        if _value is not None:
+            self.prepare = _value
+
+        _value = kwargs.get("run", None)
+        if _value is not None:
+            self.run = _value
+
+        _value = kwargs.get("close", None)
+        if _value is not None:
+            self.close = _value
+
+        _value = kwargs.get("abort", None)
+        if _value is not None:
+            self.abort = _value
+        return
 
     def do_start(self):
         if self.start is None:
@@ -41,26 +68,29 @@ class _Callback(object):
     def do_stop(self):
         if self.stop is None:
             return
-        self.start()
+        self.stop()
         return
 
     def do_prepare(self):
         if self.prepare is None:
             return
-        self.start()
+        self.prepare()
         return
 
     def do_run(self):
         if self.run is None:
             return
+        self.run()
         return
 
     def do_close(self):
         if self.close is None:
             return
+        self.close()
         return
 
     def do_abort(self):
         if self.abort is None:
             return
+        self.abort()
         return

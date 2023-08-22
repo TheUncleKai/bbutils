@@ -16,9 +16,6 @@
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
 
-__all__ = [
-]
-
 import abc
 import threading
 import time
@@ -26,7 +23,13 @@ from abc import ABCMeta
 from dataclasses import dataclass
 
 import bbutil
-from bbutil.worker import _Callback
+from bbutil.worker.callback import Callback
+
+__all__ = [
+    "Worker",
+
+    "callback"
+]
 
 
 @dataclass
@@ -37,9 +40,13 @@ class Worker(metaclass=ABCMeta):
     interval: float = 0.01
     use_thread: bool = False
 
-    _callback: _Callback = _Callback()
+    _callback: Callback = Callback()
     _error: bool = True
     _running: bool = True
+
+    @property
+    def error(self) -> bool:
+        return self._error
 
     @abc.abstractmethod
     def prepare(self) -> bool:
@@ -54,33 +61,15 @@ class Worker(metaclass=ABCMeta):
         pass
 
     def set_callback(self, **kwargs):
-        _value = kwargs.get("start", None)
-        if _value is not None:
-            self._callback.start = _value
-
-        _value = kwargs.get("stop", None)
-        if _value is not None:
-            self._callback.stop = _value
-
-        _value = kwargs.get("start", None)
-        if _value is not None:
-            self._callback.prepare = _value
-
-        _value = kwargs.get("start", None)
-        if _value is not None:
-            self._callback.run = _value
-
-        _value = kwargs.get("start", None)
-        if _value is not None:
-            self._callback.close = _value
+        self._callback.set_callback(**kwargs)
         return
 
-    def _do_step(self, step: str, function, callback):
+    def _do_step(self, step: str, function, callback_func):
         if self.abort is True:
             self.abort = False
             return
 
-        callback()
+        callback_func()
 
         _check = function()
         if _check is False:
