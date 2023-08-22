@@ -21,7 +21,7 @@ import unittest
 import unittest.mock as mock
 
 from tests.helper import set_log
-from tests.helper.worker import Worker01, Worker02
+from tests.helper.worker import CallManager, Worker01, Worker02
 
 __all__ = [
     "TestWorker"
@@ -48,40 +48,82 @@ class TestWorker(unittest.TestCase):
         return
 
     def test_worker_02(self):
+        _calls = CallManager()
         _worker = Worker01(id="Worker01")
+        _calls.setup(_worker)
 
         _worker.start()
         _worker.wait()
 
         self.assertFalse(_worker.error)
+
+        _calls.info()
+        self.assertEqual(_calls.start, 1)
+        self.assertEqual(_calls.stop, 1)
+        self.assertEqual(_calls.prepare, 1)
+        self.assertEqual(_calls.run, 1)
+        self.assertEqual(_calls.close, 1)
+        self.assertEqual(_calls.abort, 0)
         return
 
     def test_worker_03(self):
+        _calls = CallManager()
         _worker = Worker01(id="Worker01", exit_prepare=False)
+        _calls.setup(_worker)
 
         _check = _worker.execute()
         self.assertFalse(_check)
         self.assertTrue(_worker.error)
+
+        _calls.info()
+        self.assertEqual(_calls.start, 1)
+        self.assertEqual(_calls.stop, 1)
+        self.assertEqual(_calls.prepare, 1)
+        self.assertEqual(_calls.run, 0)
+        self.assertEqual(_calls.close, 0)
+        self.assertEqual(_calls.abort, 0)
         return
 
     def test_worker_04(self):
+        _calls = CallManager()
         _worker = Worker01(id="Worker01", exit_run=False)
+        _calls.setup(_worker)
 
         _check = _worker.execute()
         self.assertFalse(_check)
         self.assertTrue(_worker.error)
+
+        _calls.info()
+        self.assertEqual(_calls.start, 1)
+        self.assertEqual(_calls.stop, 1)
+        self.assertEqual(_calls.prepare, 1)
+        self.assertEqual(_calls.run, 1)
+        self.assertEqual(_calls.close, 0)
+        self.assertEqual(_calls.abort, 0)
         return
 
     def test_worker_05(self):
+        _calls = CallManager()
         _worker = Worker01(id="Worker01", exit_close=False)
+        _calls.setup(_worker)
 
         _check = _worker.execute()
         self.assertFalse(_check)
         self.assertTrue(_worker.error)
+
+        _calls.info()
+        self.assertEqual(_calls.start, 1)
+        self.assertEqual(_calls.stop, 1)
+        self.assertEqual(_calls.prepare, 1)
+        self.assertEqual(_calls.run, 1)
+        self.assertEqual(_calls.close, 1)
+        self.assertEqual(_calls.abort, 0)
         return
 
     def test_worker_06(self):
+        _calls = CallManager()
         _worker = Worker01(id="Worker01")
+        _calls.setup(_worker)
 
         _worker.start()
         _check = _worker.is_running
@@ -89,10 +131,39 @@ class TestWorker(unittest.TestCase):
 
         self.assertTrue(_check)
         self.assertFalse(_worker.error)
+
+        _calls.info()
+        self.assertEqual(_calls.start, 1)
+        self.assertEqual(_calls.stop, 1)
+        self.assertEqual(_calls.prepare, 1)
+        self.assertEqual(_calls.run, 1)
+        self.assertEqual(_calls.close, 1)
+        self.assertEqual(_calls.abort, 0)
         return
 
     def test_worker_07(self):
-        _worker = Worker02(id="Worker02")
+        _calls = CallManager()
+        _worker = Worker02(id="Worker02", max=250000)
+        _calls.setup(_worker)
+
+        _worker.start()
+        _check1 = _worker.is_running
+        _worker.abort = True
+
+        _worker.wait()
+        self.assertFalse(_worker.error)
+
+        _calls.info()
+        self.assertEqual(_calls.start, 1)
+        self.assertEqual(_calls.stop, 1)
+        self.assertEqual(_calls.prepare, 1)
+        self.assertEqual(_calls.run, 0)
+        self.assertEqual(_calls.close, 0)
+        self.assertEqual(_calls.abort, 1)
+        return
+
+    def test_worker_08(self):
+        _worker = Worker02(id="Worker02", max=250000)
 
         _worker.start()
         _check1 = _worker.is_running

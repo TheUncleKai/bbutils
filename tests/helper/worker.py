@@ -24,9 +24,45 @@ import bbutil
 from bbutil.worker import Worker
 
 __all__ = [
+    "CallManager",
     "Worker01",
     "Worker02"
 ]
+
+
+@dataclass
+class CallManager(object):
+
+    start: int = 0
+    stop: int = 0
+    prepare: int = 0
+    run: int = 0
+    close: int = 0
+    abort: int = 0
+
+    def count(self, name: str):
+        _value = getattr(self, name)
+        _value += 1
+        setattr(self, name, _value)
+        return
+
+    def setup(self, worker: Worker):
+        worker.set_callback(start=lambda: self.count("start"))
+        worker.set_callback(stop=lambda: self.count("stop"))
+        worker.set_callback(prepare=lambda: self.count("prepare"))
+        worker.set_callback(run=lambda: self.count("run"))
+        worker.set_callback(close=lambda: self.count("close"))
+        worker.set_callback(abort=lambda: self.count("abort"))
+        return
+
+    def info(self):
+        bbutil.log.inform("start", "{0:d}".format(self.start))
+        bbutil.log.inform("stop", "{0:d}".format(self.stop))
+        bbutil.log.inform("prepare", "{0:d}".format(self.prepare))
+        bbutil.log.inform("run", "{0:d}".format(self.run))
+        bbutil.log.inform("close", "{0:d}".format(self.close))
+        bbutil.log.inform("abort", "{0:d}".format(self.abort))
+        return
 
 
 @dataclass
@@ -49,10 +85,11 @@ class Worker01(Worker):
 @dataclass
 class Worker02(Worker):
 
+    max: int = 50000
     iterate_list: List[int] = field(default_factory=list)
 
     def prepare(self) -> bool:
-        _max = 50000
+        _max = self.max
         _range = range(0, _max)
         _progress = bbutil.log.progress(_max)
 

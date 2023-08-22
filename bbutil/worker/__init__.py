@@ -89,17 +89,20 @@ class Worker(metaclass=ABCMeta):
 
         self._do_step("prepare", self.prepare, self._callback.do_prepare)
         if self._running is False:
+            self._callback.do_stop()
             return
 
         self._do_step("run", self.run, self._callback.do_run)
         if self._running is False:
+            self._callback.do_stop()
             return
 
         self._do_step("close", self.close, self._callback.do_close)
         if self._running is False:
+            self._callback.do_stop()
             return
 
-        self._callback.do_close()
+        self._callback.do_stop()
         self._running = False
         return
 
