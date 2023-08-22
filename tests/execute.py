@@ -25,13 +25,14 @@ from bbutil.utils import full_path
 from bbutil.execute import Execute
 
 from tests.helper import set_log
-from tests.helper.execute import get_mock_stdout
+from tests.helper.execute import MockPopen
 
 __all__ = [
     "TestExecute"
 ]
 
 
+mock_popen = MockPopen()
 oserror = OSError("Something strange did happen!")
 mock_oserror = mock.Mock(side_effect=oserror)
 mock_remove = mock.Mock()
@@ -74,7 +75,7 @@ class TestExecute(unittest.TestCase):
         self.assertGreater(len(_execute.messages), 1)
         return
 
-    @mock.patch('subprocess.Popen', new=mock.Mock())
+    @mock.patch('subprocess.Popen', new=mock_popen)
     def test_setup_03(self):
 
         _execute = Execute()
@@ -82,9 +83,7 @@ class TestExecute(unittest.TestCase):
             "/usr/bin/ls"
         ]
 
-        _stdout = get_mock_stdout()
-
-        _execute.setup(name="Test", desc="Print ls", commands=_commands, stdout=_stdout)
+        _execute.setup(name="Test", desc="Print ls", commands=_commands)
 
         _check = _execute.execute()
         self.assertTrue(_check)

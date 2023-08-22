@@ -16,26 +16,41 @@
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
 
+from typing import Optional
 from unittest.mock import Mock
 
 __all__ = [
-    "get_mock_stdout"
+    "MockPopen"
 ]
 
 
-def get_mock_stdout() -> list:
-    _stdout = []
+class MockPopen(Mock):
 
-    _line1 = "TEST"
+    def __init__(self, **kwargs):
+        Mock.__init__(self, **kwargs)
 
-    _excec = UnicodeDecodeError('funnycodec', _line1.encode(), 1, 2, 'This is just a fake reason!')
+        _line1 = "TEST"
 
-    _line2 = Mock()
-    _line2.decode = Mock(side_effect=_excec)
+        _excec = UnicodeDecodeError('funnycodec', _line1.encode(), 1, 2, 'This is just a fake reason!')
 
-    _stdout = [
-        _line1.encode(),
-        _line2
-    ]
+        _line2 = Mock()
+        _line2.decode = Mock(side_effect=_excec)
 
-    return _stdout
+        _stdout = [
+            _line1.encode(),
+            _line2,
+            None
+        ]
+
+        self._poll = 0
+        self.stdout = _stdout
+        self.stderr = _stdout
+        self.returncode = 0
+        return
+
+    def poll(self) -> Optional[int]:
+        if self._poll == 10:
+            self._poll = 0
+            return 1
+        self._poll += 1
+        return None

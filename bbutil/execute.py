@@ -122,9 +122,8 @@ class Execute(object):
                     if self.call_stderr is not None:
                         self.call_stderr(data)
 
-            if p.poll() is None:
-                continue
-            else:
+            _poll = p.poll()
+            if _poll is not None:
                 break
 
         self.returncode = p.returncode
