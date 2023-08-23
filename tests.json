@@ -385,7 +385,7 @@
         },
         {
             "id": "Setup",
-            "path": "tests.setup",
+            "path": "tests.ssetup",
             "classname": "TestSetup",
             "tests": [
                 "test_find_data_files_01"

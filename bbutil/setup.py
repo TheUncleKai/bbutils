@@ -20,9 +20,6 @@ def _find_folders(path: str, folders: list, exlude_list: list):
 
             _item = full_path("{0:s}/{1:s}".format(root, name))
 
-            if os.path.isdir(_item) is False:
-                continue
-
             do_continue = False
 
             for _exclude in exlude_list:
@@ -32,10 +29,7 @@ def _find_folders(path: str, folders: list, exlude_list: list):
             if do_continue is True:
                 continue
 
-            if ("__pycache__" in _item) or (_item == "__pycache__"):
-                continue
-
-            if _item in folders:
+            if "__pycache__" in _item:
                 continue
 
             folders.append(_item)
@@ -49,7 +43,7 @@ def _find_files(path: str, current_path: str, exlude_list: list) -> list:
         _fullname = full_path("{0:s}/{1:s}".format(path, _item))
         _path = _fullname.replace(current_path, "")
 
-        if ("__pycache__" in _fullname) or (_item == "__pycache__"):
+        if "__pycache__" in _fullname:
             continue
 
         do_continue = False
@@ -87,7 +81,8 @@ def find_data_files(folder: str, target: str, package_files: list, exlude_list: 
         else:
             _name = "{0:s}/{1:s}".format(target, _name)
 
-        if (len(_files) == 0) or (_name == ""):
+        _count = len(_files)
+        if _count == 0:
             continue
 
         package_data = (_name, _files)
