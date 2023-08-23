@@ -61,3 +61,17 @@ class TestModule(unittest.TestCase):
 
         self.assertFalse(_check1)
         return
+
+    def test_load_01(self):
+        _module = Module()
+
+        _path = "testdata.commands"
+        _name = "testone"
+        _check1 = _module.init(_path, _name)
+        _check2 = _module.load()
+
+        self.assertTrue(_check1)
+        self.assertTrue(_check2)
+        self.assertEqual(_module.command, "test01")
+        self.assertEqual(_module.desc, "the first test")
+        return
