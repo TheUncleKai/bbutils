@@ -388,7 +388,8 @@
             "path": "tests.ssetup",
             "classname": "TestSetup",
             "tests": [
-                "test_find_data_files_01"
+                "test_find_data_files_01",
+                "test_find_data_files_02"
             ]
         }
     ]

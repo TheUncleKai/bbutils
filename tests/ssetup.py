@@ -43,3 +43,10 @@ class TestSetup(unittest.TestCase):
         self.assertListEqual(testdata1, package_files1)
         self.assertListEqual(testdata2, package_files2)
         return
+
+    def test_find_data_files_02(self):
+        package_files2 = []
+        _package = find_data_files("testdata", "data", package_files2, [".py", "testlang"])
+
+        self.assertListEqual(testdata2, package_files2)
+        return
