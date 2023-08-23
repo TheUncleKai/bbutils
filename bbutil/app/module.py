@@ -16,40 +16,69 @@
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
 
-from typing import Optional
+from typing import Optional, List
 
+import bbutil
 from bbutil.utils import get_attribute
+from bbutil.worker import Worker
 
 __all__ = [
-    "has_module",
-    "get_module"
+    "Module"
 ]
 
 
-def has_module(command: str) -> bool:
-    import mig.commands
+class Module(object):
 
-    for _item in mig.commands.__all__:
+    def __init__(self):
+        self.name: str = ""
+        self.path: str = ""
 
-        path = "{0:s}.{1:s}".format(__path__, _item)
-        module: Module = get_attribute(path, "module")
+        self.command: str = ""
+        self.desc: str = ""
+        self.workers: List[Worker] = []
+        self._module = None
+        return
 
-        if module.id == command:
-            return True
+    def get_worker(self, worker_id: str) -> Optional[Worker]:
+        for _worker in self.workers:
+            if _worker.id == worker_id:
+                return _worker
+        return None
 
-    return False
+    def init(self, path: str, name: str) -> bool:
+        self.name = name
+        self.path = "{0:s}.{1:s}".format(path, name)
 
+        try:
+            _module = __import__(self.path)
+        except ImportError as e:
+            bbutil.log.exception(e)
+            return False
 
-def get_module(command: str) -> Optional[Module]:
+        self.command = _module.__command__
+        self.desc = _module.__desc__
 
-    import mig.commands
+        self._module = _module
+        return True
 
-    for _item in mig.commands.__all__:
+    def load(self) -> bool:
+        for item in self._module.__all__:
+            _path = "{0:s}.{1:s}".format(self.path, item)
 
-        path = "{0:s}.{1:s}".format(__path__, _item)
-        module: Module = get_attribute(path, "module")
+            try:
+                _name = get_attribute(_path, "__worker__")
+            except AttributeError as e:
+                bbutil.log.error("Unable to get worker name!")
+                bbutil.log.exception(e)
+                return False
 
-        if module.id == command:
-            return module
+            try:
+                c = get_attribute(_path, _name)
+            except AttributeError as e:
+                bbutil.log.error("Unable to get worker class!")
+                bbutil.log.exception(e)
+                return False
 
-    return None
+            _worker = c()
+            self.workers.append(_worker)
+        return True

@@ -16,44 +16,39 @@
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
 
-__all__ = [
-]
-
-from dataclasses import dataclass
-from typing import List
+from dataclasses import dataclass, field
+from typing import List, Optional
 
 import bbutil
-from bbutil.utils import get_attribute
-from bbutil.worker import Worker
+from bbutil.app.module import Module
+
+__all__ = [
+    "ModuleManager"
+]
 
 
 @dataclass
 class ModuleManager(object):
 
-    command_path: str = ""
+    module_path: str = ""
+    modules: List[Module] = field(default_factory=list)
 
-    def __init__(self, name: str, module_path: str, desc: str):
-        self.id: str = name
-        self.desc: str = desc
-        self.module_path: str = module_path
-        return
-
-    def commands(self) -> List[Worker]:
-
-        _workers = []
-
+    def init(self) -> bool:
         try:
-            _module = __import__(self.module_path)
+            _root = __import__(self.module_path)
         except ImportError as e:
             bbutil.log.exception(e)
-            return _workers
+            return False
 
-        for _item in _module.__workers__:
-            _path = "{0:s}.{1:s}".format(self.module_path, _item)
+        for _name in _root.__all__:
+            _module = Module()
 
-        path = "{0:s}.{1:s}.command".format(__path__, self.folder)
-        attr = get_attribute(path, self.class_command)
-        c: Worker = attr()
+            _module.init(self.module_path, _name)
+        return True
 
-        _workers.append(c)
-        return _workers
+    def get_module(self, module_id: str) -> Optional[Module]:
+
+        for _module in self.modules:
+            if _module.name == module_id:
+                return _module
+        return None
