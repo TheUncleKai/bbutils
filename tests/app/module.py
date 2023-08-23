@@ -16,17 +16,24 @@
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
 
-__all__ = [
-    "app",
-    "database",
-    "helper",
-    "lang",
-    "logging",
+import unittest
 
-    "data",
-    "execute",
-    "file",
-    "ssetup",
-    "utils",
-    "worker"
+import unittest.mock as mock
+
+from tests.helper import set_log
+
+__all__ = [
+    "TestModule"
 ]
+
+oserror = OSError("Something strange did happen!")
+mock_oserror = mock.Mock(side_effect=oserror)
+mock_remove = mock.Mock()
+
+
+class TestModule(unittest.TestCase):
+    """Testing class for locking module."""
+
+    def setUp(self):
+        set_log()
+        return
