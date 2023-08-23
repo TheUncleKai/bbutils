@@ -26,10 +26,10 @@ from bbutil.logging.types import Writer, Message
 from bbutil.utils import get_terminal_size
 
 __all__ = [
-    "StatusWriter"
+    "TkWriter"
 ]
 
-classname = "StatusWriter"
+classname = "TkWriter"
 _index = ["INFORM", "DEBUG1", "DEBUG2", "DEBUG3", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"]
 
 _schemes = {
@@ -45,7 +45,7 @@ _schemes = {
 }
 
 
-class StatusWriter(Writer):
+class TkWriter(Writer):
 
     def __init__(self):
         Writer.__init__(self, "TkLogger", _index)

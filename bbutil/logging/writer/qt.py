@@ -29,7 +29,7 @@ __all__ = [
     "QtWriter"
 ]
 
-classname = "StatusWriter"
+classname = "QtWriter"
 _index = ["INFORM", "DEBUG1", "DEBUG2", "DEBUG3", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"]
 
 _schemes = {

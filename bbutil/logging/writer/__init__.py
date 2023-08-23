@@ -19,5 +19,6 @@
 __all__ = [
     "console",
     "file",
+    "qt",
     "tkinter"
 ]
