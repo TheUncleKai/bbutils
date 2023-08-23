@@ -25,6 +25,7 @@ __all__ = [
     "data",
     "execute",
     "file",
+    "setup",
     "utils",
     "worker"
 ]

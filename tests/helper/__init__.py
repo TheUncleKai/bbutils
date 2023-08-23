@@ -28,6 +28,7 @@ __all__ = [
     "database",
     "execute",
     "file",
+    "setup",
     "sqlite",
     "table",
     "worker",
