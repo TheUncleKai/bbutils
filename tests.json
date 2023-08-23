@@ -382,6 +382,14 @@
                 "test_setup_04",
                 "test_setup_05"
             ]
+        },
+        {
+            "id": "Setup",
+            "path": "tests.setup",
+            "classname": "TestSetup",
+            "tests": [
+                "test_find_data_files_01"
+            ]
         }
     ]
 }

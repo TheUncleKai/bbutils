@@ -16,16 +16,30 @@
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
 
-__all__ = [
-    "database",
-    "helper",
-    "lang",
-    "logging",
+import unittest
 
-    "data",
-    "execute",
-    "file",
-    "setup",
-    "utils",
-    "worker"
+from tests.helper import set_log
+from bbutil.setup import find_data_files
+from tests.helper.setup import testdata1, testdata2
+
+__all__ = [
+    "TestSetup"
 ]
+
+
+class TestSetup(unittest.TestCase):
+    """Testing class for locking module."""
+
+    def setUp(self):
+        set_log()
+        return
+
+    def test_find_data_files_01(self):
+        package_files1 = []
+        package_files2 = []
+        _package = find_data_files("testdata", "data", package_files1, [])
+        _package = find_data_files("testdata", "data", package_files2, [".py"])
+
+        self.assertListEqual(testdata1, package_files1)
+        self.assertListEqual(testdata2, package_files2)
+        return
