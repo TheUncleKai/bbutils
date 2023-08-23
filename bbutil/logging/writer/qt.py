@@ -18,41 +18,42 @@
 
 from typing import List, Optional
 
-from tkinter import Text
-from tkinter.constants import END
-from tkinter.ttk import Progressbar
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QColor, QFont, QTextCursor
+from PySide6.QtWidgets import QTextEdit, QProgressBar
 
 from bbutil.logging.types import Writer, Message
 from bbutil.utils import get_terminal_size
 
 __all__ = [
-    "TkWriter"
+    "QtWriter"
 ]
 
-classname = "TkWriter"
+classname = "QtWriter"
 _index = ["INFORM", "DEBUG1", "DEBUG2", "DEBUG3", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"]
 
 _schemes = {
-    "NORMAL": "",
-    "INFORM": "green",
-    "DEBUG1": "cyan",
-    "DEBUG2": "cyan",
-    "DEBUG3": "cyan",
-    "WARN": "magenta",
-    "ERROR": "red",
-    "EXCEPTION": "red",
-    "TIMER": "yellow"
+    "NORMAL": QColor(Qt.black),
+    "INFORM": QColor(Qt.darkGreen),
+    "DEBUG1": QColor(Qt.cyan),
+    "DEBUG2": QColor(Qt.cyan),
+    "DEBUG3": QColor(Qt.cyan),
+    "WARN": QColor(Qt.magenta),
+    "ERROR": QColor(Qt.red),
+    "EXCEPTION": QColor(Qt.red),
+    "TIMER": QColor(Qt.yellow)
 }
 
 
-class TkWriter(Writer):
+class QtWriter(Writer):
 
     def __init__(self):
         Writer.__init__(self, "TkLogger", _index)
 
-        self.text_control: Optional[Text] = None
-        self.progress_control: Optional[Progressbar] = None
+        self.text_control: Optional[QTextEdit] = None
+        self.progress_control: Optional[QProgressBar] = None
 
+        self.progress_reset: bool = False
         self.encoding: str = ""
         self.text_space: int = 15
         self.text_size: int = 11
@@ -65,7 +66,16 @@ class TkWriter(Writer):
         self.line_width: int = size_x
         self.bar_len: int = 50
         self.active: bool = False
+
+        self._prepared: bool = False
+        self._buffer: List[Message] = []
         return
+
+    @property
+    def _is_ready(self) -> bool:
+        if (self.text_control is None) or (self.progress_control is None):
+            return False
+        return True
 
     def setup(self, **kwargs):
         item = kwargs.get("text_space", None)
@@ -91,29 +101,26 @@ class TkWriter(Writer):
         item = kwargs.get("text_control", None)
         if item is not None:
             self.text_control = item
-            self._set_schemmes()
+            self._set_text()
 
         item = kwargs.get("progress_control", None)
         if item is not None:
             self.progress_control = item
         return
 
-    def _set_schemmes(self):
-        for _key in _schemes:
-            _value = _schemes[_key]
-            if _value == "":
-                self.text_control.tag_config(_key, font=("Monospace", self.text_size))
-            else:
-                self.text_control.tag_config(_key, font=("Monospace", self.text_size), foreground=_value)
+    def _set_text(self):
+        if self.text_control is None:
+            return
+
+        font = QFont("Monospace")
+        font.setStyleHint(QFont.TypeWriter)
+        font.setPointSize(self.text_size)
+
+        self.text_control.setFont(font)
         return
 
     def open(self) -> bool:
-        if self.text_control is None:
-            return False
-
-        if self.progress_control is None:
-            return False
-
+        self._init_progress()
         self.active = True
         return True
 
@@ -122,12 +129,49 @@ class TkWriter(Writer):
         return True
 
     def clear(self) -> bool:
-        self.progress_control.configure(value=0)
+        self.progress_control.setValue(0)
+        self.progress_control.reset()
+        self.progress_reset = True
         return True
 
+    def _init_progress(self):
+        if self.progress_control is None:
+            return
+        self.progress_control.setMinimum(0)
+        self.progress_control.setMaximum(100)
+        self.progress_reset = False
+        return
+
     def _set_progress(self, item: Message):
+        if self.progress_reset is True:
+            self._init_progress()
         value = int(float(item.progress.counter * 100) / float(item.progress.limit))
-        self.progress_control.configure(value=value)
+        self.progress_control.setValue(value)
+        return
+
+    def _write(self, item: Message):
+        if item.level == "":
+            item.level = "NORMAL"
+
+        _color = _schemes[item.level]
+
+        if item.tag == "":
+            text = "{0:s}\n".format(item.content)
+
+            self.text_control.setTextColor(_color)
+            self.text_control.insertPlainText(text)
+            self.text_control.setTextColor(QColor(Qt.black))
+        else:
+            tag = item.tag.ljust(self.text_space)
+            text = "{0:s} {1:s}\n".format(self.seperator, item.content)
+
+            self.text_control.setTextColor(_color)
+            self.text_control.insertPlainText(tag)
+
+            self.text_control.setTextColor(QColor(Qt.black))
+            self.text_control.insertPlainText(text)
+
+        self.text_control.moveCursor(QTextCursor.End)
         return
 
     def write(self, item: Message):
@@ -138,15 +182,14 @@ class TkWriter(Writer):
         if self.active is False:
             return
 
-        if item.tag == "":
-            text = "{0:s}\n".format(item.content)
-            self.text_control.insert(END, text, item.level)
-            self.text_control.see(END)
-        else:
-            tag = item.tag.ljust(self.text_space)
-            text = "{0:s} {1:s}\n".format(self.seperator, item.content)
+        if self._is_ready is False:
+            self._buffer.append(item)
+            return
 
-            self.text_control.insert(END, tag, item.level)
-            self.text_control.insert(END, text, "NORMAL")
-            self.text_control.see(END)
+        for _item in self._buffer:
+            self._write(_item)
+
+        self._buffer.clear()
+
+        self._write(item)
         return
