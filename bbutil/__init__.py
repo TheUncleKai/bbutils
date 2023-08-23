@@ -18,6 +18,8 @@
 
 from typing import Optional
 from bbutil.logging import Logging
+from bbutil.app.config import Config
+from bbutil.app.manager import ModuleManager
 
 __all__ = [
     "app",
@@ -33,7 +35,12 @@ __all__ = [
     "utils",
 
     "log",
-    "set_log"
+    "config",
+    "module",
+
+    "set_log",
+    "set_config",
+    "set_module"
 ]
 
 
@@ -81,9 +88,23 @@ __maintainer__ = __author__
 
 
 log: Optional[Logging] = None
+config: Optional[Config] = None
+module: Optional[ModuleManager] = None
 
 
-def set_log(module: Logging):
+def set_log(item: Logging):
     global log
-    log = module
+    log = item
+    return
+
+
+def set_config(item: Config):
+    global config
+    config = item
+    return
+
+
+def set_module(item: ModuleManager):
+    global module
+    module = item
     return

@@ -4,46 +4,38 @@
 # Copyright (C) 2020, Siemens Healthcare Diagnostics Products GmbH
 # Licensed under the Siemens Inner Source License 1.2, see LICENSE.md.
 
+import abc
 import sys
 
 from dataclasses import dataclass
+from typing import Optional
+from abc import ABCMeta
+
+import bbutil
 
 from bbutil.logging import Logging
-
-import mig
-
-from mig.base import Config
-from mig.base.module import has_module, get_module
+from bbutil.app.manager import ModuleManager
+from bbutil.app.config import Config
+from bbutil.app.module import Module
 
 __all__ = [
     "Console"
 ]
 
 
-class _Config(Config):
-
-    def setup_args(self):
-        return
-
-    def init_args(self, options) -> bool:
-        return True
-
-    def check_command(self) -> bool:
-        return True
-
-
 @dataclass
-class Console(object):
+class Console(metaclass=ABCMeta):
 
     command_id: str = ""
+    module: Optional[Module] = None
 
-    def _set_command(self) -> bool:
+    def _set_command(self, config: Config) -> bool:
 
         if self.command_id == "":
             command_names = sys.argv[1:]
 
             for _command in command_names:
-                check = has_module(_command)
+                check = bbutil.module.has_command(_command)
                 if check is False:
                     continue
 
@@ -51,78 +43,85 @@ class Console(object):
                 break
 
         if self.command_id == "":
-            _config = _Config()
-            _config.prepare_parser()
-            _config.parser.print_help()
+            config.prepare_parser()
+            config.parser.print_help()
             return False
 
-        module = get_module(self.command_id)
-        if module is None:
+        _module = bbutil.module.get_module(self.command_id)
+        if _module is None:
             sys.stderr.write("Command is not known: {0:s}".format(self.command_id))
             return False
 
-        config = module.config()
-        if config is None:
-            sys.stderr.write("Command config is not known: {0:s}".format(self.command_id))
-            return False
+        bbutil.set_config(config)
+        self.module = _module
 
-        mig.set_module(module)
-        mig.set_config(config)
-
-        mig.log.debug1("Command", self.command_id)
+        bbutil.log.debug1("Console", self.command_id)
         return True
 
-    def setup(self) -> bool:
-        _log = Logging()
-        mig.set_log(_log)
+    @abc.abstractmethod
+    def create_logging(self) -> Logging:
+        pass
 
-        mig.log.setup(app=mig.__appname__, level=2)
+    @abc.abstractmethod
+    def create_config(self) -> Config:
+        pass
 
-        console = mig.log.get_writer("console")
-        console.setup(text_space=24, error_index=["ERROR", "EXCEPTION"])
-        mig.log.register(console)
+    @abc.abstractmethod
+    def start(self) -> bool:
+        pass
 
-        check = mig.log.open()
+    @abc.abstractmethod
+    def stop(self) -> bool:
+        pass
+
+    def setup(self, module_path: str) -> bool:
+        _modules = ModuleManager(module_path)
+
+        check = _modules.init()
         if check is False:
-            sys.stderr.write("\nUnable to open logging!\n")
             return False
 
-        mig.log.debug1("Version", str(mig.__version__))
+        bbutil.set_module(_modules)
+
+        _log = self.create_logging()
+        bbutil.set_log(_log)
+
         _version = sys.version.replace('\n', '- ')
-        mig.log.debug1("Python", _version)
+        bbutil.log.debug1("Python", _version)
 
-        check = self._set_command()
+        _config = self.create_config()
+
+        check = self._set_command(_config)
         if check is False:
             return False
 
-        check = mig.config.init()
+        check = _config.init()
         if check is False:
             return False
 
-        mig.log.setup(level=mig.config.logging.verbose)
-        mig.log.debug1("Command", "Command is set")
+        bbutil.log.setup(level=_config.verbose)
         return True
 
     def execute(self) -> int:
 
-        command = mig.module.command()
-        if command is None:
-            sys.stderr.write("Command is not known: {0:s}".format(self.command_id))
-            return False
-
-        if command is None:
-            mig.log.close()
+        check = self.start()
+        if check is False:
             return 1
 
-        _check = mig.data.start()
-        if _check is False:
-            return False
+        check = self.module.load()
+        if check is False:
+            return 2
 
-        ret = command.execute()
+        for _worker in self.module.workers:
+            check = _worker.execute()
+            if check is True:
+                continue
 
-        _check = mig.data.stop()
-        if _check is False:
-            return False
+            return 3
 
-        mig.log.close()
-        return ret
+        check = self.stop()
+        if check is False:
+            return 4
+
+        bbutil.log.close()
+        return 0

@@ -17,5 +17,7 @@
 #
 
 __all__ = [
-    "config"
+    "config",
+    "manager",
+    "module"
 ]

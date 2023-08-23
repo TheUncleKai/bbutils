@@ -68,10 +68,8 @@ class Config(metaclass=ABCMeta):
 
         commands = []
 
-        for _item in _module.__all__:
-            path = "{0:s}.{1:s}".format(self.module_path, _item)
-            module = get_attribute(path, "module")
-            commands.append(module.id)
+        for _module in bbutil.module.modules:
+            commands.append(_module.command)
 
         self.parser.add_argument("command", help="commands to run, use <command> -h for more help",
                                  choices=commands)

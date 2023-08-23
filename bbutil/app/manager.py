@@ -32,6 +32,7 @@ class ModuleManager(object):
 
     module_path: str = ""
     modules: List[Module] = field(default_factory=list)
+    commands: List[str] = field(default_factory=list)
 
     def init(self) -> bool:
         try:
@@ -43,8 +44,18 @@ class ModuleManager(object):
         for _name in _root.__all__:
             _module = Module()
 
-            _module.init(self.module_path, _name)
+            check = _module.init(self.module_path, _name)
+            if check is False:
+                continue
+
+            self.commands.append(_module.command)
+            self.modules.append(_module)
         return True
+
+    def has_command(self, command: str) -> bool:
+        if command in self.commands:
+            return True
+        return False
 
     def get_module(self, module_id: str) -> Optional[Module]:
 
