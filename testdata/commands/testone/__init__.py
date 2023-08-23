@@ -16,9 +16,9 @@
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
 
-__command__ = ""
+__command__ = "test01"
 
-__desc__ = ""
+__desc__ = "the first test"
 
 __all__ = [
     "prepact",

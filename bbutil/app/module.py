@@ -50,7 +50,7 @@ class Module(object):
         self.path = "{0:s}.{1:s}".format(path, name)
 
         try:
-            _module = __import__(self.path)
+            _module = get_attribute(path, name)
         except ImportError as e:
             bbutil.log.exception(e)
             return False

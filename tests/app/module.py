@@ -22,6 +22,8 @@ import unittest.mock as mock
 
 from tests.helper import set_log
 
+from bbutil.app.module import Module
+
 __all__ = [
     "TestModule"
 ]
@@ -36,4 +38,26 @@ class TestModule(unittest.TestCase):
 
     def setUp(self):
         set_log()
+        return
+
+    def test_init_01(self):
+        _module = Module()
+
+        _path = "testdata.commands"
+        _name = "testone"
+        _check1 = _module.init(_path, _name)
+
+        self.assertTrue(_check1)
+        self.assertEqual(_module.command, "test01")
+        self.assertEqual(_module.desc, "the first test")
+        return
+
+    def test_init_02(self):
+        _module = Module()
+
+        _path = "testdata.commands"
+        _name = "testonex"
+        _check1 = _module.init(_path, _name)
+
+        self.assertFalse(_check1)
         return

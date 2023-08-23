@@ -391,6 +391,15 @@
                 "test_find_data_files_01",
                 "test_find_data_files_02"
             ]
+        },
+        {
+            "id": "App.Module",
+            "path": "tests.app.module",
+            "classname": "TestModule",
+            "tests": [
+                "test_init_01",
+                "test_init_02"
+            ]
         }
     ]
 }
