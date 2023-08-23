@@ -16,55 +16,14 @@
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
 
-from dataclasses import dataclass
-from typing import Optional, List
-
-import bbutil
+from typing import Optional
 
 from bbutil.utils import get_attribute
 
-from bbutil.worker import Worker
-from bbutil.console.config import Config
-
 __all__ = [
-    "ModuleManager",
-
     "has_module",
     "get_module"
 ]
-
-
-@dataclass
-class ModuleManager(object):
-
-    command_path: str = ""
-
-    def __init__(self, name: str, module_path: str, desc: str):
-        self.id: str = name
-        self.desc: str = desc
-        self.module_path: str = module_path
-        return
-
-    def commands(self) -> List[Worker]:
-
-        _workers = []
-
-        try:
-            _module = __import__(self.module_path)
-        except ImportError as e:
-            bbutil.log.exception(e)
-            return _workers
-
-        for _item in _module.__workers__:
-            _path = "{0:s}.{1:s}".format(self.module_path, _item)
-
-        path = "{0:s}.{1:s}.command".format(__path__, self.folder)
-        attr = get_attribute(path, self.class_command)
-        c: Worker = attr()
-
-        _workers.append(c)
-        return _workers
-
 
 
 def has_module(command: str) -> bool:

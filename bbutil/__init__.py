@@ -20,6 +20,7 @@ from typing import Optional
 from bbutil.logging import Logging
 
 __all__ = [
+    "app",
     "database",
     "lang",
     "logging",
