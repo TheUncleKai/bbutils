@@ -75,3 +75,31 @@ class TestModule(unittest.TestCase):
         self.assertEqual(_module.command, "test01")
         self.assertEqual(_module.desc, "the first test")
         return
+
+    def test_load_02(self):
+        _module = Module()
+
+        _path = "testdata.commands"
+        _name = "testtwo"
+        _check1 = _module.init(_path, _name)
+        _check2 = _module.load()
+
+        self.assertTrue(_check1)
+        self.assertFalse(_check2)
+        self.assertEqual(_module.command, "test02")
+        self.assertEqual(_module.desc, "the second test")
+        return
+
+    def test_load_03(self):
+        _module = Module()
+
+        _path = "testdata.commands"
+        _name = "testthree"
+        _check1 = _module.init(_path, _name)
+        _check2 = _module.load()
+
+        self.assertTrue(_check1)
+        self.assertFalse(_check2)
+        self.assertEqual(_module.command, "test03")
+        self.assertEqual(_module.desc, "the third test")
+        return

@@ -67,7 +67,7 @@ class Module(object):
 
             try:
                 _name = get_attribute(_path, "__worker__")
-            except AttributeError as e:
+            except ImportError as e:
                 bbutil.log.error("Unable to get worker name!")
                 bbutil.log.exception(e)
                 return False
