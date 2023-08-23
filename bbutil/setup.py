@@ -1,0 +1,77 @@
+#!/usr/bin/python3
+# coding=utf-8
+
+# Copyright (C) 2020, Siemens Healthcare Diagnostics Products GmbH
+# Licensed under the Siemens Inner Source License 1.2, see LICENSE.md.
+
+import os
+
+from bbutil.utils import full_path
+
+
+__all__ = [
+    "find_data_files"
+]
+
+
+def _find_folders(path: str, folders: list):
+    for root, dirs, files in os.walk(path, topdown=True):
+        for name in dirs:
+
+            _item = full_path("{0:s}/{1:s}".format(root, name))
+
+            if os.path.isdir(_item) is False:
+                continue
+
+            if _item in folders:
+                continue
+
+            folders.append(_item)
+    return
+
+
+def _find_files(path: str, current_path: str) -> list:
+    _files = []
+    for _item in os.listdir(path):
+
+        _fullname = full_path("{0:s}/{1:s}".format(path, _item))
+        _path = _fullname.replace(current_path, "")
+
+        if os.path.isdir(_fullname) is True:
+            continue
+
+        if "__pycache__" in _item:
+            continue
+
+        if ".pot" in _item:
+            continue
+
+        if ".po" in _item:
+            continue
+
+        _files.append(_path)
+    return _files
+
+
+def find_data_files(folder: str, target: str, package_files: list):
+    current_path = "{0:s}/".format(os.getcwd())
+    target_folder = full_path("{0:s}/{1:s}".format(current_path, folder))
+
+    _folders = [
+        target_folder
+    ]
+
+    _find_folders(target_folder, _folders)
+
+    for _item in _folders:
+        _files = _find_files(_item, current_path)
+        _name = _item.replace("{0:s}/".format(target_folder), "")
+
+        if _name == target_folder:
+            _name = target
+        else:
+            _name = "{0:s}/{1:s}".format(target, _name)
+
+        package_data = (_name, _files)
+        package_files.append(package_data)
+    return
