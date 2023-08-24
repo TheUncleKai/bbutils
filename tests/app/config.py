@@ -124,3 +124,13 @@ class TestConfig(unittest.TestCase):
         _check2 = _config.init()
         self.assertFalse(_check2)
         return
+
+    def test_init_08(self):
+        self.assertIsNotNone(bbutil.module)
+
+        _filename = full_path("{0:s}/testdata/config02.json".format(os.getcwd()))
+        _config = AppConfig(use_config=True, config_filename=_filename)
+
+        _check2 = _config.init()
+        self.assertFalse(_check2)
+        return
