@@ -87,9 +87,6 @@ class Config(metaclass=ABCMeta):
         pass
 
     def _read_parser(self) -> bool:
-        if self.use_parser is False:
-            return True
-
         options = self.parser.parse_args()
 
         check = check_object(options, ["verbose"])

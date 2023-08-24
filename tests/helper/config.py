@@ -19,7 +19,7 @@
 from unittest.mock import Mock
 
 __all__ = [
-    "MockArgumentParser"
+    "MockArgumentParser01"
 ]
 
 
@@ -33,9 +33,26 @@ class Options01(object):
         return
 
 
-class MockArgumentParser(object):
+class Options02(object):
+
+    def __init__(self):
+        self.bla = "/usr/local/bin/bla"
+        self.bleb = 10
+        self.ls = "/usr/bin/ls"
+        return
+
+
+class MockArgumentParser01(object):
 
     def __init__(self):
         self.add_argument = Mock()
         self.parse_args = Mock(return_value=Options01())
+        return
+
+
+class MockArgumentParser02(object):
+
+    def __init__(self):
+        self.add_argument = Mock()
+        self.parse_args = Mock(return_value=Options02())
         return

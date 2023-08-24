@@ -410,7 +410,10 @@
             "path": "tests.app.config",
             "classname": "TestConfig",
             "tests": [
-                "test_init_01"
+                "test_init_01",
+                "test_init_02",
+                "test_init_03",
+                "test_init_04"
             ]
         }
     ]

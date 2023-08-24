@@ -22,7 +22,7 @@ import unittest.mock as mock
 
 import bbutil
 from tests.helper import set_log, set_module
-from tests.helper.config import MockArgumentParser
+from tests.helper.config import MockArgumentParser01, MockArgumentParser02
 
 from testdata.app.config import AppConfig
 
@@ -43,7 +43,7 @@ class TestConfig(unittest.TestCase):
         set_module()
         return
 
-    @mock.patch('argparse.ArgumentParser', new=MockArgumentParser)
+    @mock.patch('argparse.ArgumentParser', new=MockArgumentParser01)
     def test_init_01(self):
         self.assertIsNotNone(bbutil.module)
 
@@ -51,4 +51,36 @@ class TestConfig(unittest.TestCase):
 
         _check2 = _config.init()
         self.assertTrue(_check2)
+        return
+
+    @mock.patch('argparse.ArgumentParser', new=MockArgumentParser01)
+    def test_init_02(self):
+        self.assertIsNotNone(bbutil.module)
+
+        _config = AppConfig(use_parser=False)
+
+        _check2 = _config.init()
+        self.assertTrue(_check2)
+        return
+
+    @mock.patch('argparse.ArgumentParser', new=MockArgumentParser01)
+    def test_init_03(self):
+        bbutil.module = None
+        bbutil.set_module(None)
+        self.assertIsNone(bbutil.module)
+
+        _config = AppConfig(use_parser=True)
+
+        _check2 = _config.init()
+        self.assertFalse(_check2)
+        return
+
+    @mock.patch('argparse.ArgumentParser', new=MockArgumentParser02)
+    def test_init_04(self):
+        self.assertIsNotNone(bbutil.module)
+
+        _config = AppConfig(use_parser=True)
+
+        _check2 = _config.init()
+        self.assertFalse(_check2)
         return
