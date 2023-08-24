@@ -22,7 +22,7 @@ import unittest.mock as mock
 
 import bbutil
 from tests.helper import set_log, set_module
-from tests.helper.config import MockArgumentParser01, MockArgumentParser02
+from tests.helper.config import MockArgumentParser01, MockArgumentParser02, MockArgumentParser03
 
 from testdata.app.config import AppConfig
 
@@ -77,6 +77,16 @@ class TestConfig(unittest.TestCase):
 
     @mock.patch('argparse.ArgumentParser', new=MockArgumentParser02)
     def test_init_04(self):
+        self.assertIsNotNone(bbutil.module)
+
+        _config = AppConfig(use_parser=True)
+
+        _check2 = _config.init()
+        self.assertFalse(_check2)
+        return
+
+    @mock.patch('argparse.ArgumentParser', new=MockArgumentParser03)
+    def test_init_05(self):
         self.assertIsNotNone(bbutil.module)
 
         _config = AppConfig(use_parser=True)

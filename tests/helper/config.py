@@ -19,11 +19,13 @@
 from unittest.mock import Mock
 
 __all__ = [
-    "MockArgumentParser01"
+    "MockArgumentParser01",
+    "MockArgumentParser02",
+    "MockArgumentParser03"
 ]
 
 
-class Options01(object):
+class _Options01(object):
 
     def __init__(self):
         self.bla = "/usr/local/bin/bla"
@@ -33,7 +35,15 @@ class Options01(object):
         return
 
 
-class Options02(object):
+class MockArgumentParser01(object):
+
+    def __init__(self):
+        self.add_argument = Mock()
+        self.parse_args = Mock(return_value=_Options01())
+        return
+
+
+class _Options02(object):
 
     def __init__(self):
         self.bla = "/usr/local/bin/bla"
@@ -42,17 +52,26 @@ class Options02(object):
         return
 
 
-class MockArgumentParser01(object):
-
-    def __init__(self):
-        self.add_argument = Mock()
-        self.parse_args = Mock(return_value=Options01())
-        return
-
-
 class MockArgumentParser02(object):
 
     def __init__(self):
         self.add_argument = Mock()
-        self.parse_args = Mock(return_value=Options02())
+        self.parse_args = Mock(return_value=_Options02())
+        return
+
+
+class _Options03(object):
+
+    def __init__(self):
+        self.bla = "/usr/local/bin/bla"
+        self.bleb = 10
+        self.verbose = 0
+        return
+
+
+class MockArgumentParser03(object):
+
+    def __init__(self):
+        self.add_argument = Mock()
+        self.parse_args = Mock(return_value=_Options03())
         return
