@@ -17,8 +17,7 @@
 #
 
 import unittest
-
-import unittest.mock as mock
+import time
 
 from tests.helper import set_log
 from tests.helper.worker import CallManager, Worker01, Worker02
@@ -26,10 +25,6 @@ from tests.helper.worker import CallManager, Worker01, Worker02
 __all__ = [
     "TestWorker"
 ]
-
-oserror = OSError("Something strange did happen!")
-mock_oserror = mock.Mock(side_effect=oserror)
-mock_remove = mock.Mock()
 
 
 class TestWorker(unittest.TestCase):
@@ -147,6 +142,7 @@ class TestWorker(unittest.TestCase):
 
         _worker.start()
         _check1 = _worker.is_running
+        time.sleep(1)
         _worker.abort = True
 
         _worker.wait()

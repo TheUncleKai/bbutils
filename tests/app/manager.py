@@ -16,13 +16,10 @@
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
 
-import os
 import unittest
 
 import unittest.mock as mock
 
-import bbutil
-from bbutil.utils import full_path, openjson
 from bbutil.app.manager import ModuleManager
 
 from tests.helper import set_log, reset_module
@@ -59,6 +56,13 @@ class TestManager(unittest.TestCase):
         self.assertFalse(_check3)
         self.assertIsNotNone(_command1)
         self.assertIsNone(_command2)
-        self.assertEqual(len(_module.commands), 3)
-        self.assertEqual(len(_module.modules), 3)
+        self.assertEqual(len(_module.commands), 4)
+        self.assertEqual(len(_module.modules), 4)
+        return
+
+    def test_init_02(self):
+        _module = ModuleManager(module_path="testdata.app.xcommands")
+        _check1 = _module.init()
+
+        self.assertFalse(_check1)
         return
