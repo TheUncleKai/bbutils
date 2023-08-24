@@ -58,6 +58,9 @@ class AppConfig(Config):
         if _check is False:
             bbutil.log.error("Config is not complete!")
             return False
+        self.bla = config["bla"]
+        self.bleb = config["bleb"]
+        self.ls = config["ls"]
         return True
 
     def check_config(self) -> bool:
