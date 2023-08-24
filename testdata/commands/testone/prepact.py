@@ -36,8 +36,11 @@ class Worker01(Worker):
     max: int = 50000
     iterate_list: List[int] = field(default_factory=list)
 
+    def init(self):
+        self.set_id("Act01")
+        return
+
     def prepare(self) -> bool:
-        self.id = "Act01"
         _max = self.max
         _range = range(0, _max)
         _progress = bbutil.log.progress(_max)
