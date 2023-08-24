@@ -17,9 +17,4 @@
 #
 
 __all__ = [
-    "testone",
-    "testtwo",
-    "testthree",
-    "testfour",
-    "testfive"
 ]

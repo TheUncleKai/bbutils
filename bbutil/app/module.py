@@ -55,6 +55,14 @@ class Module(object):
             bbutil.log.exception(e)
             return False
 
+        if hasattr(_module, "__command__") is False:
+            bbutil.log.error("No commands for {0:s}!".format(name))
+            return False
+
+        if hasattr(_module, "__desc__") is False:
+            bbutil.log.error("No description for {0:s}!".format(name))
+            return False
+
         self.command = _module.__command__
         self.desc = _module.__desc__
 

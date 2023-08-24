@@ -59,6 +59,6 @@ class TestManager(unittest.TestCase):
         self.assertFalse(_check3)
         self.assertIsNotNone(_command1)
         self.assertIsNone(_command2)
-        self.assertEqual(len(_module.commands), 1)
-        self.assertEqual(len(_module.modules), 1)
+        self.assertEqual(len(_module.commands), 3)
+        self.assertEqual(len(_module.modules), 3)
         return
