@@ -20,11 +20,11 @@ import unittest
 
 import unittest.mock as mock
 
-from tests.helper import set_log
+import bbutil
+from tests.helper import set_log, set_module
 from tests.helper.config import MockArgumentParser
 
 from testdata.app.config import AppConfig
-
 
 __all__ = [
     "TestConfig"
@@ -40,12 +40,15 @@ class TestConfig(unittest.TestCase):
 
     def setUp(self):
         set_log()
+        set_module()
         return
 
     @mock.patch('argparse.ArgumentParser', new=MockArgumentParser)
     def test_init_01(self):
-        _config = AppConfig()
+        self.assertIsNotNone(bbutil.module)
 
-        _check = _config.init()
-        self.assertTrue(_check)
+        _config = AppConfig(use_parser=True)
+
+        _check2 = _config.init()
+        self.assertTrue(_check2)
         return

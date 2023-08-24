@@ -19,8 +19,8 @@
 import os
 
 import bbutil
-from bbutil import Logging
-
+from bbutil.logging import Logging
+from bbutil.app.manager import ModuleManager
 from bbutil.database import SQLite
 from bbutil.utils import full_path
 
@@ -35,7 +35,8 @@ __all__ = [
     "worker",
 
     "get_sqlite",
-    "set_log"
+    "set_log",
+    "set_module"
 ]
 
 _index = {
@@ -69,4 +70,18 @@ def set_log():
     _log.open()
 
     bbutil.set_log(_log)
+    return
+
+
+def set_module():
+    if bbutil.module is not None:
+        return
+
+    _module = ModuleManager(module_path="testdata.app.commands")
+    _check = _module.init()
+
+    if _check is False:
+        return
+
+    bbutil.set_module(_module)
     return

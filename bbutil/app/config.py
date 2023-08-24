@@ -6,12 +6,12 @@
 
 import abc
 import os.path
+import argparse
 
 import json
 
 from dataclasses import dataclass
 from abc import ABCMeta
-from argparse import ArgumentParser
 from typing import Optional
 
 from bbutil.utils import check_object, check_dict, openjson
@@ -31,7 +31,7 @@ class Config(metaclass=ABCMeta):
     config_filename: str = ""
     use_parser: bool = False
     use_config: bool = False
-    parser: Optional[ArgumentParser] = None
+    parser: Optional[argparse.ArgumentParser] = None
     verbose: int = 0
 
     @property
@@ -57,7 +57,11 @@ class Config(metaclass=ABCMeta):
         return True
 
     def prepare_parser(self) -> bool:
-        self.parser: ArgumentParser = ArgumentParser()
+        self.parser: argparse.ArgumentParser = argparse.ArgumentParser()
+
+        if bbutil.module is None:
+            bbutil.log.error("Module manager is missing!")
+            return False
 
         commands = []
 

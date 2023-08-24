@@ -21,6 +21,7 @@ from typing import List, Optional
 
 import bbutil
 from bbutil.app.module import Module
+from bbutil.utils import get_attribute
 
 __all__ = [
     "ModuleManager"
@@ -35,13 +36,10 @@ class ModuleManager(object):
     commands: List[str] = field(default_factory=list)
 
     def init(self) -> bool:
-        try:
-            _root = __import__(self.module_path)
-        except ImportError as e:
-            bbutil.log.exception(e)
-            return False
 
-        for _name in _root.__all__:
+        _commands = get_attribute(self.module_path, "__all__")
+
+        for _name in _commands:
             _module = Module()
 
             check = _module.init(self.module_path, _name)
