@@ -205,17 +205,58 @@ class TestConfig(unittest.TestCase):
         if os.path.exists(_work) is False:
             os.mkdir(_work)
 
-        _filename = full_path("{0:s}/testdata/config01.json".format(os.getcwd()))
+        _filename1 = full_path("{0:s}/testdata/config01.json".format(os.getcwd()))
+        _filename2 = full_path("{0:s}/config01.json".format(os.getcwd()))
 
-        _config = AppConfig(use_config=True, config_filename=_filename)
+        _config = AppConfig(use_config=True, config_filename=_filename1)
         _check2 = _config.init()
 
-        os.remove(_filename)
+        os.remove(_filename1)
+
+        _config.config_filename = _filename2
 
         _check3 = _config.store()
-        _check4 = os.path.exists(_filename)
+        _check4 = os.path.exists(_filename2)
 
-        _data = openjson(_filename)
+        _data = openjson(_filename2)
+
+        self.assertTrue(_check2)
+        self.assertTrue(_check3)
+        self.assertTrue(_check4)
+        self.assertTrue(_config.valid)
+
+        self.assertEqual(_data["verbose"], 0)
+        self.assertEqual(_data["bla"], "/usr/local/bin/bla")
+        self.assertEqual(_data["bleb"], 10)
+        self.assertEqual(_data["ls"], "/usr/bin/ls")
+        self.assertEqual(_data["work"], _work)
+        return
+
+    def test_store_02(self):
+        self.assertIsNotNone(bbutil.module)
+
+        _work = "{0:s}/test".format(os.getcwd())
+        if os.path.exists(_work) is False:
+            os.mkdir(_work)
+
+        _filename1 = full_path("{0:s}/testdata/config01.json".format(os.getcwd()))
+        _filename2 = full_path("{0:s}/config01.json".format(os.getcwd()))
+
+        _config = AppConfig(use_config=True, config_filename=_filename1)
+        _check2 = _config.init()
+
+        if os.path.exists(_filename2) is True:
+            os.remove(_filename2)
+
+        _config.use_config = True
+
+        _check3 = _config.store()
+        _check4 = os.path.exists(_filename2)
+
+        _data = openjson(_filename2)
+
+        if os.path.exists(_filename2) is True:
+            os.remove(_filename2)
 
         self.assertTrue(_check2)
         self.assertTrue(_check3)
