@@ -132,5 +132,41 @@ class TestConsole(unittest.TestCase):
             _ret = _console.execute()
 
         self.assertTrue(_check1)
-        self.assertEqual(_ret, -1)
+        self.assertEqual(_ret, 2)
+        return
+
+    def test_execute_05(self):
+        _console = AppConsole()
+
+        _argv = [
+            "run-tests.py",
+            "test01"
+        ]
+
+        _check1 = _console.setup()
+        _console.return_start = False
+
+        with patch("sys.argv", _argv):
+            _ret = _console.execute()
+
+        self.assertTrue(_check1)
+        self.assertEqual(_ret, 1)
+        return
+
+    def test_execute_06(self):
+        _console = AppConsole()
+
+        _argv = [
+            "run-tests.py",
+            "test01"
+        ]
+
+        _check1 = _console.setup()
+        _console.return_stop = False
+
+        with patch("sys.argv", _argv):
+            _ret = _console.execute()
+
+        self.assertTrue(_check1)
+        self.assertEqual(_ret, 4)
         return

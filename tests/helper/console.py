@@ -42,6 +42,8 @@ _index = {
 class AppConsole(Console):
 
     filename: str = ""
+    return_start: bool = True
+    return_stop: bool = True
 
     def create_logging(self) -> Logging:
         _log = Logging()
@@ -66,7 +68,7 @@ class AppConsole(Console):
         return
 
     def start(self) -> bool:
-        return True
+        return self.return_start
 
     def stop(self) -> bool:
-        pass
+        return self.return_stop

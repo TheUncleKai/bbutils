@@ -450,7 +450,9 @@
                 "test_execute_01",
                 "test_execute_02",
                 "test_execute_03",
-                "test_execute_04"
+                "test_execute_04",
+                "test_execute_05",
+                "test_execute_06"
             ]
         }
     ]
