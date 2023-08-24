@@ -115,3 +115,12 @@ class TestConfig(unittest.TestCase):
         self.assertEqual(_config.bleb, 10)
         self.assertEqual(_config.ls, "/usr/bin/ls")
         return
+
+    def test_init_07(self):
+        self.assertIsNotNone(bbutil.module)
+
+        _config = AppConfig(use_config=True, config_filename="pufffy")
+
+        _check2 = _config.init()
+        self.assertFalse(_check2)
+        return
