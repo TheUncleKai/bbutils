@@ -16,8 +16,19 @@
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
 
+from bbutil.app.module import Module
+from bbutil.app.config import Config
+from bbutil.app.manager import ModuleManager
+from bbutil.app.console import Console
+
 __all__ = [
     "config",
+    "console",
     "manager",
-    "module"
+    "module",
+
+    "Module",
+    "Config",
+    "ModuleManager",
+    "Console"
 ]

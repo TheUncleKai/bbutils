@@ -26,10 +26,11 @@ from bbutil.utils import full_path, openjson
 
 
 from tests.helper import set_log, set_module
+from tests.helper.console import AppConsole
 
 
 __all__ = [
-    "TestManager"
+    "TestConsole"
 ]
 
 oserror = OSError("Something strange did happen!")
@@ -37,10 +38,15 @@ mock_oserror = mock.Mock(side_effect=oserror)
 mock_remove = mock.Mock()
 
 
-class TestManager(unittest.TestCase):
+class TestConsole(unittest.TestCase):
     """Testing class for locking module."""
 
     def setUp(self):
-        set_log()
-        set_module()
+        return
+
+    def test_setup_01(self):
+        _console = AppConsole()
+
+        _check = _console.setup()
+        self.assertTrue(_check)
         return

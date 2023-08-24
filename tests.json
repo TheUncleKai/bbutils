@@ -437,6 +437,14 @@
             "tests": [
                 "test_init_01"
             ]
+        },
+        {
+            "id": "App.Console",
+            "path": "tests.app.console",
+            "classname": "TestConsole",
+            "tests": [
+                "test_setup_01"
+            ]
         }
     ]
 }

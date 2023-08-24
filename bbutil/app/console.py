@@ -28,6 +28,11 @@ class Console(metaclass=ABCMeta):
 
     command_id: str = ""
     module: Optional[Module] = None
+    module_path: str = ""
+
+    def __post_init__(self):
+        self.init()
+        return
 
     def _set_command(self, config: Config) -> bool:
 
@@ -67,6 +72,10 @@ class Console(metaclass=ABCMeta):
         pass
 
     @abc.abstractmethod
+    def init(self):
+        pass
+
+    @abc.abstractmethod
     def start(self) -> bool:
         pass
 
@@ -74,21 +83,21 @@ class Console(metaclass=ABCMeta):
     def stop(self) -> bool:
         pass
 
-    def setup(self, module_path: str) -> bool:
-        _modules = ModuleManager(module_path)
+    def _setup_module(self) -> bool:
+        if self.module_path == "":
+            bbutil.log.error("Module path for console it missing!")
+            return False
+
+        _modules = ModuleManager(self.module_path)
 
         check = _modules.init()
         if check is False:
             return False
 
         bbutil.set_module(_modules)
+        return True
 
-        _log = self.create_logging()
-        bbutil.set_log(_log)
-
-        _version = sys.version.replace('\n', '- ')
-        bbutil.log.debug1("Python", _version)
-
+    def _setup_config(self) -> bool:
         _config = self.create_config()
 
         check = self._set_command(_config)
@@ -98,8 +107,24 @@ class Console(metaclass=ABCMeta):
         check = _config.init()
         if check is False:
             return False
+        return True
 
-        bbutil.log.setup(level=_config.verbose)
+    def setup(self) -> bool:
+        _log = self.create_logging()
+        bbutil.set_log(_log)
+
+        _version = sys.version.replace('\n', '- ')
+        bbutil.log.debug1("Python", _version)
+
+        _check = self._setup_module()
+        if _check is False:
+            return False
+
+        _check = self._setup_config()
+        if _check is False:
+            return False
+
+        bbutil.log.setup(level=bbutil.config.verbose)
         return True
 
     def execute(self) -> int:
