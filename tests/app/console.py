@@ -21,6 +21,7 @@ import unittest
 
 from unittest.mock import patch, Mock
 
+import bbutil
 from tests.helper.console import AppConsole
 
 
@@ -85,4 +86,34 @@ class TestConsole(unittest.TestCase):
 
         self.assertTrue(_check1)
         self.assertEqual(_ret, 0)
+        return
+
+    def test_execute_02(self):
+        _console = AppConsole()
+
+        _check1 = _console.setup()
+
+        bbutil.set_config(None)
+
+        _ret = _console.execute()
+
+        self.assertTrue(_check1)
+        self.assertEqual(_ret, -1)
+        return
+
+    def test_execute_03(self):
+        _console = AppConsole()
+
+        _argv = [
+            "run-tests.py",
+            "xxxxtest01"
+        ]
+
+        _check1 = _console.setup()
+
+        with patch("sys.argv", _argv):
+            _ret = _console.execute()
+
+        self.assertTrue(_check1)
+        self.assertEqual(_ret, -1)
         return

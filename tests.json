@@ -447,7 +447,9 @@
                 "test_setup_02",
                 "test_setup_03",
                 "test_setup_04",
-                "test_execute_01"
+                "test_execute_01",
+                "test_execute_02",
+                "test_execute_03"
             ]
         }
     ]

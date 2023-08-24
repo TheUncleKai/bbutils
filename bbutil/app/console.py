@@ -130,7 +130,7 @@ class Console(metaclass=ABCMeta):
     def execute(self) -> int:
         check = self._set_command()
         if check is False:
-            return False
+            return -1
 
         bbutil.log.inform("App", "Start {0:s}".format(self.command_id))
 
