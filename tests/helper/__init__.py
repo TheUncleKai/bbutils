@@ -26,6 +26,7 @@ from bbutil.utils import full_path
 
 __all__ = [
     "config",
+    "console",
     "database",
     "execute",
     "file",
