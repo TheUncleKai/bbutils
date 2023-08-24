@@ -141,14 +141,11 @@ class Config(metaclass=ABCMeta):
         if self.use_config is False:
             return True
 
-        _config = self.create_config()
-        if _config is None:
-            return False
-
         if self.config_filename == "":
             bbutil.log.error("No filename for storing!")
             return False
 
+        _config = self.create_config()
         _data = json.dumps(_config, indent=4)
 
         bbutil.log.inform("Config", "Store {0:s}".format(self.config_filename))

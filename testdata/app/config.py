@@ -86,5 +86,11 @@ class AppConfig(Config):
         return True
 
     def create_config(self) -> dict:
-        _config = asdict(self)
+        _config = {
+            "bla": self.bla,
+            "bleb": self.bleb,
+            "ls": self.ls,
+            "work": self.work,
+            "verbose": self.verbose
+        }
         return _config
