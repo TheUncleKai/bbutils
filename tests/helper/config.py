@@ -23,8 +23,11 @@ __all__ = [
     "MockArgumentParser02",
     "MockArgumentParser03",
     "MockArgumentParser04",
-    "MockArgumentParser05"
+    "MockArgumentParser05",
+    "mock_open"
 ]
+
+mock_open = Mock(side_effect=OSError("BUMM!"))
 
 
 class _Options01(object):

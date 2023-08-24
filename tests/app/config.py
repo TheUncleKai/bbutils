@@ -26,7 +26,7 @@ from bbutil.utils import full_path, openjson
 
 from tests.helper import set_log, set_module
 from tests.helper.config import (MockArgumentParser01, MockArgumentParser02, MockArgumentParser03,
-                                 MockArgumentParser04, MockArgumentParser05)
+                                 MockArgumentParser04, MockArgumentParser05, mock_open)
 
 from testdata.app.config import AppConfig
 
@@ -287,4 +287,33 @@ class TestConfig(unittest.TestCase):
         self.assertFalse(_check3)
         self.assertFalse(_check4)
         self.assertFalse(_config.valid)
+        return
+
+    def test_store_04(self):
+        self.assertIsNotNone(bbutil.module)
+
+        _work = "{0:s}/test".format(os.getcwd())
+        if os.path.exists(_work) is False:
+            os.mkdir(_work)
+
+        _filename1 = full_path("{0:s}/testdata/config01.json".format(os.getcwd()))
+        _filename2 = full_path("{0:s}/config01.json".format(os.getcwd()))
+
+        _config = AppConfig(use_config=True, config_filename=_filename1)
+        _check2 = _config.init()
+
+        if os.path.exists(_filename2) is True:
+            os.remove(_filename2)
+
+        _config.config_filename = _filename2
+
+        with mock.patch('builtins.open', new=mock_open):
+            _check3 = _config.store()
+
+        _check4 = os.path.exists(_filename2)
+
+        self.assertTrue(_check2)
+        self.assertFalse(_check3)
+        self.assertFalse(_check4)
+        self.assertTrue(_config.valid)
         return
