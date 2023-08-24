@@ -55,9 +55,9 @@ class ModuleManager(object):
             return True
         return False
 
-    def get_module(self, module_id: str) -> Optional[Module]:
+    def get_command(self, command_id: str) -> Optional[Module]:
 
         for _module in self.modules:
-            if _module.name == module_id:
+            if _module.command == command_id:
                 return _module
         return None

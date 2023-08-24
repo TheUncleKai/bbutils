@@ -427,6 +427,14 @@
                 "test_store_03",
                 "test_store_04"
             ]
+        },
+        {
+            "id": "App.Manager",
+            "path": "tests.app.manager",
+            "classname": "TestManager",
+            "tests": [
+                "test_init_01"
+            ]
         }
     ]
 }

@@ -36,7 +36,8 @@ __all__ = [
 
     "get_sqlite",
     "set_log",
-    "set_module"
+    "set_module",
+    "reset_module"
 ]
 
 _index = {
@@ -84,4 +85,12 @@ def set_module():
         return
 
     bbutil.set_module(_module)
+    return
+
+
+def reset_module():
+    if bbutil.module is None:
+        return
+
+    bbutil.set_module(None)
     return

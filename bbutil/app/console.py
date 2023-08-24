@@ -47,7 +47,7 @@ class Console(metaclass=ABCMeta):
             config.parser.print_help()
             return False
 
-        _module = bbutil.module.get_module(self.command_id)
+        _module = bbutil.module.get_command(self.command_id)
         if _module is None:
             sys.stderr.write("Command is not known: {0:s}".format(self.command_id))
             return False
