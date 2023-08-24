@@ -28,6 +28,8 @@ class Options01(object):
     def __init__(self):
         self.bla = "/usr/local/bin/bla"
         self.bleb = 10
+        self.verbose = 0
+        self.ls = "/usr/bin/ls"
         return
 
 

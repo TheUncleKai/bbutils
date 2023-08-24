@@ -39,12 +39,15 @@ class Config(metaclass=ABCMeta):
         return self._is_valid
 
     @staticmethod
-    def check_path(input_path):
+    def check_path(input_path) -> bool:
         if input_path == "":
-            raise ValueError("Invalid path!")
+            bbutil.log.error("Invalid path!")
+            return False
+
         if os.path.exists(input_path) is False:
-            raise ValueError("Unable to find: {0:s}".format(input_path))
-        return
+            bbutil.log.error("Unable to find: {0:s}".format(input_path))
+            return False
+        return True
 
     @staticmethod
     def path_exists(input_path) -> bool:
