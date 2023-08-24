@@ -14,7 +14,7 @@ from abc import ABCMeta
 from argparse import ArgumentParser
 from typing import Optional
 
-from bbutil.utils import check_object, check_dict, get_attribute, openjson
+from bbutil.utils import check_object, check_dict, openjson
 
 import bbutil
 
@@ -29,7 +29,6 @@ class Config(metaclass=ABCMeta):
     _is_valid: bool = False
 
     config_filename: str = ""
-    module_path: str = ""
     use_parser: bool = False
     use_config: bool = False
     parser: Optional[ArgumentParser] = None
@@ -59,12 +58,6 @@ class Config(metaclass=ABCMeta):
 
     def prepare_parser(self) -> bool:
         self.parser: ArgumentParser = ArgumentParser()
-
-        try:
-            _module = __import__(self.module_path)
-        except ImportError as e:
-            bbutil.log.exception(e)
-            return False
 
         commands = []
 

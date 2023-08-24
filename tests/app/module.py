@@ -43,7 +43,7 @@ class TestModule(unittest.TestCase):
     def test_init_01(self):
         _module = Module()
 
-        _path = "testdata.commands"
+        _path = "testdata.app.commands"
         _name = "testone"
         _check1 = _module.init(_path, _name)
 
@@ -55,7 +55,7 @@ class TestModule(unittest.TestCase):
     def test_init_02(self):
         _module = Module()
 
-        _path = "testdata.commands"
+        _path = "testdata.app.commands"
         _name = "testonex"
         _check1 = _module.init(_path, _name)
 
@@ -65,7 +65,7 @@ class TestModule(unittest.TestCase):
     def test_load_01(self):
         _module = Module()
 
-        _path = "testdata.commands"
+        _path = "testdata.app.commands"
         _name = "testone"
         _check1 = _module.init(_path, _name)
         _check2 = _module.load()
@@ -79,7 +79,7 @@ class TestModule(unittest.TestCase):
     def test_load_02(self):
         _module = Module()
 
-        _path = "testdata.commands"
+        _path = "testdata.app.commands"
         _name = "testtwo"
         _check1 = _module.init(_path, _name)
         _check2 = _module.load()
@@ -93,7 +93,7 @@ class TestModule(unittest.TestCase):
     def test_load_03(self):
         _module = Module()
 
-        _path = "testdata.commands"
+        _path = "testdata.app.commands"
         _name = "testthree"
         _check1 = _module.init(_path, _name)
         _check2 = _module.load()
@@ -110,7 +110,7 @@ class TestModule(unittest.TestCase):
     def test_init_04(self):
         _module = Module()
 
-        _path = "testdata.commands"
+        _path = "testdata.app.commands"
         _name = "testone"
         _check1 = _module.init(_path, _name)
         _check2 = _module.load()
