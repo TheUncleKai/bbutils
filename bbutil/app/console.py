@@ -55,13 +55,7 @@ class Console(metaclass=ABCMeta):
             bbutil.config.parser.print_help()
             return False
 
-        _module = bbutil.module.get_command(self.command_id)
-        if _module is None:
-            sys.stderr.write("Command is not known: {0:s}".format(self.command_id))
-            return False
-
-        self.module = _module
-
+        self.module = bbutil.module.get_command(self.command_id)
         bbutil.log.debug1("Console", self.command_id)
         return True
 
