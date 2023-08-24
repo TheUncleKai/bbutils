@@ -37,7 +37,11 @@ class ModuleManager(object):
 
     def init(self) -> bool:
 
-        _commands = get_attribute(self.module_path, "__all__")
+        try:
+            _commands = get_attribute(self.module_path, "__all__")
+        except ImportError as e:
+            bbutil.log.error("Unable to find commands: {0:s}".format(self.module_path))
+            return False
 
         for _name in _commands:
             _module = Module()

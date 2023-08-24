@@ -443,7 +443,9 @@
             "path": "tests.app.console",
             "classname": "TestConsole",
             "tests": [
-                "test_setup_01"
+                "test_setup_01",
+                "test_setup_02",
+                "test_setup_03"
             ]
         }
     ]

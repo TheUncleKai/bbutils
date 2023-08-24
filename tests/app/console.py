@@ -50,3 +50,19 @@ class TestConsole(unittest.TestCase):
         _check = _console.setup()
         self.assertTrue(_check)
         return
+
+    def test_setup_02(self):
+        _console = AppConsole()
+        _console.module_path = "testdata.app.xcommands"
+
+        _check = _console.setup()
+        self.assertFalse(_check)
+        return
+
+    def test_setup_03(self):
+        _console = AppConsole()
+        _console.filename = "fuhhhhhhh"
+
+        _check = _console.setup()
+        self.assertFalse(_check)
+        return

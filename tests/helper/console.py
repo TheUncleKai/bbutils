@@ -18,6 +18,8 @@
 
 import os
 
+from dataclasses import dataclass
+
 from bbutil.utils import full_path
 from bbutil.logging import Logging
 from bbutil.app import Console, Config
@@ -36,7 +38,15 @@ _index = {
 }
 
 
+@dataclass
 class AppConsole(Console):
+
+    filename: str = ""
+
+    def __post_init__(self):
+        self.init()
+        self.filename = full_path("{0:s}/testdata/config01.json".format(os.getcwd()))
+        return
 
     def create_logging(self) -> Logging:
         _log = Logging()
@@ -52,8 +62,7 @@ class AppConsole(Console):
         if os.path.exists(_work) is False:
             os.mkdir(_work)
 
-        _filename = full_path("{0:s}/testdata/config01.json".format(os.getcwd()))
-        _config = AppConfig(use_config=True, config_filename=_filename)
+        _config = AppConfig(use_config=True, config_filename=self.filename)
         return _config
 
     def init(self):
