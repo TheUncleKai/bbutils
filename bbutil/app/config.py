@@ -147,27 +147,6 @@ class Config(metaclass=ABCMeta):
         return True
 
     @abc.abstractmethod
-    def check_config(self) -> bool:
-        pass
-
-    def init(self) -> bool:
-        check = self._init_parser()
-        if check is False:
-            return False
-
-        check = self._load_config()
-        if check is False:
-            return False
-
-        check = self.check_config()
-        if check is False:
-            bbutil.log.error("Config check has failed!")
-            return False
-
-        self._is_valid = True
-        return True
-
-    @abc.abstractmethod
     def create_config(self) -> dict:
         pass
 
@@ -195,4 +174,29 @@ class Config(metaclass=ABCMeta):
 
         f.write(_data)
         f.close()
+        return True
+
+    @abc.abstractmethod
+    def check_config(self) -> bool:
+        pass
+
+    def init(self) -> bool:
+        if (self.use_config is False) and (self.use_parser is False):
+            self._is_valid = True
+            return True
+
+        check = self._init_parser()
+        if check is False:
+            return False
+
+        check = self._load_config()
+        if check is False:
+            return False
+
+        check = self.check_config()
+        if check is False:
+            bbutil.log.error("Config check has failed!")
+            return False
+
+        self._is_valid = True
         return True
