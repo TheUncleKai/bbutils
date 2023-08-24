@@ -16,10 +16,16 @@
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
 
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
+
+import bbutil
+
 from bbutil.app.config import Config
 
+from bbutil.utils import check_object, check_dict
+
 __all__ = [
+    "AppConfig"
 ]
 
 
@@ -27,8 +33,40 @@ __all__ = [
 class AppConfig(Config):
 
     bla: str = ""
-    bleb: str = ""
+    bleb: int = 0
 
     def setup_parser(self):
+        self.parser.add_argument("-b", "--bla", help="bla binary", type=str, default="/user/bin/bla")
+        self.parser.add_argument("-b", "--bleb", help="bleb settings", type=int, default=5)
         return
 
+    def read_parser(self, options) -> bool:
+        _check = check_object(options, ["bla", "bleb"])
+        if _check is False:
+            bbutil.log.error("Parser arguments are not complete!")
+            return False
+
+        self.bla = options.bla
+        self.bleb = options.bleb
+        return True
+
+    def parse_config(self, config: dict) -> bool:
+        _check = check_dict(config, ["bla", "bleb"])
+        if _check is False:
+            bbutil.log.error("Config is not complete!")
+            return False
+        return True
+
+    def check_config(self) -> bool:
+        if self.bla == "":
+            bbutil.log.error("bla is missing!")
+            return False
+
+        if self.bleb < 0:
+            bbutil.log.error("bleb is invalid!")
+            return False
+        return True
+
+    def create_config(self) -> dict:
+        _config = asdict(self)
+        return _config

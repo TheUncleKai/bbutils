@@ -404,6 +404,14 @@
                 "test_load_03",
                 "test_init_04"
             ]
+        },
+        {
+            "id": "App.Config",
+            "path": "tests.app.config",
+            "classname": "TestConfig",
+            "tests": [
+                "test_init_01"
+            ]
         }
     ]
 }

@@ -25,6 +25,7 @@ from bbutil.database import SQLite
 from bbutil.utils import full_path
 
 __all__ = [
+    "config",
     "database",
     "execute",
     "file",
