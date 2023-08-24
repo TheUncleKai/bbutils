@@ -45,6 +45,10 @@ class Worker(metaclass=ABCMeta):
     _error: bool = False
     _running: bool = True
 
+    def __post_init__(self):
+        self.init()
+        return
+
     @property
     def id(self) -> str:
         return self._id
