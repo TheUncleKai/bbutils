@@ -16,16 +16,11 @@
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
 
-import os
+import sys
 import unittest
 
-import unittest.mock as mock
+from unittest.mock import patch, Mock
 
-import bbutil
-from bbutil.utils import full_path, openjson
-
-
-from tests.helper import set_log, set_module
 from tests.helper.console import AppConsole
 
 
@@ -34,8 +29,8 @@ __all__ = [
 ]
 
 oserror = OSError("Something strange did happen!")
-mock_oserror = mock.Mock(side_effect=oserror)
-mock_remove = mock.Mock()
+mock_oserror = Mock(side_effect=oserror)
+mock_remove = Mock()
 
 
 class TestConsole(unittest.TestCase):
@@ -73,4 +68,21 @@ class TestConsole(unittest.TestCase):
 
         _check = _console.setup()
         self.assertFalse(_check)
+        return
+
+    def test_execute_01(self):
+        _console = AppConsole()
+
+        _argv = [
+            "run-tests.py",
+            "test01"
+        ]
+
+        _check1 = _console.setup()
+
+        with patch("sys.argv", _argv):
+            _ret = _console.execute()
+
+        self.assertTrue(_check1)
+        self.assertEqual(_ret, 0)
         return

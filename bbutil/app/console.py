@@ -132,6 +132,8 @@ class Console(metaclass=ABCMeta):
         if check is False:
             return False
 
+        bbutil.log.inform("App", "Start {0:s}".format(self.command_id))
+
         check = self.start()
         if check is False:
             return 1

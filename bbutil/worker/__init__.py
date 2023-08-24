@@ -110,6 +110,8 @@ class Worker(metaclass=ABCMeta):
         self._running = True
         self._callback.do_start()
 
+        bbutil.log.inform(self.id, "Execute")
+
         self._do_step("prepare", self.prepare, self._callback.do_prepare)
         if self._running is False:
             self._callback.do_stop()
