@@ -16,7 +16,6 @@
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
 
-import sys
 import unittest
 
 from unittest.mock import patch, Mock
@@ -93,6 +92,7 @@ class TestConsole(unittest.TestCase):
 
         _check1 = _console.setup()
 
+        # noinspection PyTypeChecker
         bbutil.set_config(None)
 
         _ret = _console.execute()
@@ -169,4 +169,21 @@ class TestConsole(unittest.TestCase):
 
         self.assertTrue(_check1)
         self.assertEqual(_ret, 4)
+        return
+
+    def test_execute_07(self):
+        _console = AppConsole()
+
+        _argv = [
+            "run-tests.py",
+            "test06"
+        ]
+
+        _check1 = _console.setup()
+
+        with patch("sys.argv", _argv):
+            _ret = _console.execute()
+
+        self.assertTrue(_check1)
+        self.assertEqual(_ret, 3)
         return

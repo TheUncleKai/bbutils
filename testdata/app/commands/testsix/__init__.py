@@ -16,11 +16,11 @@
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
 
+__command__ = "test06"
+
+__desc__ = "the first test"
+
 __all__ = [
-    "testone",
-    "testtwo",
-    "testthree",
-    "testfour",
-    "testfive",
-    "testsix"
+    "prepact",
+    "runact"
 ]
