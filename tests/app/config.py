@@ -51,6 +51,10 @@ class TestConfig(unittest.TestCase):
     def test_init_01(self):
         self.assertIsNotNone(bbutil.module)
 
+        _work = "{0:s}/test".format(os.getcwd())
+        if os.path.exists(_work) is False:
+            os.mkdir(_work)
+
         _config = AppConfig(use_parser=True)
 
         _check2 = _config.init()
@@ -60,6 +64,7 @@ class TestConfig(unittest.TestCase):
         self.assertEqual(_config.bla, "/usr/local/bin/bla")
         self.assertEqual(_config.bleb, 10)
         self.assertEqual(_config.ls, "/usr/bin/ls")
+        self.assertEqual(_config.work, _work)
         return
 
     @mock.patch('argparse.ArgumentParser', new=MockArgumentParser01)
@@ -111,6 +116,10 @@ class TestConfig(unittest.TestCase):
     def test_init_06(self):
         self.assertIsNotNone(bbutil.module)
 
+        _work = "{0:s}/test".format(os.getcwd())
+        if os.path.exists(_work) is False:
+            os.mkdir(_work)
+
         _filename = full_path("{0:s}/testdata/config01.json".format(os.getcwd()))
         _config = AppConfig(use_config=True, config_filename=_filename)
 
@@ -121,6 +130,7 @@ class TestConfig(unittest.TestCase):
         self.assertEqual(_config.bla, "/usr/local/bin/bla")
         self.assertEqual(_config.bleb, 10)
         self.assertEqual(_config.ls, "/usr/bin/ls")
+        self.assertEqual(_config.work, _work)
         return
 
     def test_init_07(self):
@@ -171,6 +181,17 @@ class TestConfig(unittest.TestCase):
         self.assertIsNotNone(bbutil.module)
 
         _config = AppConfig(use_parser=True)
+
+        _check2 = _config.init()
+        self.assertFalse(_check2)
+        self.assertFalse(_config.valid)
+        return
+
+    def test_init_12(self):
+        self.assertIsNotNone(bbutil.module)
+
+        _filename = full_path("{0:s}/testdata/config04.json".format(os.getcwd()))
+        _config = AppConfig(use_config=True, config_filename=_filename)
 
         _check2 = _config.init()
         self.assertFalse(_check2)

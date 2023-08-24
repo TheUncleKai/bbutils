@@ -49,16 +49,6 @@ class Config(metaclass=ABCMeta):
             return False
         return True
 
-    @staticmethod
-    def path_exists(input_path) -> bool:
-        if input_path == "":
-            bbutil.log.error("Path is empty!")
-            return False
-        if os.path.exists(input_path) is False:
-            bbutil.log.error("Unable to find: {0:s}".format(input_path))
-            return False
-        return True
-
     def prepare_parser(self) -> bool:
         self.parser: argparse.ArgumentParser = argparse.ArgumentParser()
 

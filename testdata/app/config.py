@@ -22,7 +22,7 @@ import bbutil
 
 from bbutil.app.config import Config
 
-from bbutil.utils import check_object, check_dict
+from bbutil.utils import check_object, check_dict, full_path
 
 __all__ = [
     "AppConfig"
@@ -53,6 +53,7 @@ class AppConfig(Config):
         self.bla = options.bla
         self.bleb = options.bleb
         self.ls = options.ls
+        self.work = full_path(options.work)
         return True
 
     def parse_config(self, config: dict) -> bool:
@@ -63,7 +64,7 @@ class AppConfig(Config):
         self.bla = config["bla"]
         self.bleb = config["bleb"]
         self.ls = config["ls"]
-        self.work = config["work"]
+        self.work = full_path(config["work"])
         return True
 
     def check_config(self) -> bool:
@@ -74,7 +75,12 @@ class AppConfig(Config):
         if self.bleb < 0:
             bbutil.log.error("bleb is invalid!")
             return False
+
         check = self.check_path(self.ls)
+        if check is False:
+            return False
+
+        check = self.check_path(self.work)
         if check is False:
             return False
         return True
