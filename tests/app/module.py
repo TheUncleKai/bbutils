@@ -62,6 +62,26 @@ class TestModule(unittest.TestCase):
         self.assertFalse(_check1)
         return
 
+    def test_init_03(self):
+        _module = Module()
+
+        _path = "testdata.app.commands"
+        _name = "testfour"
+        _check1 = _module.init(_path, _name)
+
+        self.assertFalse(_check1)
+        return
+
+    def test_init_04(self):
+        _module = Module()
+
+        _path = "testdata.app.commands"
+        _name = "testfive"
+        _check1 = _module.init(_path, _name)
+
+        self.assertFalse(_check1)
+        return
+
     def test_load_01(self):
         _module = Module()
 
@@ -107,7 +127,7 @@ class TestModule(unittest.TestCase):
         self.assertIsNone(_worker)
         return
 
-    def test_init_04(self):
+    def test_load_04(self):
         _module = Module()
 
         _path = "testdata.app.commands"
