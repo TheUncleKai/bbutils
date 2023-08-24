@@ -72,6 +72,10 @@ class Worker01(Worker):
     exit_run: bool = True
     exit_close: bool = True
 
+    def init(self):
+        self.set_id("Worker01")
+        return
+
     def prepare(self) -> bool:
         return self.exit_prepare
 
@@ -87,6 +91,10 @@ class Worker02(Worker):
 
     max: int = 50000
     iterate_list: List[int] = field(default_factory=list)
+
+    def init(self):
+        self.set_id("Worker02")
+        return
 
     def prepare(self) -> bool:
         _max = self.max

@@ -62,7 +62,10 @@ class Module(object):
         return True
 
     def load(self) -> bool:
-        for item in self._module.__all__:
+
+        _worker_list = self._module.__all__
+
+        for item in _worker_list:
             _path = "{0:s}.{1:s}".format(self.path, item)
 
             try:

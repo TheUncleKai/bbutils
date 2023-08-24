@@ -98,8 +98,27 @@ class TestModule(unittest.TestCase):
         _check1 = _module.init(_path, _name)
         _check2 = _module.load()
 
+        _worker = _module.get_worker("Act01")
+
         self.assertTrue(_check1)
         self.assertFalse(_check2)
         self.assertEqual(_module.command, "test03")
         self.assertEqual(_module.desc, "the third test")
+        self.assertIsNone(_worker)
+        return
+
+    def test_init_04(self):
+        _module = Module()
+
+        _path = "testdata.commands"
+        _name = "testone"
+        _check1 = _module.init(_path, _name)
+        _check2 = _module.load()
+
+        _worker = _module.get_worker("Act01")
+
+        self.assertTrue(_check1)
+        self.assertEqual(_module.command, "test01")
+        self.assertEqual(_module.desc, "the first test")
+        self.assertIsNotNone(_worker)
         return
