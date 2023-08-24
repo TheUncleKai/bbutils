@@ -81,6 +81,8 @@ class TestConfig(unittest.TestCase):
     @mock.patch('argparse.ArgumentParser', new=MockArgumentParser01)
     def test_init_03(self):
         bbutil.module = None
+
+        # noinspection PyTypeChecker
         bbutil.set_module(None)
         self.assertIsNone(bbutil.module)
 
