@@ -34,7 +34,10 @@ class Console(metaclass=ABCMeta):
         self.init()
         return
 
-    def _set_command(self, config: Config) -> bool:
+    def _set_command(self) -> bool:
+        if bbutil.config is None:
+            bbutil.log.error("Config is missing!")
+            return False
 
         if self.command_id == "":
             command_names = sys.argv[1:]
@@ -48,8 +51,8 @@ class Console(metaclass=ABCMeta):
                 break
 
         if self.command_id == "":
-            config.prepare_parser()
-            config.parser.print_help()
+            bbutil.config.prepare_parser()
+            bbutil.config.parser.print_help()
             return False
 
         _module = bbutil.module.get_command(self.command_id)
@@ -57,7 +60,6 @@ class Console(metaclass=ABCMeta):
             sys.stderr.write("Command is not known: {0:s}".format(self.command_id))
             return False
 
-        bbutil.set_config(config)
         self.module = _module
 
         bbutil.log.debug1("Console", self.command_id)
@@ -100,13 +102,11 @@ class Console(metaclass=ABCMeta):
     def _setup_config(self) -> bool:
         _config = self.create_config()
 
-        check = self._set_command(_config)
-        if check is False:
-            return False
-
         check = _config.init()
         if check is False:
             return False
+
+        bbutil.set_config(_config)
         return True
 
     def setup(self) -> bool:
@@ -128,6 +128,9 @@ class Console(metaclass=ABCMeta):
         return True
 
     def execute(self) -> int:
+        check = self._set_command()
+        if check is False:
+            return False
 
         check = self.start()
         if check is False:
