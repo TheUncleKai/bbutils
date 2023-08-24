@@ -422,7 +422,9 @@
                 "test_init_10",
                 "test_init_11",
                 "test_init_12",
-                "test_store_01"
+                "test_store_01",
+                "test_store_02",
+                "test_store_03"
             ]
         }
     ]

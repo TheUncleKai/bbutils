@@ -142,6 +142,7 @@ class Config(metaclass=ABCMeta):
             return True
 
         if self.config_filename == "":
+            self._is_valid = False
             bbutil.log.error("No filename for storing!")
             return False
 
