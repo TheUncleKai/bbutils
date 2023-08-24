@@ -17,8 +17,7 @@
 #
 
 import unittest
-
-import unittest.mock as mock
+import time
 
 from tests.helper import set_log
 from tests.helper.worker import CallManager, Worker01, Worker02
@@ -26,10 +25,6 @@ from tests.helper.worker import CallManager, Worker01, Worker02
 __all__ = [
     "TestWorker"
 ]
-
-oserror = OSError("Something strange did happen!")
-mock_oserror = mock.Mock(side_effect=oserror)
-mock_remove = mock.Mock()
 
 
 class TestWorker(unittest.TestCase):
@@ -40,16 +35,17 @@ class TestWorker(unittest.TestCase):
         return
 
     def test_worker_01(self):
-        _worker = Worker01(id="Worker01")
+        _worker = Worker01()
 
         _check = _worker.execute()
+        self.assertEqual(_worker.id, "Worker01")
         self.assertTrue(_check)
         self.assertFalse(_worker.error)
         return
 
     def test_worker_02(self):
         _calls = CallManager()
-        _worker = Worker01(id="Worker01")
+        _worker = Worker01()
         _calls.setup(_worker)
 
         _worker.start()
@@ -68,7 +64,7 @@ class TestWorker(unittest.TestCase):
 
     def test_worker_03(self):
         _calls = CallManager()
-        _worker = Worker01(id="Worker01", exit_prepare=False)
+        _worker = Worker01(exit_prepare=False)
         _calls.setup(_worker)
 
         _check = _worker.execute()
@@ -86,7 +82,7 @@ class TestWorker(unittest.TestCase):
 
     def test_worker_04(self):
         _calls = CallManager()
-        _worker = Worker01(id="Worker01", exit_run=False)
+        _worker = Worker01(exit_run=False)
         _calls.setup(_worker)
 
         _check = _worker.execute()
@@ -104,7 +100,7 @@ class TestWorker(unittest.TestCase):
 
     def test_worker_05(self):
         _calls = CallManager()
-        _worker = Worker01(id="Worker01", exit_close=False)
+        _worker = Worker01(exit_close=False)
         _calls.setup(_worker)
 
         _check = _worker.execute()
@@ -122,7 +118,7 @@ class TestWorker(unittest.TestCase):
 
     def test_worker_06(self):
         _calls = CallManager()
-        _worker = Worker01(id="Worker01")
+        _worker = Worker01()
         _calls.setup(_worker)
 
         _worker.start()
@@ -141,11 +137,12 @@ class TestWorker(unittest.TestCase):
 
     def test_worker_07(self):
         _calls = CallManager()
-        _worker = Worker02(id="Worker02", max=250000)
+        _worker = Worker02(max=250000)
         _calls.setup(_worker)
 
         _worker.start()
         _check1 = _worker.is_running
+        time.sleep(1)
         _worker.abort = True
 
         _worker.wait()
@@ -161,7 +158,7 @@ class TestWorker(unittest.TestCase):
         return
 
     def test_worker_08(self):
-        _worker = Worker02(id="Worker02", max=250000)
+        _worker = Worker02(max=250000)
 
         _worker.start()
         _check1 = _worker.is_running

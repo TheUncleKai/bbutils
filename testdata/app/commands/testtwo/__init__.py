@@ -16,17 +16,10 @@
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
 
-__all__ = [
-    "app",
-    "database",
-    "helper",
-    "lang",
-    "logging",
+__command__ = "test02"
 
-    "data",
-    "execute",
-    "file",
-    "ssetup",
-    "utils",
-    "worker"
+__desc__ = "the second test"
+
+__all__ = [
+    "prepact"
 ]

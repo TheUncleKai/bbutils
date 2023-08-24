@@ -37,17 +37,33 @@ __all__ = [
 @dataclass
 class Worker(metaclass=ABCMeta):
 
-    id: str = ""
     abort: bool = False
     interval: float = 0.01
 
+    _id: str = ""
     _callback: Optional[Callback] = None
     _error: bool = False
     _running: bool = True
 
+    def __post_init__(self):
+        self.init()
+        return
+
+    @property
+    def id(self) -> str:
+        return self._id
+
     @property
     def error(self) -> bool:
         return self._error
+
+    def set_id(self, new_id: str):
+        self._id = new_id
+        return
+
+    @abc.abstractmethod
+    def init(self):
+        pass
 
     @abc.abstractmethod
     def prepare(self) -> bool:
@@ -73,7 +89,7 @@ class Worker(metaclass=ABCMeta):
             self._running = False
             self.abort = False
             self._callback.do_abort()
-            bbutil.log.warn(self.id, "Abort {0:s}".format(step))
+            bbutil.log.warn(self._id, "Abort {0:s}".format(step))
             return
 
         callback_func()
@@ -93,6 +109,8 @@ class Worker(metaclass=ABCMeta):
 
         self._running = True
         self._callback.do_start()
+
+        bbutil.log.inform(self.id, "Execute")
 
         self._do_step("prepare", self.prepare, self._callback.do_prepare)
         if self._running is False:

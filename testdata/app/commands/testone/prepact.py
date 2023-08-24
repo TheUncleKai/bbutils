@@ -23,77 +23,21 @@ import bbutil
 
 from bbutil.worker import Worker
 
+__worker__ = "Worker01"
+
 __all__ = [
-    "CallManager",
-    "Worker01",
-    "Worker02"
+    "Worker01"
 ]
-
-
-@dataclass
-class CallManager(object):
-
-    start: int = 0
-    stop: int = 0
-    prepare: int = 0
-    run: int = 0
-    close: int = 0
-    abort: int = 0
-
-    def count(self, name: str):
-        _value = getattr(self, name)
-        _value += 1
-        setattr(self, name, _value)
-        return
-
-    def setup(self, worker: Worker):
-        worker.set_callback(start=lambda: self.count("start"))
-        worker.set_callback(stop=lambda: self.count("stop"))
-        worker.set_callback(prepare=lambda: self.count("prepare"))
-        worker.set_callback(run=lambda: self.count("run"))
-        worker.set_callback(close=lambda: self.count("close"))
-        worker.set_callback(abort=lambda: self.count("abort"))
-        return
-
-    def info(self):
-        bbutil.log.inform("start", "{0:d}".format(self.start))
-        bbutil.log.inform("stop", "{0:d}".format(self.stop))
-        bbutil.log.inform("prepare", "{0:d}".format(self.prepare))
-        bbutil.log.inform("run", "{0:d}".format(self.run))
-        bbutil.log.inform("close", "{0:d}".format(self.close))
-        bbutil.log.inform("abort", "{0:d}".format(self.abort))
-        return
 
 
 @dataclass
 class Worker01(Worker):
 
-    exit_prepare: bool = True
-    exit_run: bool = True
-    exit_close: bool = True
-
-    def init(self):
-        self.set_id("Worker01")
-        return
-
-    def prepare(self) -> bool:
-        return self.exit_prepare
-
-    def run(self) -> bool:
-        return self.exit_run
-
-    def close(self) -> bool:
-        return self.exit_close
-
-
-@dataclass
-class Worker02(Worker):
-
     max: int = 50000
     iterate_list: List[int] = field(default_factory=list)
 
     def init(self):
-        self.set_id("Worker02")
+        self.set_id("Act01")
         return
 
     def prepare(self) -> bool:

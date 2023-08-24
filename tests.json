@@ -391,6 +391,71 @@
                 "test_find_data_files_01",
                 "test_find_data_files_02"
             ]
+        },
+        {
+            "id": "App.Module",
+            "path": "tests.app.module",
+            "classname": "TestModule",
+            "tests": [
+                "test_init_01",
+                "test_init_02",
+                "test_init_03",
+                "test_init_04",
+                "test_load_01",
+                "test_load_02",
+                "test_load_03",
+                "test_load_04"
+            ]
+        },
+        {
+            "id": "App.Config",
+            "path": "tests.app.config",
+            "classname": "TestConfig",
+            "tests": [
+                "test_init_01",
+                "test_init_02",
+                "test_init_03",
+                "test_init_04",
+                "test_init_05",
+                "test_init_06",
+                "test_init_07",
+                "test_init_08",
+                "test_init_09",
+                "test_init_10",
+                "test_init_11",
+                "test_init_12",
+                "test_store_01",
+                "test_store_02",
+                "test_store_03",
+                "test_store_04"
+            ]
+        },
+        {
+            "id": "App.Manager",
+            "path": "tests.app.manager",
+            "classname": "TestManager",
+            "tests": [
+                "test_init_01",
+                "test_init_02"
+            ]
+        },
+        {
+            "id": "App.Console",
+            "path": "tests.app.console",
+            "classname": "TestConsole",
+            "tests": [
+                "test_setup_01",
+                "test_setup_02",
+                "test_setup_03",
+                "test_setup_04",
+                "test_execute_01",
+                "test_execute_02",
+                "test_execute_03",
+                "test_execute_04",
+                "test_execute_05",
+                "test_execute_06",
+                "test_execute_07"
+            ]
         }
     ]
 }

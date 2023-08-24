@@ -3,6 +3,7 @@
 omit =
     # omit everything in test
     tests/*
+    testdata/*
     run-tests.py
 
 [report]

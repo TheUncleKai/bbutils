@@ -37,8 +37,8 @@ class TestSetup(unittest.TestCase):
     def test_find_data_files_01(self):
         package_files1 = []
         package_files2 = []
-        _package = find_data_files("testdata", "data", package_files1, [])
-        _package = find_data_files("testdata", "data", package_files2, [".py"])
+        find_data_files("testdata", "data", package_files1, ["app", ".json"])
+        find_data_files("testdata", "data", package_files2, ["app", ".py", ".json"])
 
         self.assertListEqual(testdata1, package_files1)
         self.assertListEqual(testdata2, package_files2)
@@ -46,7 +46,7 @@ class TestSetup(unittest.TestCase):
 
     def test_find_data_files_02(self):
         package_files2 = []
-        _package = find_data_files("testdata", "data", package_files2, [".py", "testlang"])
+        find_data_files("testdata", "data", package_files2, ["app", ".json", ".py", "testlang"])
 
         self.assertListEqual(testdata2, package_files2)
         return
