@@ -21,7 +21,9 @@ from unittest.mock import Mock
 __all__ = [
     "MockArgumentParser01",
     "MockArgumentParser02",
-    "MockArgumentParser03"
+    "MockArgumentParser03",
+    "MockArgumentParser04",
+    "MockArgumentParser05"
 ]
 
 
@@ -32,6 +34,7 @@ class _Options01(object):
         self.bleb = 10
         self.verbose = 0
         self.ls = "/usr/bin/ls"
+        self.work = "test"
         return
 
 
@@ -49,6 +52,7 @@ class _Options02(object):
         self.bla = "/usr/local/bin/bla"
         self.bleb = 10
         self.ls = "/usr/bin/ls"
+        self.work = "test"
         return
 
 
@@ -66,6 +70,7 @@ class _Options03(object):
         self.bla = "/usr/local/bin/bla"
         self.bleb = 10
         self.verbose = 0
+        self.work = "test"
         return
 
 
@@ -74,4 +79,42 @@ class MockArgumentParser03(object):
     def __init__(self):
         self.add_argument = Mock()
         self.parse_args = Mock(return_value=_Options03())
+        return
+
+
+class _Options04(object):
+
+    def __init__(self):
+        self.bla = "/usr/local/bin/bla"
+        self.bleb = 10
+        self.verbose = 0
+        self.ls = "/usr/toilet/ls"
+        self.work = "test"
+        return
+
+
+class MockArgumentParser04(object):
+
+    def __init__(self):
+        self.add_argument = Mock()
+        self.parse_args = Mock(return_value=_Options04())
+        return
+
+
+class _Options05(object):
+
+    def __init__(self):
+        self.bla = "/usr/local/bin/bla"
+        self.bleb = 10
+        self.verbose = 0
+        self.ls = ""
+        self.work = "test"
+        return
+
+
+class MockArgumentParser05(object):
+
+    def __init__(self):
+        self.add_argument = Mock()
+        self.parse_args = Mock(return_value=_Options05())
         return

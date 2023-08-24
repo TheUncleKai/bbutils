@@ -2,5 +2,6 @@
     "verbose": 0,
     "bla": "/usr/local/bin/bla",
     "bleb": 10,
-    "ls": "/usr/bin/ls"
+    "ls": "/usr/bin/ls",
+    "work": "test"
 }

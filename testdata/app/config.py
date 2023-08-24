@@ -35,15 +35,17 @@ class AppConfig(Config):
     bla: str = ""
     ls: str = ""
     bleb: int = 0
+    work: str = ""
 
     def setup_parser(self):
         self.parser.add_argument("-b", "--bla", help="bla binary", type=str, default="/usr/bin/bla")
         self.parser.add_argument("-e", "--bleb", help="bleb settings", type=int, default=5)
         self.parser.add_argument("-l", "--ls", help="bleb settings", type=str, default="/usr/bin/ls")
+        self.parser.add_argument("-w", "--work", help="work folder", type=str, default="test")
         return
 
     def read_parser(self, options) -> bool:
-        _check = check_object(options, ["bla", "bleb", "ls"])
+        _check = check_object(options, ["bla", "bleb", "ls", "work"])
         if _check is False:
             bbutil.log.error("Parser arguments are not complete!")
             return False
@@ -54,13 +56,14 @@ class AppConfig(Config):
         return True
 
     def parse_config(self, config: dict) -> bool:
-        _check = check_dict(config, ["bla", "bleb", "ls"])
+        _check = check_dict(config, ["bla", "bleb", "ls", "work"])
         if _check is False:
             bbutil.log.error("Config is not complete!")
             return False
         self.bla = config["bla"]
         self.bleb = config["bleb"]
         self.ls = config["ls"]
+        self.work = config["work"]
         return True
 
     def check_config(self) -> bool:

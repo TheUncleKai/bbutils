@@ -1,5 +1,6 @@
 {
     "verbose": 0,
     "bla": "/usr/local/bin/bla",
-    "bleb": 10
+    "bleb": 10,
+    "work": "test"
 }

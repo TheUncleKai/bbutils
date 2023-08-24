@@ -25,7 +25,8 @@ import bbutil
 from bbutil.utils import full_path
 
 from tests.helper import set_log, set_module
-from tests.helper.config import MockArgumentParser01, MockArgumentParser02, MockArgumentParser03
+from tests.helper.config import (MockArgumentParser01, MockArgumentParser02, MockArgumentParser03,
+                                 MockArgumentParser04, MockArgumentParser05)
 
 from testdata.app.config import AppConfig
 
@@ -54,6 +55,7 @@ class TestConfig(unittest.TestCase):
 
         _check2 = _config.init()
         self.assertTrue(_check2)
+        self.assertTrue(_config.valid)
         self.assertEqual(_config.verbose, 0)
         self.assertEqual(_config.bla, "/usr/local/bin/bla")
         self.assertEqual(_config.bleb, 10)
@@ -68,6 +70,7 @@ class TestConfig(unittest.TestCase):
 
         _check2 = _config.init()
         self.assertTrue(_check2)
+        self.assertTrue(_config.valid)
         return
 
     @mock.patch('argparse.ArgumentParser', new=MockArgumentParser01)
@@ -80,6 +83,7 @@ class TestConfig(unittest.TestCase):
 
         _check2 = _config.init()
         self.assertFalse(_check2)
+        self.assertFalse(_config.valid)
         return
 
     @mock.patch('argparse.ArgumentParser', new=MockArgumentParser02)
@@ -90,6 +94,7 @@ class TestConfig(unittest.TestCase):
 
         _check2 = _config.init()
         self.assertFalse(_check2)
+        self.assertFalse(_config.valid)
         return
 
     @mock.patch('argparse.ArgumentParser', new=MockArgumentParser03)
@@ -100,6 +105,7 @@ class TestConfig(unittest.TestCase):
 
         _check2 = _config.init()
         self.assertFalse(_check2)
+        self.assertFalse(_config.valid)
         return
 
     def test_init_06(self):
@@ -110,6 +116,7 @@ class TestConfig(unittest.TestCase):
 
         _check2 = _config.init()
         self.assertTrue(_check2)
+        self.assertTrue(_config.valid)
         self.assertEqual(_config.verbose, 0)
         self.assertEqual(_config.bla, "/usr/local/bin/bla")
         self.assertEqual(_config.bleb, 10)
@@ -123,6 +130,7 @@ class TestConfig(unittest.TestCase):
 
         _check2 = _config.init()
         self.assertFalse(_check2)
+        self.assertFalse(_config.valid)
         return
 
     def test_init_08(self):
@@ -133,6 +141,7 @@ class TestConfig(unittest.TestCase):
 
         _check2 = _config.init()
         self.assertFalse(_check2)
+        self.assertFalse(_config.valid)
         return
 
     def test_init_09(self):
@@ -143,4 +152,27 @@ class TestConfig(unittest.TestCase):
 
         _check2 = _config.init()
         self.assertFalse(_check2)
+        self.assertFalse(_config.valid)
+        return
+
+    @mock.patch('argparse.ArgumentParser', new=MockArgumentParser04)
+    def test_init_10(self):
+        self.assertIsNotNone(bbutil.module)
+
+        _config = AppConfig(use_parser=True)
+
+        _check2 = _config.init()
+        self.assertFalse(_check2)
+        self.assertFalse(_config.valid)
+        return
+
+    @mock.patch('argparse.ArgumentParser', new=MockArgumentParser05)
+    def test_init_11(self):
+        self.assertIsNotNone(bbutil.module)
+
+        _config = AppConfig(use_parser=True)
+
+        _check2 = _config.init()
+        self.assertFalse(_check2)
+        self.assertFalse(_config.valid)
         return
