@@ -16,7 +16,19 @@
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
 
+from dataclasses import dataclass
+from bbutil.app.config import Config
+
 __all__ = [
-    "commands",
-    "config"
 ]
+
+
+@dataclass
+class AppConfig(Config):
+
+    bla: str = ""
+    bleb: str = ""
+
+    def setup_parser(self):
+        return
+
