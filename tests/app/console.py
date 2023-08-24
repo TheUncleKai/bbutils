@@ -66,3 +66,11 @@ class TestConsole(unittest.TestCase):
         _check = _console.setup()
         self.assertFalse(_check)
         return
+
+    def test_setup_04(self):
+        _console = AppConsole()
+        _console.module_path = ""
+
+        _check = _console.setup()
+        self.assertFalse(_check)
+        return

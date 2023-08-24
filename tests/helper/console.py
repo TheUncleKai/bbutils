@@ -43,11 +43,6 @@ class AppConsole(Console):
 
     filename: str = ""
 
-    def __post_init__(self):
-        self.init()
-        self.filename = full_path("{0:s}/testdata/config01.json".format(os.getcwd()))
-        return
-
     def create_logging(self) -> Logging:
         _log = Logging()
         _log.setup(app="Test", level=2, index=_index)
@@ -67,6 +62,7 @@ class AppConsole(Console):
 
     def init(self):
         self.module_path = "testdata.app.commands"
+        self.filename = full_path("{0:s}/testdata/config01.json".format(os.getcwd()))
         return
 
     def start(self) -> bool:
