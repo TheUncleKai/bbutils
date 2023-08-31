@@ -471,26 +471,67 @@ class TestSQLite(unittest.TestCase):
         self._clean(_sqlite)
         return
 
-    def test_select_01(self):
-        _sqlite = get_sqlite(filename="test_select.sqlite", path="testdata/database")
+    @mock.patch('sqlite3.connect', new=get_sqlite_operational_error())
+    def test_update_05(self):
+        _sqlite = copy_sqlite(filename="test_update.sqlite", path="testdata/database")
+        _sqlite.prepare()
+
         _table = get_table_01(_sqlite)
 
-        _check1 = _sqlite.connect()
-        _count1 = _sqlite.count_table(_table.name)
+        _new = get_data_07()
+        sql_filter = "testid = ?"
+
+        _check = _sqlite.update(_table.name, _table.names, _new, sql_filter, 4)
+        self.assertFalse(_check)
+
+        self._clean(_sqlite)
+        return
+
+    @mock.patch('sqlite3.connect', new=get_sqlite_integrity_error())
+    def test_update_06(self):
+        _sqlite = copy_sqlite(filename="test_update.sqlite", path="testdata/database")
+        _sqlite.prepare()
+
+        _table = get_table_01(_sqlite)
+
+        _new = get_data_07()
+        sql_filter = "testid = ?"
+
+        _check = _sqlite.update(_table.name, _table.names, _new, sql_filter, 4)
+        self.assertFalse(_check)
+
+        self._clean(_sqlite)
+        return
+
+    def test_update_07(self):
+        _sqlite = copy_sqlite(filename="test_update.sqlite", path="testdata/database")
+        _sqlite.prepare()
+
+        _table = get_table_01(_sqlite)
+
+        _new = get_data_08()
+        sql_filter = "testid = ?"
+
+        _check = _sqlite.update(_table.name, _table.names, _new, sql_filter, 4)
+        self.assertFalse(_check)
+
+        self._clean(_sqlite)
+        return
+
+    def test_select_01(self):
+        _sqlite = get_sqlite(filename="test_select.sqlite", path="testdata/database")
+        _sqlite.prepare()
+
+        _table = get_table_01(_sqlite)
 
         _data_list = _sqlite.select(table_name=_table.name, names=[], sql_filter="", data=[])
-        _count2 = len(_data_list)
-
-        _check4 = _sqlite.disconnect()
+        _count = len(_data_list)
 
         _data = (1, True, "Test01", "testers/")
         _check_data = _data_list[0]
 
-        self.assertTrue(_check1)
-        self.assertEqual(_count1, 6)
-        self.assertEqual(_count2, 6)
+        self.assertEqual(_count, 6)
         self.assertSequenceEqual(_data, _check_data)
-        self.assertTrue(_check4)
         return
 
     def test_select_02(self):

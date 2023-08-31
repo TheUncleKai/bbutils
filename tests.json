@@ -275,7 +275,11 @@
                 "test_update_01",
                 "test_update_02",
                 "test_update_03",
-                "test_update_04"
+                "test_update_04",
+                "test_update_05",
+                "test_update_06",
+                "test_update_07",
+                "test_select_01"
             ]
         },
         {
