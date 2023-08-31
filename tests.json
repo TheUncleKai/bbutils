@@ -248,7 +248,13 @@
                 "test_check_03",
                 "test_check_04",
                 "test_check_05",
-                "test_check_06"
+                "test_check_06",
+                "test_count_01",
+                "test_count_02",
+                "test_count_03",
+                "test_count_04",
+                "test_count_05",
+                "test_prepare_table_01"
             ]
         },
         {

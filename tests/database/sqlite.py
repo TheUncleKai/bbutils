@@ -26,7 +26,7 @@ from bbutil.database import SQLite
 from bbutil.utils import full_path
 
 from tests.helper.sqlite import sqlite_operational_error, sqlite_integrity_error, sqlite_unknown_error
-from tests.helper.sqlite import get_test_check_03, get_test_check_04, get_test_check_05
+from tests.helper.sqlite import get_sqlite_01, get_sqlite_02, get_sqlite_03
 from tests.helper.sqlite import (get_table_01, get_data_01, get_data_02, get_data_03, get_data_04, get_data_05,
                                  get_data_06, get_data_07, get_data_08)
 
@@ -79,7 +79,7 @@ class TestSQLite(unittest.TestCase):
         self.assertTrue(_check)
         return
 
-    @mock.patch('sqlite3.connect', new=get_test_check_03())
+    @mock.patch('sqlite3.connect', new=get_sqlite_01())
     def test_check_03(self):
         _sqlite = get_sqlite(filename="test_check_table.sqlite", path="testdata/database")
         _sqlite.prepare()
@@ -88,7 +88,7 @@ class TestSQLite(unittest.TestCase):
         self.assertFalse(_check)
         return
 
-    @mock.patch('sqlite3.connect', new=get_test_check_04())
+    @mock.patch('sqlite3.connect', new=get_sqlite_02())
     def test_check_04(self):
         _sqlite = get_sqlite(filename="test_check_table.sqlite", path="testdata/database")
         _sqlite.prepare()
@@ -97,7 +97,7 @@ class TestSQLite(unittest.TestCase):
         self.assertFalse(_check)
         return
 
-    @mock.patch('bbutil.database.sqlite.manager.Connection.connect', new=get_test_check_05())
+    @mock.patch('bbutil.database.sqlite.manager.Connection.connect', new=get_sqlite_03())
     def test_check_05(self):
         _sqlite = get_sqlite(filename="test_check_table.sqlite", path="testdata/database")
         _sqlite.prepare()
@@ -106,7 +106,7 @@ class TestSQLite(unittest.TestCase):
         self.assertFalse(_check)
         return
 
-    @mock.patch('bbutil.database.sqlite.manager.Connection.release', new=get_test_check_05())
+    @mock.patch('bbutil.database.sqlite.manager.Connection.release', new=get_sqlite_03())
     def test_check_06(self):
         _sqlite = get_sqlite(filename="test_check_table.sqlite", path="testdata/database")
         _sqlite.prepare()
@@ -115,70 +115,56 @@ class TestSQLite(unittest.TestCase):
         self.assertFalse(_check)
         return
 
-    def test_count_table_01(self):
+    def test_count_01(self):
         _sqlite = get_sqlite(filename="test_check_table.sqlite", path="testdata/database")
+        _sqlite.prepare()
 
-        _check1 = _sqlite.connect()
-
-        _count = _sqlite.count_table("tester01")
-
-        _check2 = _sqlite.disconnect()
-
-        self.assertTrue(_check1)
+        _count = _sqlite.count("tester01")
         self.assertEqual(_count, 0)
-        self.assertTrue(_check2)
         return
 
-    def test_count_table_02(self):
+    @mock.patch('sqlite3.connect', new=get_sqlite_01())
+    def test_count_02(self):
         _sqlite = get_sqlite(filename="test_check_table.sqlite", path="testdata/database")
+        _sqlite.prepare()
 
-        _check1 = _sqlite.connect()
-
-        _cursor_mock = Mock()
-        _cursor_mock.execute = Mock(side_effect=sqlite_operational_error)
-
-        _class_mock = Mock()
-        _class_mock.cursor = Mock(return_value=_cursor_mock)
-
-        _sqlite.connection = _class_mock
-
-        _count = _sqlite.count_table("tester01")
-
-        _check2 = _sqlite.disconnect()
-
-        self.assertTrue(_check1)
+        _count = _sqlite.count("tester01")
         self.assertEqual(_count, -1)
-        self.assertTrue(_check2)
         return
 
-    def test_count_table_03(self):
+    def test_count_03(self):
+        _sqlite = get_sqlite(filename="test_select.sqlite", path="testdata/database")
+        _sqlite.prepare()
+
+        _count = _sqlite.count("tester01")
+        self.assertEqual(_count, 6)
+        return
+
+    @mock.patch('bbutil.database.sqlite.manager.Connection.connect', new=get_sqlite_03())
+    def test_count_04(self):
         _sqlite = get_sqlite(filename="test_check_table.sqlite", path="testdata/database")
+        _sqlite.prepare()
 
-        _check1 = _sqlite.connect()
-        _sqlite.connection = None
-
-        _count = _sqlite.count_table("tester01")
-
-        _check2 = _sqlite.disconnect()
-
-        self.assertTrue(_check1)
+        _count = _sqlite.count("tester01")
         self.assertEqual(_count, -1)
-        self.assertTrue(_check2)
+        return
+
+    @mock.patch('bbutil.database.sqlite.manager.Connection.release', new=get_sqlite_03())
+    def test_count_05(self):
+        _sqlite = get_sqlite(filename="test_check_table.sqlite", path="testdata/database")
+        _sqlite.prepare()
+
+        _count = _sqlite.count("tester01")
+        self.assertEqual(_count, -1)
         return
 
     def test_prepare_table_01(self):
         _sqlite = get_sqlite(filename="test.sqlite", clean=True)
+        _sqlite.prepare()
         _table = get_table_01(_sqlite)
 
-        _check1 = _sqlite.connect()
-
-        _check2 = _sqlite.prepare_table(_table.name, _table.column_list, _table.unique_list)
-
-        _check3 = _sqlite.disconnect()
-
-        self.assertTrue(_check1)
-        self.assertTrue(_check2)
-        self.assertTrue(_check3)
+        _check = _sqlite.prepare_table(_table.name, _table.column_list, _table.unique_list)
+        self.assertTrue(_check)
         return
 
     def test_prepare_table_02(self):
