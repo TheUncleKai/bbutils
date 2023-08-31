@@ -17,30 +17,21 @@
 #
 
 import sqlite3
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from multiprocessing import Lock
 from typing import Optional, List, Union
 
 import bbutil
+from bbutil.database.sqlite.types import Execute
 
 from bbutil.database.types import Data
 
 __all__ = [
-    "Select",
+    "types",
+    "manager",
+
     "SQLite"
 ]
-
-
-@dataclass
-class _Execute(object):
-    data: list = field(default_factory=list)
-    sql: str = ""
-
-
-@dataclass
-class Select(object):
-    number: int = -1
-    data: list = field(default_factory=list)
 
 
 @dataclass
@@ -221,7 +212,7 @@ class SQLite(object):
         return True
 
     @staticmethod
-    def _single_execute(table_name: str, names: list, data: Data) -> Optional[_Execute]:
+    def _single_execute(table_name: str, names: list, data: Data) -> Optional[Execute]:
         _data = []
         _names = ", ".join(names)
         _placeholder = ", ".join(['?'] * len(names))
@@ -236,11 +227,11 @@ class SQLite(object):
                 bbutil.log.error("Data format does not fit database table!")
                 return None
             _data.append(_value)
-        _execute = _Execute(sql=sql, data=_data)
+        _execute = Execute(sql=sql, data=_data)
         return _execute
 
     @staticmethod
-    def _many_execute(table_name: str, names: list, data_list: List[Data]) -> Optional[_Execute]:
+    def _many_execute(table_name: str, names: list, data_list: List[Data]) -> Optional[Execute]:
         _data = []
         _length = len(data_list)
         _names = ", ".join(names)
@@ -260,7 +251,7 @@ class SQLite(object):
                 _value.append(_ret)
             _data.append(_value)
 
-        _execute = _Execute(sql=sql, data=_data)
+        _execute = Execute(sql=sql, data=_data)
         return _execute
 
     def insert(self, table_name: str, names: list, data: Union[Data, List[Data]]) -> int:
