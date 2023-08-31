@@ -270,7 +270,9 @@
                 "test_insert_07",
                 "test_insert_08",
                 "test_insert_09",
-                "test_insert_10"
+                "test_insert_10",
+                "test_insert_11",
+                "test_update_01"
             ]
         },
         {
