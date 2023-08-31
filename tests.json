@@ -279,7 +279,13 @@
                 "test_update_05",
                 "test_update_06",
                 "test_update_07",
-                "test_select_01"
+                "test_select_01",
+                "test_select_02",
+                "test_select_03",
+                "test_select_04",
+                "test_select_05",
+                "test_select_06",
+                "test_select_07"
             ]
         },
         {

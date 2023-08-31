@@ -534,12 +534,33 @@ class TestSQLite(unittest.TestCase):
         self.assertSequenceEqual(_data, _check_data)
         return
 
+    @mock.patch('bbutil.database.sqlite.manager.Connection.connect', new=get_sqlite_return_false())
     def test_select_02(self):
         _sqlite = get_sqlite(filename="test_select.sqlite", path="testdata/database")
+        _sqlite.prepare()
+
         _table = get_table_01(_sqlite)
 
-        _check1 = _sqlite.connect()
-        _count1 = _sqlite.count_table(_table.name)
+        _data_list = _sqlite.select(table_name=_table.name, names=[], sql_filter="", data=[])
+        self.assertIsNone(_data_list)
+        return
+
+    @mock.patch('bbutil.database.sqlite.manager.Connection.release', new=get_sqlite_return_false())
+    def test_select_03(self):
+        _sqlite = get_sqlite(filename="test_select.sqlite", path="testdata/database")
+        _sqlite.prepare()
+
+        _table = get_table_01(_sqlite)
+
+        _data_list = _sqlite.select(table_name=_table.name, names=[], sql_filter="", data=[])
+        self.assertIsNone(_data_list)
+        return
+
+    def test_select_04(self):
+        _sqlite = get_sqlite(filename="test_select.sqlite", path="testdata/database")
+        _sqlite.prepare()
+
+        _table = get_table_01(_sqlite)
 
         sql_filter = "testid = ?"
         data_filter = [1]
@@ -547,24 +568,18 @@ class TestSQLite(unittest.TestCase):
         _data_list = _sqlite.select(table_name=_table.name, names=[], sql_filter=sql_filter, data=data_filter)
         _count2 = len(_data_list)
 
-        _check4 = _sqlite.disconnect()
-
         _data = (1, True, "Test01", "testers/")
         _check_data = _data_list[0]
 
-        self.assertTrue(_check1)
-        self.assertEqual(_count1, 6)
         self.assertEqual(_count2, 1)
         self.assertSequenceEqual(_data, _check_data)
-        self.assertTrue(_check4)
         return
 
-    def test_select_03(self):
+    def test_select_05(self):
         _sqlite = get_sqlite(filename="test_select.sqlite", path="testdata/database")
-        _table = get_table_01(_sqlite)
+        _sqlite.prepare()
 
-        _check1 = _sqlite.connect()
-        _count1 = _sqlite.count_table(_table.name)
+        _table = get_table_01(_sqlite)
 
         sql_filter = "testid = ?"
         data_filter = [1]
@@ -576,76 +591,36 @@ class TestSQLite(unittest.TestCase):
         _data_list = _sqlite.select(table_name=_table.name, names=names, sql_filter=sql_filter, data=data_filter)
         _count2 = len(_data_list)
 
-        _check4 = _sqlite.disconnect()
-
         _data = (1, True)
         _check_data = _data_list[0]
 
-        self.assertTrue(_check1)
-        self.assertEqual(_count1, 6)
         self.assertEqual(_count2, 1)
         self.assertSequenceEqual(_data, _check_data)
-        self.assertTrue(_check4)
         return
 
-    def test_select_04(self):
-        _sqlite = get_sqlite(filename="test_select.sqlite", path="testdata/database")
-        _table = get_table_01(_sqlite)
-
-        _check1 = _sqlite.connect()
-        _count1 = _sqlite.count_table(_table.name)
-
-        sql_filter = "testid = ?"
-        data_filter = [1]
-        names = [
-            "testid",
-            "use_test"
-        ]
-
-        _sqlite.connection = None
-
-        _data_list = _sqlite.select(table_name=_table.name, names=names, sql_filter=sql_filter, data=data_filter)
-
-        self.assertTrue(_check1)
-        self.assertEqual(_count1, 6)
-        self.assertIsNone(_data_list)
-        return
-
-    def test_select_05(self):
-        _sqlite = get_sqlite(filename="test_select.sqlite", path="testdata/database")
-        _table = get_table_01(_sqlite)
-
-        _check1 = _sqlite.connect()
-        _count1 = _sqlite.count_table(_table.name)
-
-        sql_filter = "testid = ?"
-        data_filter = [1]
-        names = [
-            "testid",
-            "use_test"
-        ]
-
-        _cursor_mock = Mock()
-        _cursor_mock.execute = Mock(side_effect=sqlite_operational_error)
-
-        _class_mock = Mock()
-        _class_mock.cursor = Mock(return_value=_cursor_mock)
-
-        _sqlite.connection = _class_mock
-
-        _data_list = _sqlite.select(table_name=_table.name, names=names, sql_filter=sql_filter, data=data_filter)
-
-        self.assertTrue(_check1)
-        self.assertEqual(_count1, 6)
-        self.assertIsNone(_data_list)
-        return
-
+    @mock.patch('sqlite3.connect', new=get_sqlite_operational_error())
     def test_select_06(self):
         _sqlite = get_sqlite(filename="test_select.sqlite", path="testdata/database")
+        _sqlite.prepare()
+
         _table = get_table_01(_sqlite)
 
-        _check1 = _sqlite.connect()
-        _count1 = _sqlite.count_table(_table.name)
+        sql_filter = "testid = ?"
+        data_filter = [1]
+        names = [
+            "testid",
+            "use_test"
+        ]
+
+        _data_list = _sqlite.select(table_name=_table.name, names=names, sql_filter=sql_filter, data=data_filter)
+        self.assertIsNone(_data_list)
+        return
+
+    def test_select_07(self):
+        _sqlite = get_sqlite(filename="test_select.sqlite", path="testdata/database")
+        _sqlite.prepare()
+
+        _table = get_table_01(_sqlite)
 
         sql_filter = "testid = ?"
         data_filter = [15235670141346654134]
@@ -656,7 +631,5 @@ class TestSQLite(unittest.TestCase):
 
         _data_list = _sqlite.select(table_name=_table.name, names=names, sql_filter=sql_filter, data=data_filter)
 
-        self.assertTrue(_check1)
-        self.assertEqual(_count1, 6)
         self.assertIsNone(_data_list)
         return
