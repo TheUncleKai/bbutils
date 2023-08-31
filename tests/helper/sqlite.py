@@ -28,7 +28,7 @@ __all__ = [
     "mock_operational_error",
 
     "get_sqlite_operational_error",
-    "get_sqlite_02",
+    "get_sqlite_integrity_error",
     "get_sqlite_return_false",
 
     "get_table_01",
@@ -59,9 +59,9 @@ def get_sqlite_operational_error():
     return _sqlite
 
 
-def get_sqlite_02():
+def get_sqlite_integrity_error():
     _cursor = mock.Mock(name="SQLite3.cursor")
-    _cursor.execute = mock.Mock(side_effect=sqlite_operational_error)
+    _cursor.execute = mock.Mock(side_effect=sqlite_integrity_error)
 
     _connection = mock.Mock(name="SQLite3.connect")
     _connection.cursor = mock.Mock(return_value=_cursor)
