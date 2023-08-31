@@ -20,12 +20,9 @@ import os
 import unittest
 import unittest.mock as mock
 
-from unittest.mock import Mock
-
 from bbutil.database import SQLite
 from bbutil.utils import full_path
 
-from tests.helper.sqlite import sqlite_operational_error, sqlite_integrity_error, sqlite_unknown_error
 from tests.helper.sqlite import get_sqlite_operational_error, get_sqlite_integrity_error, get_sqlite_return_false
 from tests.helper.sqlite import (get_table_01, get_data_01, get_data_02, get_data_03, get_data_04, get_data_05,
                                  get_data_06, get_data_07, get_data_08)
