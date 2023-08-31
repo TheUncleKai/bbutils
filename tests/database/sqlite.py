@@ -244,28 +244,28 @@ class TestSQLite(unittest.TestCase):
 
         _data = get_data_01()
         count2 = _sqlite.insert(_table.name, _table.names, _data)
+        count3 = _sqlite.count(_table.name)
 
         self.assertEqual(count1, 0)
         self.assertEqual(count2, 1)
+        self.assertEqual(count3, 1)
         return
 
     def test_insert_02(self):
         _sqlite = get_sqlite(filename="test.sqlite", clean=True)
+        _sqlite.prepare()
+
         _table = get_table_01(_sqlite)
 
-        _check1 = _sqlite.connect()
-
-        _check2 = _sqlite.prepare_table(_table.name, _table.column_list, _table.unique_list)
+        count1 = _sqlite.prepare_table(_table.name, _table.column_list, _table.unique_list)
 
         _data = get_data_02()
-        count = _sqlite.insert(_table.name, _table.names, _data)
+        count2 = _sqlite.insert(_table.name, _table.names, _data)
+        count3 = _sqlite.count(_table.name)
 
-        _check3 = _sqlite.disconnect()
-
-        self.assertTrue(_check1)
-        self.assertTrue(_check2)
-        self.assertEqual(count, -1)
-        self.assertTrue(_check3)
+        self.assertEqual(count1, 0)
+        self.assertEqual(count2, -1)
+        self.assertEqual(count3, 0)
         return
 
     def test_insert_03(self):

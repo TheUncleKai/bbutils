@@ -39,6 +39,10 @@ class Connection(object):
     _connection: Optional[sqlite3.Connection] = None
     _cursor: Optional[sqlite3.Cursor] = None
 
+    def unlock(self):
+        self._lock.release()
+        return
+
     @property
     def connection(self) -> Optional[sqlite3.Connection]:
         return self._connection

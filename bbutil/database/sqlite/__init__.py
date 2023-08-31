@@ -62,6 +62,7 @@ class SQLite(object):
         except sqlite3.OperationalError as e:
             bbutil.log.error("Unable to check for table: {0:s}".format(table_name))
             bbutil.log.exception(e)
+            self.manager.release()
             return False
 
         result = c.fetchone()
@@ -91,6 +92,7 @@ class SQLite(object):
         except sqlite3.OperationalError as e:
             bbutil.log.error("Unable to count rows: {0:s}".format(table_name))
             bbutil.log.exception(e)
+            self.manager.release()
             return -1
 
         result = c.fetchall()
@@ -153,6 +155,7 @@ class SQLite(object):
             bbutil.log.error("Unable to create table: {0:s}".format(table_name))
             bbutil.log.exception(e)
             print(command)
+            self.manager.release()
             return -1
 
         bbutil.log.debug1(self.name, "Create table: {0:s}".format(table_name))
@@ -228,6 +231,7 @@ class SQLite(object):
             _execute = self._many_execute(table_name, names, data)
 
         if _execute is None:
+            self.manager.release()
             return -1
 
         if _is_many is True:
@@ -242,19 +246,23 @@ class SQLite(object):
             bbutil.log.error("One or more values is an invalid format!")
             bbutil.log.error("SQL:  " + str(_execute.sql))
             bbutil.log.error("DATA: " + str(_execute.data))
+            self.manager.release()
             return -1
         except OverflowError as e:
             bbutil.log.exception(e)
             bbutil.log.error("One or more values is too large!")
             bbutil.log.error("SQL:  " + str(_execute.sql))
             bbutil.log.error("DATA: " + str(_execute.data))
+            self.manager.release()
             return -1
         except sqlite3.IntegrityError:
+            self.manager.release()
             return -1
         except Exception as e:
             bbutil.log.exception(e)
             bbutil.log.error("SQL:  " + str(_execute.sql))
             bbutil.log.error("DATA: " + str(_execute.data))
+            self.manager.release()
             return -1
 
         _counter = c.rowcount
@@ -262,6 +270,7 @@ class SQLite(object):
         if _counter > 0:
             _check = self.manager.commit()
             if _check is False:
+                self.manager.release()
                 return -1
 
         _check = self.manager.release()
