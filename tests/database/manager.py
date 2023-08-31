@@ -77,7 +77,6 @@ class TestSQLiteManager(unittest.TestCase):
 
     def test_connect_01(self):
         _testfile = full_path("{0:s}/test.sqlite".format(os.getcwd()))
-        _name = "Test"
 
         if os.path.exists(_testfile) is True:
             os.remove(_testfile)
@@ -97,4 +96,63 @@ class TestSQLiteManager(unittest.TestCase):
 
         _check = _connection.release()
         self.assertTrue(_check)
+        return
+
+    @mock.patch('sqlite3.connect', new=mock_operational_error)
+    def test_connect_02(self):
+        _testfile = full_path("{0:s}/test.sqlite".format(os.getcwd()))
+
+        if os.path.exists(_testfile) is True:
+            os.remove(_testfile)
+
+        _connection = Connection()
+        _connection.setup(filename=_testfile, use_memory=False)
+
+        self.assertEqual(_connection.filename, _testfile)
+        self.assertEqual(_connection.use_memory, False)
+        self.assertIsNotNone(_connection._lock)
+
+        _check = _connection.connect()
+        c = _connection.cursor()
+        self.assertFalse(_check)
+        self.assertIsNone(_connection.connection)
+        self.assertIsNone(c)
+
+        _check = _connection.release()
+        self.assertFalse(_check)
+        return
+
+    def test_connect_03(self):
+        _connection = Connection()
+        _connection.setup(use_memory=True)
+
+        self.assertTrue(_connection.use_memory)
+        self.assertIsNotNone(_connection._lock)
+
+        _check = _connection.connect()
+        c = _connection.cursor()
+        self.assertTrue(_check)
+        self.assertIsNotNone(_connection.connection)
+        self.assertIsNotNone(c)
+
+        _check = _connection.release()
+        self.assertTrue(_check)
+        return
+
+    @mock.patch('sqlite3.connect', new=mock_operational_error)
+    def test_connect_04(self):
+        _connection = Connection()
+        _connection.setup(use_memory=True)
+
+        self.assertTrue(_connection.use_memory)
+        self.assertIsNotNone(_connection._lock)
+
+        _check = _connection.connect()
+        c = _connection.cursor()
+        self.assertFalse(_check)
+        self.assertIsNone(_connection.connection)
+        self.assertIsNone(c)
+
+        _check = _connection.release()
+        self.assertFalse(_check)
         return

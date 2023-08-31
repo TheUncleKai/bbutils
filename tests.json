@@ -252,7 +252,10 @@
             "tests": [
                 "test_setup_01",
                 "test_setup_02",
-                "test_connect_01"
+                "test_connect_01",
+                "test_connect_02",
+                "test_connect_03",
+                "test_connect_04"
             ]
         },
         {

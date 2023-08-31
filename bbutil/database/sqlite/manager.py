@@ -66,6 +66,7 @@ class Connection(object):
             self._connection = sqlite3.connect(':memory:',
                                                detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
         except sqlite3.OperationalError as e:
+            self._connection = None
             bbutil.log.error("Unable to create database in memory!")
             bbutil.log.exception(e)
             return False
