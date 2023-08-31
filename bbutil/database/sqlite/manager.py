@@ -128,6 +128,8 @@ class Connection(object):
             bbutil.log.exception(e)
             return False
 
+        self._connection = None
+
         if self.use_memory is False:
             bbutil.log.debug1("SQLite3", "Close {0:s}".format(self.filename))
 
