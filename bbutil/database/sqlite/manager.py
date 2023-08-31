@@ -116,6 +116,11 @@ class Connection(object):
             return False
         return True
 
+    def abort(self):
+        self._connection = None
+        self._lock.release()
+        return
+
     def release(self) -> bool:
         if self._connection is None:
             bbutil.log.error("No connection!")

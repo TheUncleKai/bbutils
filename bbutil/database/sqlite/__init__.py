@@ -62,7 +62,7 @@ class SQLite(object):
         except sqlite3.OperationalError as e:
             bbutil.log.error("Unable to check for table: {0:s}".format(table_name))
             bbutil.log.exception(e)
-            self.manager.release()
+            self.manager.abort()
             return False
 
         result = c.fetchone()
@@ -92,7 +92,7 @@ class SQLite(object):
         except sqlite3.OperationalError as e:
             bbutil.log.error("Unable to count rows: {0:s}".format(table_name))
             bbutil.log.exception(e)
-            self.manager.release()
+            self.manager.abort()
             return -1
 
         result = c.fetchall()
@@ -155,7 +155,7 @@ class SQLite(object):
             bbutil.log.error("Unable to create table: {0:s}".format(table_name))
             bbutil.log.exception(e)
             print(command)
-            self.manager.release()
+            self.manager.abort()
             return -1
 
         bbutil.log.debug1(self.name, "Create table: {0:s}".format(table_name))
@@ -246,23 +246,23 @@ class SQLite(object):
             bbutil.log.error("One or more values is an invalid format!")
             bbutil.log.error("SQL:  " + str(_execute.sql))
             bbutil.log.error("DATA: " + str(_execute.data))
-            self.manager.release()
+            self.manager.abort()
             return -1
         except OverflowError as e:
             bbutil.log.exception(e)
             bbutil.log.error("One or more values is too large!")
             bbutil.log.error("SQL:  " + str(_execute.sql))
             bbutil.log.error("DATA: " + str(_execute.data))
-            self.manager.release()
+            self.manager.abort()
             return -1
         except sqlite3.IntegrityError:
-            self.manager.release()
+            self.manager.abort()
             return -1
         except Exception as e:
             bbutil.log.exception(e)
             bbutil.log.error("SQL:  " + str(_execute.sql))
             bbutil.log.error("DATA: " + str(_execute.data))
-            self.manager.release()
+            self.manager.abort()
             return -1
 
         _counter = c.rowcount
