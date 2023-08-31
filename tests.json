@@ -256,7 +256,11 @@
                 "test_connect_02",
                 "test_connect_03",
                 "test_connect_04",
-                "test_connect_05"
+                "test_connect_05",
+                "test_release_01",
+                "test_release_02",
+                "test_release_03",
+                "test_release_04"
             ]
         },
         {

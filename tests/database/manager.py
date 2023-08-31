@@ -22,7 +22,6 @@ import unittest.mock as mock
 
 from unittest.mock import Mock
 
-from bbutil.database import SQLite
 from bbutil.database.sqlite.manager import Connection
 from bbutil.utils import full_path
 
@@ -174,5 +173,63 @@ class TestSQLiteManager(unittest.TestCase):
         _connection._connection = Mock()
 
         _check = _connection.connect()
+        self.assertFalse(_check)
+        return
+
+    def test_release_01(self):
+        _testfile = full_path("{0:s}/test.sqlite".format(os.getcwd()))
+
+        if os.path.exists(_testfile) is True:
+            os.remove(_testfile)
+
+        _connection = Connection()
+        _connection.setup(filename=_testfile, use_memory=False)
+
+        _check = _connection.connect()
+        self.assertTrue(_check)
+
+        _check = _connection.release()
+        self.assertTrue(_check)
+        return
+
+    def test_release_02(self):
+        _testfile = full_path("{0:s}/test.sqlite".format(os.getcwd()))
+
+        if os.path.exists(_testfile) is True:
+            os.remove(_testfile)
+
+        _connection = Connection()
+        _connection.setup(filename=_testfile, use_memory=False)
+
+        _check = _connection.release()
+        self.assertFalse(_check)
+        return
+
+    def test_release_03(self):
+        _testfile = full_path("{0:s}/test.sqlite".format(os.getcwd()))
+
+        if os.path.exists(_testfile) is True:
+            os.remove(_testfile)
+
+        _connection = Connection()
+        _connection._connection = Mock()
+
+        _check = _connection.release()
+        self.assertFalse(_check)
+        return
+
+    def test_release_04(self):
+        _testfile = full_path("{0:s}/test.sqlite".format(os.getcwd()))
+
+        if os.path.exists(_testfile) is True:
+            os.remove(_testfile)
+
+        _connection = Connection()
+        _connection.setup(filename=_testfile, use_memory=False)
+
+        _connection._connection = Mock()
+        _connection._connection.close = Mock(side_effect=sqlite_operational_error)
+
+        _check = _connection.release()
         self.assertFalse(_check)
         return
