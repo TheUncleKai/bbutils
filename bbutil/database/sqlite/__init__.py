@@ -44,7 +44,7 @@ class SQLite(object):
 
     def prepare(self):
         if self.manager is not None:
-            return True
+            return
 
         self.manager: Connection = Connection()
         self.manager.setup(use_memory=self.use_memory, filename=self.filename)

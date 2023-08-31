@@ -44,7 +44,7 @@ class TestSQLite(unittest.TestCase):
         set_log()
         return
 
-    def test_connect_01(self):
+    def test_prepare_01(self):
         _testfile = full_path("{0:s}/test.sqlite".format(os.getcwd()))
         _name = "Test"
 
@@ -53,44 +53,14 @@ class TestSQLite(unittest.TestCase):
 
         _sqlite = SQLite(filename=_testfile, name="Test")
 
-        _check1 = _sqlite.connect()
-        _check2 = os.path.exists(_testfile)
+        self.assertIsNone(_sqlite.manager)
+
+        _sqlite.prepare()
+        _sqlite.prepare()
 
         self.assertEqual(_sqlite.name, _name)
         self.assertEqual(_sqlite.filename, _testfile)
-        self.assertTrue(_check1)
-        self.assertTrue(_check2)
-        self.assertTrue(_sqlite.is_connected)
-
-        if os.path.exists(_testfile) is True:
-            os.remove(_testfile)
-        return
-
-    def test_connect_02(self):
-        _name = "Test"
-        _sqlite = SQLite(filename="", name="Test")
-
-        _check1 = _sqlite.connect()
-
-        self.assertEqual(_sqlite.name, _name)
-        self.assertFalse(_check1)
-        self.assertFalse(_sqlite.is_connected)
-        return
-
-    def test_connect_03(self):
-        _sqlite = SQLite(filename="", name="")
-
-        _check1 = _sqlite.connect()
-
-        self.assertFalse(_check1)
-        return
-
-    def test_connect_04(self):
-        _sqlite = SQLite(filename="", name="Test", use_memory=True)
-
-        _check1 = _sqlite.connect()
-
-        self.assertTrue(_check1)
+        self.assertIsNotNone(_sqlite.manager)
         return
 
     @mock.patch('sqlite3.connect', new=mock_operational_error)
