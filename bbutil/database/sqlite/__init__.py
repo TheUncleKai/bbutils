@@ -76,12 +76,14 @@ class SQLite(object):
             return False
 
         _res = self._check_table(table_name)
+        if _res is False:
+            return False
 
         _check = self.manager.release()
         if _check is False:
             return False
 
-        return _res
+        return True
 
     def _count_table(self, table_name: str) -> int:
         c = self.manager.cursor()
@@ -114,22 +116,24 @@ class SQLite(object):
 
         return _count
 
-    def prepare_table(self, table_name: str, column_list: list, unique_list: list) -> int:
+    def prepare_table(self, table_name: str, column_list: list, unique_list: list, skip_check: bool = False) -> int:
         _check = self.manager.connect()
         if _check is False:
             return -1
 
-        _check = self._check_table(table_name)
-        if _check is True:
-            _count = self._count_table(table_name)
+        if skip_check is False:
+            _check = self._check_table(table_name)
+            if _check is True:
+                _count = self._count_table(table_name)
 
-            _check = self.manager.release()
-            if _check is False:
-                return -1
+                _check = self.manager.release()
+                if _check is False:
+                    return -1
 
-            return _count
+                return _count
 
-        c = self.manager.cursor()
+        _connection = self.manager.connection
+        c = _connection.cursor()
 
         _columns = ""
 

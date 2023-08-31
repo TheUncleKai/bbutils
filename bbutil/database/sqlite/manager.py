@@ -117,7 +117,6 @@ class Connection(object):
         return True
 
     def abort(self):
-        self._connection = None
         self._lock.release()
         return
 

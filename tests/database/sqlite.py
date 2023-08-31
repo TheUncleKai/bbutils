@@ -220,7 +220,7 @@ class TestSQLite(unittest.TestCase):
         _sqlite.prepare()
         _table = get_table_01(_sqlite)
 
-        _count = _sqlite.prepare_table(_table.name, _table.column_list, _table.unique_list)
+        _count = _sqlite.prepare_table(_table.name, _table.column_list, _table.unique_list, True)
         self.assertEqual(_count, -1)
         return
 
