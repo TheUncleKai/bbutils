@@ -25,12 +25,9 @@ from unittest.mock import Mock
 from bbutil.database.sqlite.manager import Connection
 from bbutil.utils import full_path
 
-from tests.helper.sqlite import (sqlite_operational_error, sqlite_integrity_error, sqlite_unknown_error,
-                                 mock_operational_error, get_table_01, get_data_01,
-                                 get_data_02, get_data_03, get_data_04, get_data_05, get_data_06, get_data_07,
-                                 get_data_08)
+from tests.helper.sqlite import sqlite_operational_error, mock_operational_error
 
-from tests.helper import get_sqlite, set_log
+from tests.helper import set_log
 
 __all__ = [
     "TestSQLiteManager"
@@ -231,5 +228,53 @@ class TestSQLiteManager(unittest.TestCase):
         _connection._connection.close = Mock(side_effect=sqlite_operational_error)
 
         _check = _connection.release()
+        self.assertFalse(_check)
+        return
+
+    def test_commit_01(self):
+        _testfile = full_path("{0:s}/test.sqlite".format(os.getcwd()))
+
+        if os.path.exists(_testfile) is True:
+            os.remove(_testfile)
+
+        _connection = Connection()
+        _connection.setup(filename=_testfile, use_memory=False)
+
+        _check = _connection.connect()
+        self.assertTrue(_check)
+
+        _check = _connection.commit()
+        self.assertTrue(_check)
+
+        _check = _connection.release()
+        self.assertTrue(_check)
+        return
+
+    def test_commit_02(self):
+        _testfile = full_path("{0:s}/test.sqlite".format(os.getcwd()))
+
+        if os.path.exists(_testfile) is True:
+            os.remove(_testfile)
+
+        _connection = Connection()
+        _connection.setup(filename=_testfile, use_memory=False)
+
+        _check = _connection.commit()
+        self.assertFalse(_check)
+        return
+
+    def test_commit_03(self):
+        _testfile = full_path("{0:s}/test.sqlite".format(os.getcwd()))
+
+        if os.path.exists(_testfile) is True:
+            os.remove(_testfile)
+
+        _connection = Connection()
+        _connection.setup(filename=_testfile, use_memory=False)
+
+        _connection._connection = Mock()
+        _connection._connection.commit = Mock(side_effect=sqlite_operational_error)
+
+        _check = _connection.commit()
         self.assertFalse(_check)
         return

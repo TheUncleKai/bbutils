@@ -260,7 +260,10 @@
                 "test_release_01",
                 "test_release_02",
                 "test_release_03",
-                "test_release_04"
+                "test_release_04",
+                "test_commit_01",
+                "test_commit_02",
+                "test_commit_03"
             ]
         },
         {
