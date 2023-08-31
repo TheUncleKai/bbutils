@@ -246,6 +246,16 @@
             ]
         },
         {
+            "id": "Database.SQLite.Manager",
+            "path": "tests.database.manager",
+            "classname": "TestSQLiteManager",
+            "tests": [
+                "test_setup_01",
+                "test_setup_02",
+                "test_connect_01"
+            ]
+        },
+        {
             "id": "Database.Table",
             "path": "tests.database.table",
             "classname": "TestTable",
