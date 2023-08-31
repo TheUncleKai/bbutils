@@ -82,7 +82,7 @@ class Connection(object):
             bbutil.log.exception(e)
             return False
 
-        bbutil.log.inform("SQLite3", "Connect to {0:s}".format(self.filename))
+        bbutil.log.debug1("SQLite3", "Connect to {0:s}".format(self.filename))
         return True
 
     def connect(self) -> bool:
@@ -128,7 +128,7 @@ class Connection(object):
             return False
 
         if self.use_memory is False:
-            bbutil.log.inform("SQLite3", "Close {0:s}".format(self.filename))
+            bbutil.log.debug1("SQLite3", "Close {0:s}".format(self.filename))
 
         self._lock.release()
         return True
