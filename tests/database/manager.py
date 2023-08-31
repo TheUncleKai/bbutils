@@ -71,6 +71,24 @@ class TestSQLiteManager(unittest.TestCase):
         self.assertIsNotNone(_connection._lock)
         return
 
+    def test_abort_01(self):
+        _testfile = full_path("{0:s}/test.sqlite".format(os.getcwd()))
+        _name = "Test"
+
+        if os.path.exists(_testfile) is True:
+            os.remove(_testfile)
+
+        _connection = Connection()
+
+        _connection.abort()
+        self.assertIsNone(_connection._lock)
+
+        _connection.setup(filename=_testfile, use_memory=False)
+
+        _connection._lock.acquire()
+        _connection.abort()
+        return
+
     def test_connect_01(self):
         _testfile = full_path("{0:s}/test.sqlite".format(os.getcwd()))
 
