@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-# coding=utf-8
+# -*- coding: utf-8 -*-
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -16,25 +16,5 @@
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
 
-from bbutil.database.types import Types, Column, DataType, Data, select_interval
-from bbutil.database.sqlite import SQLite
-from bbutil.database.table import Table
-from bbutil.database.database import Database
-
 __all__ = [
-    "sqlite",
-
-    "database",
-    "table",
-    "types",
-
-    "Types",
-    "Column",
-    "Data",
-    "DataType",
-    "select_interval",
-
-    "SQLite",
-    "Table",
-    "Database"
 ]
