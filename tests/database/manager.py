@@ -156,3 +156,23 @@ class TestSQLiteManager(unittest.TestCase):
         _check = _connection.release()
         self.assertFalse(_check)
         return
+
+    @mock.patch('sqlite3.connect', new=mock_operational_error)
+    def test_connect_05(self):
+        _testfile = full_path("{0:s}/test.sqlite".format(os.getcwd()))
+
+        if os.path.exists(_testfile) is True:
+            os.remove(_testfile)
+
+        _connection = Connection()
+        _connection.setup(filename=_testfile, use_memory=False)
+
+        self.assertEqual(_connection.filename, _testfile)
+        self.assertEqual(_connection.use_memory, False)
+        self.assertIsNotNone(_connection._lock)
+
+        _connection._connection = Mock()
+
+        _check = _connection.connect()
+        self.assertFalse(_check)
+        return
