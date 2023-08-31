@@ -27,6 +27,8 @@ __all__ = [
     "sqlite_integrity_error",
     "mock_operational_error",
 
+    "get_connection_01",
+
     "get_table_01",
     "get_data_01",
     "get_data_02",
@@ -42,6 +44,26 @@ sqlite_unknown_error = Exception("Something strange did happen!")
 sqlite_operational_error = sqlite3.OperationalError('This did go boing!!')
 sqlite_integrity_error = sqlite3.IntegrityError('These values did go boing!!')
 mock_operational_error = mock.Mock(side_effect=sqlite_operational_error)
+
+
+class Connection(object):
+
+    def cursor(self):
+        _cursor_mock = mock.Mock(name="MockCursor")
+        _cursor_mock.execute = mock.Mock(name="MockCrash", side_effect=sqlite_operational_error)
+        return _cursor_mock
+
+
+def get_connection_01():
+
+    _cursor = mock.Mock(name="SQLite3.cursor")
+    _cursor.execute = mock.Mock(side_effect=sqlite_operational_error)
+
+    _connection = mock.Mock(name="SQLite3.connect")
+    _connection.cursor = mock.Mock(return_value=_cursor)
+
+    _sqlite = mock.Mock(name="SQLite3", return_value=_connection)
+    return _sqlite
 
 
 def get_table_01(sqlite_object: SQLite) -> Table:

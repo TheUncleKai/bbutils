@@ -242,7 +242,10 @@
             "path": "tests.database.sqlite",
             "classname": "TestSQLite",
             "tests": [
-                "test_prepare_01"
+                "test_prepare_01",
+                "test_check_01",
+                "test_check_02",
+                "test_check_03"
             ]
         },
         {
