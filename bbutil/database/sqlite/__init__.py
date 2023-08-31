@@ -18,12 +18,11 @@
 
 import sqlite3
 from dataclasses import dataclass
-from multiprocessing import Lock
 from typing import Optional, List, Union
 
 import bbutil
 from bbutil.database.sqlite.types import Execute
-
+from bbutil.database.sqlite.manager import Connection
 from bbutil.database.types import Data
 
 __all__ = [
@@ -38,100 +37,21 @@ __all__ = [
 class SQLite(object):
 
     name: str = ""
-    connection: Optional[sqlite3.Connection] = None
-    commit: bool = False
-    cursor: Optional[sqlite3.Cursor] = None
+    manager: Optional[Connection] = None
     use_memory: bool = False
     use_scrict: bool = False
     filename: str = ""
-    lock: Optional[Lock] = None
 
-    def _lock(self):
-        if self.lock is None:
-            self.lock = Lock()
+    def prepare(self):
+        if self.manager is not None:
+            return True
 
-        bbutil.log.debug1(self.name, "Acquire Lock")
-        self.lock.acquire()
+        self.manager: Connection = Connection()
+        self.manager.setup(use_memory=self.use_memory, filename=self.filename)
         return
 
-    def connect(self) -> bool:
-        if self.name == "":
-            bbutil.log.error("Connection is unnamed!")
-            return False
-
-        if (self.filename == "") and (self.use_memory is False):
-            bbutil.log.error("No filename given!")
-            return False
-
-        self._lock()
-
-        if self.connection is not None:
-            return True
-
-        if self.use_memory is True:
-            try:
-                self.connection = sqlite3.connect(':memory:',
-                                                  detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
-            except sqlite3.OperationalError as e:
-                bbutil.log.error("Unable to create database in memory!")
-                bbutil.log.exception(e)
-                return False
-
-            self.filename = "memory"
-
-            return True
-
-        bbutil.log.inform(self.name, "Connect to {0:s}".format(self.filename))
-
-        try:
-            self.connection = sqlite3.connect(self.filename,
-                                              detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
-        except sqlite3.OperationalError as e:
-            bbutil.log.error("Unable to create database: {0:s}".format(self.filename))
-            bbutil.log.exception(e)
-            return False
-
-        return True
-
-    def disconnect(self) -> bool:
-        if self.connection is None:
-            return True
-
-        if self.commit is True:
-            try:
-                self.connection.commit()
-            except sqlite3.OperationalError as e:
-                bbutil.log.error("Unable to commit to database!")
-                bbutil.log.exception(e)
-                return False
-
-            self.commit = False
-
-        bbutil.log.debug1(self.name, "Close {0:s}".format(self.filename))
-
-        try:
-            self.connection.close()
-        except sqlite3.OperationalError as e:
-            bbutil.log.error("Unable to close connection!")
-            bbutil.log.exception(e)
-            return False
-
-        self.connection = None
-        self.lock.release()
-        return True
-
-    @property
-    def is_connected(self) -> bool:
-        if self.connection is None:
-            return False
-        return True
-
-    def check_table(self, table_name: str) -> bool:
-        if self.connection is None:
-            bbutil.log.error("No valid connection!")
-            return False
-
-        c = self.connection.cursor()
+    def _check_table(self, table_name: str) -> bool:
+        c = self.manager.cursor()
         command = "SELECT name FROM sqlite_master WHERE type='table' AND name='{0:s}';".format(table_name)
 
         bbutil.log.debug1(self.name, "Check for table: {0:s}".format(table_name))
@@ -148,12 +68,8 @@ class SQLite(object):
             return False
         return True
 
-    def count_table(self, table_name: str) -> int:
-        if self.connection is None:
-            bbutil.log.error("No valid connection!")
-            return -1
-
-        c = self.connection.cursor()
+    def _count_table(self, table_name: str) -> int:
+        c = self.manager.cursor()
         command = "SELECT count(*) FROM {0:s};".format(table_name)
 
         try:
@@ -169,16 +85,35 @@ class SQLite(object):
         bbutil.log.debug1(self.name, "Count table: {0:s}, {1:d}".format(table_name, count))
         return count
 
-    def prepare_table(self, table_name: str, column_list: list, unique_list: list) -> bool:
-        if self.connection is None:
-            bbutil.log.error("No valid connection!")
-            return False
+    def count(self, table_name: str) -> int:
+        _check = self.manager.connect()
+        if _check is False:
+            return -1
 
-        _check = self.check_table(table_name)
+        _count = self._count_table(table_name)
+
+        _check = self.manager.release()
+        if _check is False:
+            return -1
+
+        return _count
+
+    def prepare_table(self, table_name: str, column_list: list, unique_list: list) -> int:
+        _check = self.manager.connect()
+        if _check is False:
+            return -1
+
+        _check = self._check_table(table_name)
         if _check is True:
-            return True
+            _count = self._count_table(table_name)
 
-        c = self.connection.cursor()
+            _check = self.manager.release()
+            if _check is False:
+                return -1
+
+            return _count
+
+        c = self.manager.cursor()
 
         _columns = ""
 
@@ -204,12 +139,19 @@ class SQLite(object):
             bbutil.log.error("Unable to create table: {0:s}".format(table_name))
             bbutil.log.exception(e)
             print(command)
-            return False
+            return -1
 
         bbutil.log.debug1(self.name, "Create table: {0:s}".format(table_name))
 
-        self.connection.commit()
-        return True
+        _check = self.manager.commit()
+        if _check is False:
+            self.manager.release()
+            return -1
+
+        _check = self.manager.release()
+        if _check is False:
+            return -1
+        return 0
 
     @staticmethod
     def _single_execute(table_name: str, names: list, data: Data) -> Optional[Execute]:
@@ -255,11 +197,11 @@ class SQLite(object):
         return _execute
 
     def insert(self, table_name: str, names: list, data: Union[Data, List[Data]]) -> int:
-        if self.connection is None:
-            bbutil.log.error("No valid connection!")
+        _check = self.manager.connect()
+        if _check is False:
             return -1
 
-        c = self.connection.cursor()
+        c = self.manager.cursor()
 
         _is_many = True
 
@@ -304,15 +246,22 @@ class SQLite(object):
         _counter = c.rowcount
 
         if _counter > 0:
-            self.commit = True
+            _check = self.manager.commit()
+            if _check is False:
+                return -1
+
+        _check = self.manager.release()
+        if _check is False:
+            return -1
+
         return _counter
 
     def update(self, table_name: str, names: list, data: Data, sql_filter: str, filter_value=None) -> bool:
-        if self.connection is None:
-            bbutil.log.error("No valid connection!")
+        _check = self.manager.connect()
+        if _check is False:
             return False
 
-        c = self.connection.cursor()
+        c = self.manager.cursor()
 
         _sets = []
         for _name in names:
@@ -346,7 +295,14 @@ class SQLite(object):
             bbutil.log.error("DATA: " + str(_data))
             return False
 
-        self.commit = True
+        _check = self.manager.commit()
+        if _check is False:
+            return False
+
+        _check = self.manager.release()
+        if _check is False:
+            return False
+
         return True
 
     @staticmethod
@@ -358,11 +314,11 @@ class SQLite(object):
         return
 
     def select(self, table_name: str, names: list, sql_filter: str, data: list) -> Optional[list]:
-        if self.connection is None:
-            bbutil.log.error("No valid connection!")
+        _check = self.manager.connect()
+        if _check is False:
             return None
 
-        c = self.connection.cursor()
+        c = self.manager.cursor()
 
         _selector = "*"
         if len(names) != 0:
@@ -394,5 +350,9 @@ class SQLite(object):
 
         for _data in c:
             _fetchlist.append(_data)
+
+        _check = self.manager.release()
+        if _check is False:
+            return None
 
         return _fetchlist

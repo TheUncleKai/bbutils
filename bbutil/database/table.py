@@ -53,9 +53,12 @@ class Table(object):
         _counter = len(self.data)
         return _counter
 
+    def check(self) -> int:
+        self._counter = self.sqlite.count(self.name)
+        return self._counter
+
     @property
     def count(self) -> int:
-        self._counter = self.sqlite.count_table(self.name)
         return self._counter
 
     @property
@@ -260,11 +263,11 @@ class Table(object):
                 continue
             _unique.append(_col.name)
 
-        _check = self.sqlite.prepare_table(self.name, _columns, _unique)
-        if _check is False:
+        _count = self.sqlite.prepare_table(self.name, _columns, _unique)
+        if _count == -1:
             return False
 
-        self._counter = self.sqlite.count_table(self.name)
+        self._counter = _count
         return True
 
     def add(self, item: Data):
