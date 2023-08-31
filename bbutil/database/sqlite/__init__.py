@@ -247,7 +247,6 @@ class SQLite(object):
             _execute = self._many_execute(table_name, names, data)
 
         if _execute is None:
-            self.manager.release()
             return -1
 
         if _is_many is True:
@@ -330,7 +329,13 @@ class SQLite(object):
 
         for _item_list in _split_list:
             _counter += len(_item_list)
-            _stored += self._insert(table_name, names, _item_list)
+            _result = self._insert(table_name, names, _item_list)
+            if _result == -1:
+                bbutil.log.clear()
+                return -1
+
+            _stored += _result
+
             _progress.inc()
 
         bbutil.log.clear()

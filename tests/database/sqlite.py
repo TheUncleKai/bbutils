@@ -317,6 +317,9 @@ class TestSQLite(unittest.TestCase):
 
         _data = get_data_02()
         count2 = _sqlite.insert(_table.name, _table.names, _data)
+
+        _sqlite.manager.reset()
+
         count3 = _sqlite.count(_table.name)
 
         self.assertEqual(count1, 0)
