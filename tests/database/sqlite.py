@@ -26,11 +26,11 @@ from bbutil.database import SQLite
 from bbutil.utils import full_path
 
 from tests.helper.sqlite import sqlite_operational_error, sqlite_integrity_error, sqlite_unknown_error
-from tests.helper.sqlite import get_sqlite_01, get_sqlite_02, get_sqlite_03
+from tests.helper.sqlite import get_sqlite_operational_error, get_sqlite_02, get_sqlite_return_false
 from tests.helper.sqlite import (get_table_01, get_data_01, get_data_02, get_data_03, get_data_04, get_data_05,
                                  get_data_06, get_data_07, get_data_08)
 
-from tests.helper import get_sqlite, set_log
+from tests.helper import get_sqlite, set_log, copy_sqlite
 
 __all__ = [
     "TestSQLite"
@@ -79,7 +79,7 @@ class TestSQLite(unittest.TestCase):
         self.assertTrue(_check)
         return
 
-    @mock.patch('sqlite3.connect', new=get_sqlite_01())
+    @mock.patch('sqlite3.connect', new=get_sqlite_operational_error())
     def test_check_03(self):
         _sqlite = get_sqlite(filename="test_check_table.sqlite", path="testdata/database")
         _sqlite.prepare()
@@ -88,7 +88,7 @@ class TestSQLite(unittest.TestCase):
         self.assertFalse(_check)
         return
 
-    @mock.patch('sqlite3.connect', new=get_sqlite_02())
+    @mock.patch('sqlite3.connect', new=get_sqlite_operational_error())
     def test_check_04(self):
         _sqlite = get_sqlite(filename="test_check_table.sqlite", path="testdata/database")
         _sqlite.prepare()
@@ -97,7 +97,7 @@ class TestSQLite(unittest.TestCase):
         self.assertFalse(_check)
         return
 
-    @mock.patch('bbutil.database.sqlite.manager.Connection.connect', new=get_sqlite_03())
+    @mock.patch('bbutil.database.sqlite.manager.Connection.connect', new=get_sqlite_return_false())
     def test_check_05(self):
         _sqlite = get_sqlite(filename="test_check_table.sqlite", path="testdata/database")
         _sqlite.prepare()
@@ -106,7 +106,7 @@ class TestSQLite(unittest.TestCase):
         self.assertFalse(_check)
         return
 
-    @mock.patch('bbutil.database.sqlite.manager.Connection.release', new=get_sqlite_03())
+    @mock.patch('bbutil.database.sqlite.manager.Connection.release', new=get_sqlite_return_false())
     def test_check_06(self):
         _sqlite = get_sqlite(filename="test_check_table.sqlite", path="testdata/database")
         _sqlite.prepare()
@@ -123,7 +123,7 @@ class TestSQLite(unittest.TestCase):
         self.assertEqual(_count, 0)
         return
 
-    @mock.patch('sqlite3.connect', new=get_sqlite_01())
+    @mock.patch('sqlite3.connect', new=get_sqlite_operational_error())
     def test_count_02(self):
         _sqlite = get_sqlite(filename="test_check_table.sqlite", path="testdata/database")
         _sqlite.prepare()
@@ -140,7 +140,7 @@ class TestSQLite(unittest.TestCase):
         self.assertEqual(_count, 6)
         return
 
-    @mock.patch('bbutil.database.sqlite.manager.Connection.connect', new=get_sqlite_03())
+    @mock.patch('bbutil.database.sqlite.manager.Connection.connect', new=get_sqlite_return_false())
     def test_count_04(self):
         _sqlite = get_sqlite(filename="test_check_table.sqlite", path="testdata/database")
         _sqlite.prepare()
@@ -149,7 +149,7 @@ class TestSQLite(unittest.TestCase):
         self.assertEqual(_count, -1)
         return
 
-    @mock.patch('bbutil.database.sqlite.manager.Connection.release', new=get_sqlite_03())
+    @mock.patch('bbutil.database.sqlite.manager.Connection.release', new=get_sqlite_return_false())
     def test_count_05(self):
         _sqlite = get_sqlite(filename="test_check_table.sqlite", path="testdata/database")
         _sqlite.prepare()
@@ -173,7 +173,7 @@ class TestSQLite(unittest.TestCase):
         self.assertEqual(_count, 0)
         return
 
-    @mock.patch('bbutil.database.sqlite.manager.Connection.connect', new=get_sqlite_03())
+    @mock.patch('bbutil.database.sqlite.manager.Connection.connect', new=get_sqlite_return_false())
     def test_prepare_table_02(self):
         _sqlite = get_sqlite(filename="test.sqlite", clean=True)
         _sqlite.prepare()
@@ -183,7 +183,7 @@ class TestSQLite(unittest.TestCase):
         self.assertEqual(_count, -1)
         return
 
-    @mock.patch('bbutil.database.sqlite.manager.Connection.release', new=get_sqlite_03())
+    @mock.patch('bbutil.database.sqlite.manager.Connection.release', new=get_sqlite_return_false())
     def test_prepare_table_03(self):
         _sqlite = get_sqlite(filename="test.sqlite", clean=True)
         _sqlite.prepare()
@@ -203,7 +203,7 @@ class TestSQLite(unittest.TestCase):
         self.assertEqual(_count, 6)
         return
 
-    @mock.patch('bbutil.database.sqlite.manager.Connection.release', new=get_sqlite_03())
+    @mock.patch('bbutil.database.sqlite.manager.Connection.release', new=get_sqlite_return_false())
     def test_prepare_table_05(self):
         _sqlite = get_sqlite(filename="test_select.sqlite", path="testdata/database")
         _sqlite.prepare()
@@ -214,7 +214,7 @@ class TestSQLite(unittest.TestCase):
         self.assertEqual(_count, -1)
         return
 
-    @mock.patch('sqlite3.connect', new=get_sqlite_01())
+    @mock.patch('sqlite3.connect', new=get_sqlite_operational_error())
     def test_prepare_table_06(self):
         _sqlite = get_sqlite(filename="test.sqlite", clean=True)
         _sqlite.prepare()
@@ -224,7 +224,7 @@ class TestSQLite(unittest.TestCase):
         self.assertEqual(_count, -1)
         return
 
-    @mock.patch('bbutil.database.sqlite.manager.Connection.commit', new=get_sqlite_03())
+    @mock.patch('bbutil.database.sqlite.manager.Connection.commit', new=get_sqlite_return_false())
     def test_prepare_table_07(self):
         _sqlite = get_sqlite(filename="test.sqlite", clean=True)
         _sqlite.prepare()
@@ -251,7 +251,49 @@ class TestSQLite(unittest.TestCase):
         self.assertEqual(count3, 1)
         return
 
+    @mock.patch('bbutil.database.sqlite.manager.Connection.connect', new=get_sqlite_return_false())
     def test_insert_02(self):
+        _sqlite = get_sqlite(filename="test.sqlite", clean=True)
+        _sqlite.prepare()
+
+        _table = get_table_01(_sqlite)
+
+        _data = get_data_01()
+        count = _sqlite.insert(_table.name, _table.names, _data)
+        self.assertEqual(count, -1)
+        return
+
+    @mock.patch('bbutil.database.sqlite.manager.Connection.release', new=get_sqlite_return_false())
+    def test_insert_03(self):
+        _sqlite = copy_sqlite(filename="test_check_table.sqlite", path="testdata/database")
+        _sqlite.prepare()
+
+        _table = get_table_01(_sqlite)
+        _data = get_data_01()
+
+        count = _sqlite.insert(_table.name, _table.names, _data)
+
+        self.assertEqual(count, -1)
+
+        os.remove(_sqlite.filename)
+        return
+
+    @mock.patch('bbutil.database.sqlite.manager.Connection.commit', new=get_sqlite_return_false())
+    def test_insert_04(self):
+        _sqlite = copy_sqlite(filename="test_check_table.sqlite", path="testdata/database")
+        _sqlite.prepare()
+
+        _table = get_table_01(_sqlite)
+        _data = get_data_01()
+
+        count = _sqlite.insert(_table.name, _table.names, _data)
+
+        self.assertEqual(count, -1)
+
+        os.remove(_sqlite.filename)
+        return
+
+    def test_insert_05(self):
         _sqlite = get_sqlite(filename="test.sqlite", clean=True)
         _sqlite.prepare()
 
@@ -268,7 +310,23 @@ class TestSQLite(unittest.TestCase):
         self.assertEqual(count3, 0)
         return
 
-    def test_insert_03(self):
+    @mock.patch('sqlite3.connect', new=get_sqlite_operational_error())
+    def test_insert_06(self):
+        _sqlite = copy_sqlite(filename="test_check_table.sqlite", path="testdata/database")
+        _sqlite.prepare()
+
+        _table = get_table_01(_sqlite)
+        _data = get_data_01()
+
+        count = _sqlite.insert(_table.name, _table.names, _data)
+
+        self.assertEqual(count, -1)
+
+        os.remove(_sqlite.filename)
+        return
+
+
+    def test_insert_03x(self):
         _sqlite = get_sqlite(filename="test.sqlite", clean=True)
         _table = get_table_01(_sqlite)
 
@@ -295,7 +353,7 @@ class TestSQLite(unittest.TestCase):
         self.assertTrue(_check3)
         return
 
-    def test_insert_04(self):
+    def test_insert_04x(self):
         _sqlite = get_sqlite(filename="test.sqlite", clean=True)
         _table = get_table_01(_sqlite)
 
@@ -322,7 +380,7 @@ class TestSQLite(unittest.TestCase):
         self.assertTrue(_check3)
         return
 
-    def test_insert_05(self):
+    def test_insert_05x(self):
         _sqlite = get_sqlite(filename="test.sqlite", clean=True)
         _table = get_table_01(_sqlite)
 
@@ -341,7 +399,7 @@ class TestSQLite(unittest.TestCase):
         self.assertTrue(_check4)
         return
 
-    def test_insert_06(self):
+    def test_insert_06x(self):
         _sqlite = get_sqlite(filename="test.sqlite", clean=True)
         _table = get_table_01(_sqlite)
 
@@ -360,7 +418,7 @@ class TestSQLite(unittest.TestCase):
         self.assertTrue(_check3)
         return
 
-    def test_insert_07(self):
+    def test_insert_07x(self):
         _sqlite = get_sqlite(filename="test.sqlite", clean=True)
         _table = get_table_01(_sqlite)
 
@@ -379,7 +437,7 @@ class TestSQLite(unittest.TestCase):
         self.assertTrue(_check3)
         return
 
-    def test_insert_08(self):
+    def test_insert_08x(self):
         _sqlite = get_sqlite(filename="test.sqlite", clean=True)
         _table = get_table_01(_sqlite)
 
@@ -400,7 +458,7 @@ class TestSQLite(unittest.TestCase):
         self.assertTrue(_check3)
         return
 
-    def test_insert_09(self):
+    def test_insert_09x(self):
         _sqlite = get_sqlite(filename="test.sqlite", clean=True)
         _table = get_table_01(_sqlite)
 

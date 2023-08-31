@@ -27,9 +27,9 @@ __all__ = [
     "sqlite_integrity_error",
     "mock_operational_error",
 
-    "get_sqlite_01",
+    "get_sqlite_operational_error",
     "get_sqlite_02",
-    "get_sqlite_03",
+    "get_sqlite_return_false",
 
     "get_table_01",
     "get_data_01",
@@ -48,7 +48,7 @@ sqlite_integrity_error = sqlite3.IntegrityError('These values did go boing!!')
 mock_operational_error = mock.Mock(side_effect=sqlite_operational_error)
 
 
-def get_sqlite_01():
+def get_sqlite_operational_error():
     _cursor = mock.Mock(name="SQLite3.cursor")
     _cursor.execute = mock.Mock(side_effect=sqlite_operational_error)
 
@@ -70,7 +70,7 @@ def get_sqlite_02():
     return _sqlite
 
 
-def get_sqlite_03():
+def get_sqlite_return_false():
     _sqlite = mock.Mock(name="close", return_value=False)
     return _sqlite
 

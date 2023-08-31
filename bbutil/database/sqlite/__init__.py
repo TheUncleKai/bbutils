@@ -109,6 +109,8 @@ class SQLite(object):
             return -1
 
         _count = self._count_table(table_name)
+        if _count == -1:
+            return -1
 
         _check = self.manager.release()
         if _check is False:
