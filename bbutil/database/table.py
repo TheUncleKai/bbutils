@@ -179,67 +179,13 @@ class Table(object):
 
         return _result
 
-    def _store(self) -> int:
-        _chunk_size = self._get_chunk_size(len(self.data))
-        _split_list = self._split_list(self.data, _chunk_size)
-        _max = len(_split_list) + 1
-        _progress = bbutil.log.progress(_max)
-
-        _counter = 0
-        _stored = 0
-
-        for _item_list in _split_list:
-            _counter += len(_item_list)
-            _stored += self.sqlite.insert(self.name, self.names, _item_list)
-            _progress.inc()
-
-        bbutil.log.clear()
-        if _counter != _stored:
-            bbutil.log.warn(self.name, "Entries {0:d}, Stored {1:d}".format(_counter, _stored))
-        else:
-            bbutil.log.inform(self.name, "Stored {0:d}".format(_counter))
-
-        return _stored
-
     def store(self, data: Data = None) -> int:
+        _data = data
         if data is None:
-            _check = self._store()
-            return _check
+            _data = self.data
 
-        _count = self.sqlite.insert(self.name, self.names, data)
+        _count = self.sqlite.insert(self.name, self.names, _data)
         return _count
-
-    @staticmethod
-    def _split_list(data_list: List[Data], chunk_size: int) -> list:
-        chunked_list = []
-        for i in range(0, len(data_list), chunk_size):
-            chunked_list.append(data_list[i:i + chunk_size])
-
-        return chunked_list
-
-    @staticmethod
-    def _get_chunk_size(max_intervall: int) -> int:
-        interval = 1
-
-        if max_intervall > 500:
-            interval = 5
-
-        if max_intervall > 1000:
-            interval = 10
-
-        if max_intervall > 5000:
-            interval = 50
-
-        if max_intervall > 10000:
-            interval = 100
-
-        if max_intervall > 20000:
-            interval = 200
-
-        if max_intervall > 50000:
-            interval = 500
-
-        return interval
 
     def update(self, data: Data, data_filter: str, filter_value=None) -> bool:
         _check = self.sqlite.update(self.name, self.names, data, data_filter, filter_value)

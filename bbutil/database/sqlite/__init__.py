@@ -233,11 +233,7 @@ class SQLite(object):
         _execute = Execute(sql=sql, data=_data)
         return _execute
 
-    def insert(self, table_name: str, names: list, data: Union[Data, List[Data]]) -> int:
-        _check = self.manager.connect()
-        if _check is False:
-            return -1
-
+    def _insert(self, table_name: str, names: list, data: Union[Data, List[Data]]) -> int:
         c = self.manager.cursor()
 
         _is_many = True
@@ -266,23 +262,19 @@ class SQLite(object):
             bbutil.log.error("One or more values is an invalid format!")
             bbutil.log.error("SQL:  " + str(_execute.sql))
             bbutil.log.error("DATA: " + str(_execute.data))
-            self.manager.abort()
             return -1
         except OverflowError as e:
             bbutil.log.exception(e)
             bbutil.log.error("One or more values is too large!")
             bbutil.log.error("SQL:  " + str(_execute.sql))
             bbutil.log.error("DATA: " + str(_execute.data))
-            self.manager.abort()
             return -1
         except sqlite3.IntegrityError:
-            self.manager.abort()
             return -1
         except Exception as e:
             bbutil.log.exception(e)
             bbutil.log.error("SQL:  " + str(_execute.sql))
             bbutil.log.error("DATA: " + str(_execute.data))
-            self.manager.abort()
             return -1
 
         _counter = c.rowcount
@@ -290,14 +282,85 @@ class SQLite(object):
         if _counter > 0:
             _check = self.manager.commit()
             if _check is False:
-                self.manager.release()
                 return -1
+
+        return _counter
+
+    @staticmethod
+    def _get_chunk_size(max_intervall: int) -> int:
+        interval = 1
+
+        if max_intervall > 500:
+            interval = 5
+
+        if max_intervall > 1000:
+            interval = 10
+
+        if max_intervall > 5000:
+            interval = 50
+
+        if max_intervall > 10000:
+            interval = 100
+
+        if max_intervall > 20000:
+            interval = 200
+
+        if max_intervall > 50000:
+            interval = 500
+
+        return interval
+
+    @staticmethod
+    def _split_list(data_list: List[Data], chunk_size: int) -> list:
+        chunked_list = []
+        for i in range(0, len(data_list), chunk_size):
+            chunked_list.append(data_list[i:i + chunk_size])
+
+        return chunked_list
+
+    def _insert_list(self, table_name: str, names: list, data_list: List[Data]) -> int:
+        _chunk_size = self._get_chunk_size(len(data_list))
+        _split_list = self._split_list(data_list, _chunk_size)
+        _max = len(_split_list) + 1
+
+        _progress = bbutil.log.progress(_max)
+
+        _counter = 0
+        _stored = 0
+
+        for _item_list in _split_list:
+            _counter += len(_item_list)
+            _stored += self._insert(table_name, names, _item_list)
+            _progress.inc()
+
+        bbutil.log.clear()
+
+        if _counter != _stored:
+            bbutil.log.warn(self.name, "Entries {0:d}, Stored {1:d}".format(_counter, _stored))
+        else:
+            bbutil.log.inform(self.name, "Stored {0:d}".format(_counter))
+
+        return _stored
+
+    def insert(self, table_name: str, names: list, data: Union[Data, List[Data]]) -> int:
+        _check = self.manager.connect()
+        if _check is False:
+            return -1
+
+        if type(data) is list:
+            count = self._insert_list(table_name, names, data)
+        else:
+            count = self._insert(table_name, names, data)
+
+        if count == -1:
+            self.manager.abort()
+            return -1
 
         _check = self.manager.release()
         if _check is False:
             return -1
 
-        return _counter
+        return count
 
     def update(self, table_name: str, names: list, data: Data, sql_filter: str, filter_value=None) -> bool:
         _check = self.manager.connect()
