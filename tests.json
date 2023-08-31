@@ -258,7 +258,10 @@
                 "test_prepare_table_02",
                 "test_prepare_table_03",
                 "test_prepare_table_04",
-                "test_prepare_table_05"
+                "test_prepare_table_05",
+                "test_prepare_table_06",
+                "test_prepare_table_07",
+                "test_insert_01"
             ]
         },
         {

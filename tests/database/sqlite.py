@@ -214,23 +214,39 @@ class TestSQLite(unittest.TestCase):
         self.assertEqual(_count, -1)
         return
 
-    def test_insert_01(self):
+    @mock.patch('sqlite3.connect', new=get_sqlite_01())
+    def test_prepare_table_06(self):
         _sqlite = get_sqlite(filename="test.sqlite", clean=True)
+        _sqlite.prepare()
         _table = get_table_01(_sqlite)
 
-        _check1 = _sqlite.connect()
+        _count = _sqlite.prepare_table(_table.name, _table.column_list, _table.unique_list)
+        self.assertEqual(_count, -1)
+        return
 
-        _check2 = _sqlite.prepare_table(_table.name, _table.column_list, _table.unique_list)
+    @mock.patch('bbutil.database.sqlite.manager.Connection.commit', new=get_sqlite_03())
+    def test_prepare_table_07(self):
+        _sqlite = get_sqlite(filename="test.sqlite", clean=True)
+        _sqlite.prepare()
+        _table = get_table_01(_sqlite)
+
+        _count = _sqlite.prepare_table(_table.name, _table.column_list, _table.unique_list)
+        self.assertEqual(_count, -1)
+        return
+
+    def test_insert_01(self):
+        _sqlite = get_sqlite(filename="test.sqlite", clean=True)
+        _sqlite.prepare()
+
+        _table = get_table_01(_sqlite)
+
+        count1 = _sqlite.prepare_table(_table.name, _table.column_list, _table.unique_list)
 
         _data = get_data_01()
-        count = _sqlite.insert(_table.name, _table.names, _data)
+        count2 = _sqlite.insert(_table.name, _table.names, _data)
 
-        _check3 = _sqlite.disconnect()
-
-        self.assertTrue(_check1)
-        self.assertTrue(_check2)
-        self.assertEqual(count, 1)
-        self.assertTrue(_check3)
+        self.assertEqual(count1, 0)
+        self.assertEqual(count2, 1)
         return
 
     def test_insert_02(self):
