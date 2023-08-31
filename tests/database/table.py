@@ -17,11 +17,16 @@
 #
 
 import unittest
+import unittest.mock as mock
+
+import bbutil
 
 from bbutil.database import Table, Types
 
 from tests.helper import get_sqlite, set_log
 from tests.helper.table import TestData, get_table_01, get_table_02, get_table_03, get_table_04
+
+from tests.helper.sqlite import get_sqlite_operational_error, get_sqlite_integrity_error, get_sqlite_return_false
 
 __all__ = [
     "TestTable"
@@ -106,51 +111,35 @@ class TestTable(unittest.TestCase):
         return
 
     def test_init_01(self):
-
         _sqlite = get_sqlite(filename="test_check_table.sqlite", path="testdata/database")
         _table = get_table_01(sqlite_object=_sqlite)
 
-        _check1 = _sqlite.connect()
-        _check2 = _table.init()
-        _check3 = _sqlite.disconnect()
-
-        self.assertTrue(_check1)
-        self.assertTrue(_check2)
-        self.assertTrue(_check3)
+        _check = _table.init()
+        self.assertTrue(_check)
         return
 
     def test_init_02(self):
-
         _sqlite = get_sqlite(filename="test_check_table.sqlite", path="testdata/database")
         _table = Table(name="test01", sqlite=_sqlite)
 
-        _check1 = _sqlite.connect()
-        _check2 = _table.init()
-        _check3 = _sqlite.disconnect()
-
-        self.assertTrue(_check1)
-        self.assertFalse(_check2)
-        self.assertTrue(_check3)
+        _check = _table.init()
+        self.assertFalse(_check)
         return
 
+    @mock.patch('sqlite3.connect', new=get_sqlite_operational_error())
     def test_init_03(self):
-
         _sqlite = get_sqlite(filename="test_check_table.sqlite", path="testdata/database")
         _table = get_table_01(sqlite_object=_sqlite)
 
-        _check1 = _sqlite.connect()
-        _sqlite.connection = None
-        _check2 = _table.init()
-
-        self.assertTrue(_check1)
-        self.assertFalse(_check2)
+        _check = _table.init()
+        self.assertFalse(_check)
         return
 
     def test_init_04(self):
+        bbutil.set_log(None)
+
         _table = Table(name="Testos")
-
         _check1 = _table.init()
-
         self.assertFalse(_check1)
         return
 

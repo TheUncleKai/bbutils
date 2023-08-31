@@ -50,7 +50,11 @@ class SQLite(object):
         self.manager.setup(use_memory=self.use_memory, filename=self.filename)
         return
 
-    def _check_table(self, table_name: str) -> bool:
+    def check(self, table_name: str) -> int:
+        _check = self.manager.connect()
+        if _check is False:
+            return False
+
         _connection = self.manager.connection
         c = _connection.cursor()
         command = "SELECT name FROM sqlite_master WHERE type='table' AND name='{0:s}';".format(table_name)
@@ -65,25 +69,16 @@ class SQLite(object):
             self.manager.abort()
             return False
 
+        _res = True
         result = c.fetchone()
         if result is None:
-            return False
-        return True
-
-    def check(self, table_name: str) -> int:
-        _check = self.manager.connect()
-        if _check is False:
-            return False
-
-        _res = self._check_table(table_name)
-        if _res is False:
-            return False
+            _res = False
 
         _check = self.manager.release()
         if _check is False:
             return False
 
-        return True
+        return _res
 
     def _count_table(self, table_name: str) -> int:
         c = self.manager.cursor()
@@ -117,6 +112,25 @@ class SQLite(object):
             return -1
 
         return _count
+
+    def _check_table(self, table_name: str) -> bool:
+        _connection = self.manager.connection
+        c = _connection.cursor()
+        command = "SELECT name FROM sqlite_master WHERE type='table' AND name='{0:s}';".format(table_name)
+
+        bbutil.log.debug1(self.name, "Check for table: {0:s}".format(table_name))
+
+        try:
+            c.execute(command)
+        except sqlite3.OperationalError as e:
+            bbutil.log.error("Unable to check for table: {0:s}".format(table_name))
+            bbutil.log.exception(e)
+            return False
+
+        result = c.fetchone()
+        if result is None:
+            return False
+        return True
 
     def prepare_table(self, table_name: str, column_list: list, unique_list: list, skip_check: bool = False) -> int:
         _check = self.manager.connect()

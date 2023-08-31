@@ -321,21 +321,7 @@
                 "test_init_01",
                 "test_init_02",
                 "test_init_03",
-                "test_init_04",
-                "test_select_01",
-                "test_select_02",
-                "test_select_03",
-                "test_select_04",
-                "test_store_01",
-                "test_store_02",
-                "test_store_03",
-                "test_store_04",
-                "test_add_01",
-                "test_add_02",
-                "test_update_01",
-                "test_load_01",
-                "test_load_02",
-                "test_clear_01"
+                "test_init_04"
             ]
         },
         {

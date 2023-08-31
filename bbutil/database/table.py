@@ -263,6 +263,8 @@ class Table(object):
                 continue
             _unique.append(_col.name)
 
+        self.sqlite.prepare()
+
         _count = self.sqlite.prepare_table(self.name, _columns, _unique)
         if _count == -1:
             return False
