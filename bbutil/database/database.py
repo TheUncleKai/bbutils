@@ -58,10 +58,17 @@ class Database(metaclass=ABCMeta):
         self.clear_data()
         return
 
-    def store(self):
+    def store(self) -> int:
+        _count = 0
         for _table in self.tables:
-            _table.store()
-        return
+            _count += _table.store()
+        return _count
+
+    def load(self) -> int:
+        _count = 0
+        for _table in self.tables:
+            _count += _table.load()
+        return _count
 
     def start(self) -> bool:
         self.init()

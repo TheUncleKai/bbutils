@@ -58,10 +58,6 @@ class Table(object):
         return self._counter
 
     @property
-    def count(self) -> int:
-        return self._counter
-
-    @property
     def column_list(self) -> list:
         _columns = []
         for _col in self.columns:

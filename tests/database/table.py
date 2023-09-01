@@ -389,7 +389,7 @@ class TestTable(unittest.TestCase):
         return
 
     def _load_table(self, table: Table, limit: int):
-        _sql_count = table.count
+        _sql_count = table.check()
         _data_count = table.load()
 
         self.assertEqual(_sql_count, limit)
