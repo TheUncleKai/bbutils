@@ -22,6 +22,8 @@ import unittest.mock as mock
 
 from unittest.mock import Mock
 
+from bbutil.database import Database
+
 from tests.helper import set_log
 from tests.helper.database import TestData
 
@@ -39,6 +41,15 @@ class TestDatabase(unittest.TestCase):
         set_log()
         return
 
+    @staticmethod
+    def _clean(database: Database):
+        if database.sqlite is None:
+            return
+
+        if os.path.exists(database.sqlite.filename) is True:
+            os.remove(database.sqlite.filename)
+        return
+
     def assertHasAttr(self, obj, intended_attr):
         _testBool = hasattr(obj, intended_attr)
 
@@ -54,18 +65,16 @@ class TestDatabase(unittest.TestCase):
         self.assertIsNotNone(_database.table01)
         self.assertIsNotNone(_database.table02)
 
-        _check2 = _database.stop()
-
-        self.assertTrue(_check1)
-        self.assertTrue(_check2)
+        self._clean(_database)
         return
 
     def test_start_02(self):
         _database = TestData(filename="")
 
         _check1 = _database.start()
-
         self.assertFalse(_check1)
+
+        self._clean(_database)
         return
 
     def test_start_03(self):
@@ -75,6 +84,7 @@ class TestDatabase(unittest.TestCase):
         _check1 = _database.start()
 
         self.assertFalse(_check1)
+        self._clean(_database)
         return
 
     @mock.patch('sqlite3.connect', new=mock_operational_error)
@@ -85,50 +95,7 @@ class TestDatabase(unittest.TestCase):
         _check1 = _database.start()
 
         self.assertFalse(_check1)
-        return
-
-    def test_start_05(self):
-        _filename = "{0:s}/test.sqlite".format(os.getcwd())
-
-        _cursor_mock = Mock()
-        _cursor_mock.execute = Mock(side_effect=sqlite_operational_error)
-
-        _class_mock = Mock()
-        _class_mock.cursor = Mock(return_value=_cursor_mock)
-
-        _database = TestData(filename=_filename, mock_connection=_class_mock)
-
-        _check1 = _database.start()
-
-        self.assertFalse(_check1)
-        return
-
-    def test_stop_01(self):
-        _filename = "{0:s}/test.sqlite".format(os.getcwd())
-
-        _database = TestData(filename=_filename)
-
-        _check1 = _database.stop()
-
-        self.assertFalse(_check1)
-        return
-
-    def test_stop_02(self):
-        _filename = "{0:s}/test.sqlite".format(os.getcwd())
-
-        _connection_mock = Mock()
-        _connection_mock.close = Mock(side_effect=sqlite_operational_error)
-
-        _database = TestData(filename=_filename)
-
-        _check1 = _database.start()
-
-        _database.sqlite.connection = _connection_mock
-
-        _check2 = _database.stop()
-
-        self.assertTrue(_check1)
-        self.assertFalse(_check2)
+        self._clean(_database)
         return
 
     def test_store_01(self):
@@ -158,15 +125,50 @@ class TestDatabase(unittest.TestCase):
 
         _database.table02.add(_data)
 
-        _database.store()
+        _count3 = _database.store()
 
-        _count1 = _database.table01.count
-        _count2 = _database.table02.count
-
-        _check2 = _database.stop()
+        _count1 = _database.table01.check()
+        _count2 = _database.table02.check()
 
         self.assertTrue(_check1)
-        self.assertTrue(_check2)
         self.assertEqual(_count1, 1)
         self.assertEqual(_count2, 1)
+        self.assertEqual(_count3, 2)
+        self._clean(_database)
+        return
+
+    def test_load_01(self):
+        _filename = "{0:s}/testdata/database/test_database.sqlite".format(os.getcwd())
+        _database = TestData(filename=_filename)
+
+        _check1 = _database.start()
+        self.assertIsNotNone(_database.table01)
+        self.assertIsNotNone(_database.table02)
+
+        _count = _database.load()
+
+        self.assertTrue(_check1)
+        self.assertEqual(_count, 2)
+        self.assertEqual(_database.table01.data_count, 1)
+        self.assertEqual(_database.table02.data_count, 1)
+        return
+
+    def test_clear_01(self):
+        _filename = "{0:s}/testdata/database/test_database.sqlite".format(os.getcwd())
+        _database = TestData(filename=_filename)
+
+        _check1 = _database.start()
+        self.assertIsNotNone(_database.table01)
+        self.assertIsNotNone(_database.table02)
+
+        _count = _database.load()
+
+        self.assertTrue(_check1)
+        self.assertEqual(_count, 2)
+        self.assertEqual(_database.table01.data_count, 1)
+        self.assertEqual(_database.table02.data_count, 1)
+
+        _database.clear()
+        self.assertEqual(_database.table01.data_count, 0)
+        self.assertEqual(_database.table02.data_count, 0)
         return

@@ -66,6 +66,4 @@ class TestData(Database):
         return True
 
     def clear_data(self):
-        self.table01 = None
-        self.table02 = None
         return

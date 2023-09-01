@@ -58,10 +58,17 @@ class Database(metaclass=ABCMeta):
         self.clear_data()
         return
 
-    def store(self):
+    def store(self) -> int:
+        _count = 0
         for _table in self.tables:
-            _table.store()
-        return
+            _count += _table.store()
+        return _count
+
+    def load(self) -> int:
+        _count = 0
+        for _table in self.tables:
+            _count += _table.load()
+        return _count
 
     def start(self) -> bool:
         self.init()
@@ -72,19 +79,11 @@ class Database(metaclass=ABCMeta):
 
         self.sqlite = SQLite(name=self.name, filename=self.filename)
 
+        self.sqlite.prepare()
+
         _check = self.prepare()
         if _check is False:
             bbutil.log.error("Preparation of tables has failed!")
-            return False
-
-        _check = self._open()
-        if _check is False:
-            return False
-        return True
-
-    def _open(self) -> bool:
-        _check = self.sqlite.connect()
-        if _check is False:
             return False
 
         for _table in self.tables:
@@ -92,20 +91,4 @@ class Database(metaclass=ABCMeta):
             if _check is False:
                 return False
 
-        return True
-
-    def stop(self) -> bool:
-        if self.sqlite is None:
-            bbutil.log.error("No SQLite connection established!")
-            return False
-
-        bbutil.log.inform(self.name, "Close connection!")
-        _check = self.sqlite.disconnect()
-        if _check is False:
-            return False
-
-        del self.sqlite
-        self.sqlite = None
-
-        self.clear()
         return True

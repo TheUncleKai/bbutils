@@ -27,6 +27,10 @@ __all__ = [
     "sqlite_integrity_error",
     "mock_operational_error",
 
+    "get_sqlite_operational_error",
+    "get_sqlite_integrity_error",
+    "get_sqlite_return_false",
+
     "get_table_01",
     "get_data_01",
     "get_data_02",
@@ -42,6 +46,33 @@ sqlite_unknown_error = Exception("Something strange did happen!")
 sqlite_operational_error = sqlite3.OperationalError('This did go boing!!')
 sqlite_integrity_error = sqlite3.IntegrityError('These values did go boing!!')
 mock_operational_error = mock.Mock(side_effect=sqlite_operational_error)
+
+
+def get_sqlite_operational_error():
+    _cursor = mock.Mock(name="SQLite3.cursor")
+    _cursor.execute = mock.Mock(side_effect=sqlite_operational_error)
+
+    _connection = mock.Mock(name="SQLite3.connect")
+    _connection.cursor = mock.Mock(return_value=_cursor)
+
+    _sqlite = mock.Mock(name="SQLite3", return_value=_connection)
+    return _sqlite
+
+
+def get_sqlite_integrity_error():
+    _cursor = mock.Mock(name="SQLite3.cursor")
+    _cursor.execute = mock.Mock(side_effect=sqlite_integrity_error)
+
+    _connection = mock.Mock(name="SQLite3.connect")
+    _connection.cursor = mock.Mock(return_value=_cursor)
+
+    _sqlite = mock.Mock(name="SQLite3", return_value=_connection)
+    return _sqlite
+
+
+def get_sqlite_return_false():
+    _sqlite = mock.Mock(name="close", return_value=False)
+    return _sqlite
 
 
 def get_table_01(sqlite_object: SQLite) -> Table:

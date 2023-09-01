@@ -16,12 +16,18 @@
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
 
+import os
 import unittest
+import unittest.mock as mock
 
-from bbutil.database import Table, Types
+import bbutil
+
+from bbutil.database import Table, Types, SQLite
 
 from tests.helper import get_sqlite, set_log
 from tests.helper.table import TestData, get_table_01, get_table_02, get_table_03, get_table_04
+
+from tests.helper.sqlite import get_sqlite_operational_error, get_sqlite_integrity_error, get_sqlite_return_false
 
 __all__ = [
     "TestTable"
@@ -33,6 +39,12 @@ class TestTable(unittest.TestCase):
 
     def setUp(self):
         set_log()
+        return
+
+    @staticmethod
+    def _clean(sqlite: SQLite):
+        if os.path.exists(sqlite.filename) is True:
+            os.remove(sqlite.filename)
         return
 
     def assertHasAttr(self, obj, intended_attr):
@@ -78,6 +90,7 @@ class TestTable(unittest.TestCase):
         self.assertListEqual(_names, _table.names)
         self.assertListEqual(_column_list, _table.column_list)
         self.assertListEqual(_unique_list, _table.unique_list)
+        self._clean(_table.sqlite)
         return
 
     def test_add_column_02(self):
@@ -91,6 +104,7 @@ class TestTable(unittest.TestCase):
         _count1 = len(_table.names)
 
         self.assertEqual(_count1, 1)
+        self._clean(_table.sqlite)
         return
 
     def test_new_data_01(self):
@@ -103,133 +117,95 @@ class TestTable(unittest.TestCase):
         self.assertHasAttr(_data, "use_test")
         self.assertHasAttr(_data, "testname")
         self.assertHasAttr(_data, "path")
+        self._clean(_table.sqlite)
         return
 
     def test_init_01(self):
-
         _sqlite = get_sqlite(filename="test_check_table.sqlite", path="testdata/database")
         _table = get_table_01(sqlite_object=_sqlite)
 
-        _check1 = _sqlite.connect()
-        _check2 = _table.init()
-        _check3 = _sqlite.disconnect()
-
-        self.assertTrue(_check1)
-        self.assertTrue(_check2)
-        self.assertTrue(_check3)
+        _check = _table.init()
+        self.assertTrue(_check)
         return
 
     def test_init_02(self):
-
         _sqlite = get_sqlite(filename="test_check_table.sqlite", path="testdata/database")
         _table = Table(name="test01", sqlite=_sqlite)
 
-        _check1 = _sqlite.connect()
-        _check2 = _table.init()
-        _check3 = _sqlite.disconnect()
-
-        self.assertTrue(_check1)
-        self.assertFalse(_check2)
-        self.assertTrue(_check3)
+        _check = _table.init()
+        self.assertFalse(_check)
         return
 
+    @mock.patch('sqlite3.connect', new=get_sqlite_operational_error())
     def test_init_03(self):
-
         _sqlite = get_sqlite(filename="test_check_table.sqlite", path="testdata/database")
         _table = get_table_01(sqlite_object=_sqlite)
 
-        _check1 = _sqlite.connect()
-        _sqlite.connection = None
-        _check2 = _table.init()
-
-        self.assertTrue(_check1)
-        self.assertFalse(_check2)
+        _check = _table.init()
+        self.assertFalse(_check)
         return
 
     def test_init_04(self):
+        bbutil.set_log(None)
+
         _table = Table(name="Testos")
-
         _check1 = _table.init()
-
         self.assertFalse(_check1)
         return
 
     def test_select_01(self):
-
         _sqlite = get_sqlite(filename="test_select.sqlite", path="testdata/database")
         _table = get_table_01(sqlite_object=_sqlite)
 
-        _check1 = _sqlite.connect()
         _check2 = _table.init()
 
         _data = _table.select()
         _count = len(_data)
 
-        _check3 = _sqlite.disconnect()
-
-        self.assertTrue(_check1)
         self.assertTrue(_check2)
-        self.assertTrue(_check3)
         self.assertEqual(_count, 6)
         return
 
     def test_select_02(self):
-
         _sqlite = get_sqlite(filename="test_check_table.sqlite", path="testdata/database")
         _table = get_table_01(sqlite_object=_sqlite)
         _table.suppress_warnings = False
 
-        _check1 = _sqlite.connect()
         _check2 = _table.init()
 
         _data = _table.select()
         _count = len(_data)
 
-        _check3 = _sqlite.disconnect()
-
-        self.assertTrue(_check1)
         self.assertTrue(_check2)
-        self.assertTrue(_check3)
         self.assertEqual(_count, 0)
         return
 
     def test_select_03(self):
-
         _sqlite = get_sqlite(filename="test_select.sqlite", path="testdata/database")
         _table = get_table_01(sqlite_object=_sqlite)
         _table.suppress_warnings = False
 
-        _check1 = _sqlite.connect()
         _check2 = _table.init()
 
-        _sqlite.connection = None
-        _data = _table.select()
+        with mock.patch('sqlite3.connect', new=get_sqlite_operational_error()):
+            _data = _table.select()
+
         _count = len(_data)
 
-        _check3 = _sqlite.disconnect()
-
-        self.assertTrue(_check1)
         self.assertTrue(_check2)
-        self.assertTrue(_check3)
         self.assertEqual(_count, 0)
         return
 
     def test_select_04(self):
-
         _sqlite = get_sqlite(filename="test_select.sqlite", path="testdata/database")
         _table = get_table_02(sqlite_object=_sqlite)
 
-        _check1 = _sqlite.connect()
         _check2 = _table.init()
 
         _data = _table.select()
         _count = len(_data)
 
-        _check3 = _sqlite.disconnect()
-
-        self.assertTrue(_check1)
         self.assertTrue(_check2)
-        self.assertTrue(_check3)
         self.assertEqual(_count, 0)
         return
 
@@ -237,7 +213,6 @@ class TestTable(unittest.TestCase):
         _sqlite = get_sqlite(filename="test.sqlite", clean=True)
         _table = get_table_01(sqlite_object=_sqlite)
 
-        _check1 = _sqlite.connect()
         _check2 = _table.init()
 
         _data = _table.new_data()
@@ -247,19 +222,15 @@ class TestTable(unittest.TestCase):
 
         _count = _table.store(_data)
 
-        _check3 = _sqlite.disconnect()
-
-        self.assertTrue(_check1)
         self.assertTrue(_check2)
-        self.assertTrue(_check3)
         self.assertEqual(_count, 1)
+        self._clean(_table.sqlite)
         return
 
     def test_store_02(self):
         _sqlite = get_sqlite(filename="test.sqlite", clean=True)
         _table = get_table_01(sqlite_object=_sqlite)
 
-        _check1 = _sqlite.connect()
         _check2 = _table.init()
 
         _data1 = _table.new_data()
@@ -279,19 +250,15 @@ class TestTable(unittest.TestCase):
 
         _count = _table.store()
 
-        _check3 = _sqlite.disconnect()
-
-        self.assertTrue(_check1)
         self.assertTrue(_check2)
-        self.assertTrue(_check3)
         self.assertEqual(_count, 2)
+        self._clean(_table.sqlite)
         return
 
     def test_store_03(self):
         _sqlite = get_sqlite(filename="test.sqlite", clean=True)
         _table = get_table_01(sqlite_object=_sqlite)
 
-        _check1 = _sqlite.connect()
         _check2 = _table.init()
 
         _data1 = _table.new_data()
@@ -318,77 +285,15 @@ class TestTable(unittest.TestCase):
 
         _count = _table.store()
 
-        _check3 = _sqlite.disconnect()
-
-        self.assertTrue(_check1)
         self.assertTrue(_check2)
-        self.assertTrue(_check3)
         self.assertEqual(_count, 2)
-        return
-
-    def _check_store(self, table: Table, limit: int, check: int):
-        _range = range(0, limit)
-        n = 1
-        for _number in _range:
-            _data = table.new_data()
-            _data.use_test = True
-            _data.testname = "Test{0:d}".format(n)
-            _data.path = "path"
-            table.add(_data)
-            n += 1
-
-        _count1 = table.store()
-        _count2 = table.count
-        self.assertEqual(_count1, check)
-        self.assertEqual(_count2, check)
-        return
-
-    def test_store_04(self):
-        _sqlite = get_sqlite(filename="test.sqlite", clean=True)
-
-        _table0 = get_table_03("interval0", sqlite_object=_sqlite)
-        _table1 = get_table_03("interval1", sqlite_object=_sqlite)
-        _table2 = get_table_03("interval2", sqlite_object=_sqlite)
-        _table3 = get_table_03("interval3", sqlite_object=_sqlite)
-        _table4 = get_table_03("interval4", sqlite_object=_sqlite)
-        _table5 = get_table_03("interval5", sqlite_object=_sqlite)
-        _table6 = get_table_03("interval6", sqlite_object=_sqlite)
-
-        _check_connect = _sqlite.connect()
-
-        _tables = [
-            _table0,
-            _table1,
-            _table2,
-            _table3,
-            _table4,
-            _table5,
-            _table6
-        ]
-
-        for _table in _tables:
-            _check = _table.init()
-            self.assertTrue(_check)
-
-        self._check_store(_table0, 500, 500)
-        self._check_store(_table1, 1000, 1000)
-        self._check_store(_table2, 5000, 5000)
-        self._check_store(_table3, 10000, 10000)
-        self._check_store(_table4, 20000, 20000)
-        self._check_store(_table5, 50000, 50000)
-        self._check_store(_table6, 100000, 100000)
-
-        _check_disconnect = _sqlite.disconnect()
-
-        self.assertTrue(_check_connect)
-        self.assertTrue(_check_disconnect)
+        self._clean(_table.sqlite)
         return
 
     def test_add_01(self):
         _sqlite = get_sqlite(filename="test.sqlite", clean=True)
         _table = get_table_04(sqlite_object=_sqlite)
 
-        _check1 = _sqlite.connect()
         _check2 = _table.init()
 
         _data1 = _table.new_data()
@@ -416,20 +321,16 @@ class TestTable(unittest.TestCase):
         _list1 = _table.index["TestMain"]
         _list2 = _table.index["TestOther"]
 
-        _check3 = _sqlite.disconnect()
-
-        self.assertTrue(_check1)
         self.assertTrue(_check2)
-        self.assertTrue(_check3)
         self.assertEqual(len(_list1), 2)
         self.assertEqual(len(_list2), 1)
+        self._clean(_table.sqlite)
         return
 
     def test_add_02(self):
         _sqlite = get_sqlite(filename="test.sqlite", clean=True)
         _table = get_table_04(sqlite_object=_sqlite)
 
-        _check1 = _sqlite.connect()
         _check2 = _table.init()
 
         _data1 = _table.new_data()
@@ -451,19 +352,15 @@ class TestTable(unittest.TestCase):
 
         _list1 = _table.index["TestMain"]
 
-        _check3 = _sqlite.disconnect()
-
-        self.assertTrue(_check1)
         self.assertTrue(_check2)
-        self.assertTrue(_check3)
         self.assertEqual(len(_list1), 1)
+        self._clean(_table.sqlite)
         return
 
     def test_update_01(self):
         _sqlite = get_sqlite(filename="test.sqlite", clean=True)
         _table = get_table_04(sqlite_object=_sqlite)
 
-        _check1 = _sqlite.connect()
         _check2 = _table.init()
 
         _data1 = _table.new_data()
@@ -482,21 +379,17 @@ class TestTable(unittest.TestCase):
         _data2.path = "path"
 
         _check4 = _table.update(_data2, "testid = ?", 1)
+        _count = _table.check()
 
-        _count = _table.count
-
-        _check5 = _sqlite.disconnect()
-
-        self.assertTrue(_check1)
         self.assertTrue(_check2)
         self.assertTrue(_check3)
         self.assertTrue(_check4)
-        self.assertTrue(_check5)
         self.assertEqual(_count, 1)
+        self._clean(_table.sqlite)
         return
 
     def _load_table(self, table: Table, limit: int):
-        _sql_count = table.count
+        _sql_count = table.check()
         _data_count = table.load()
 
         self.assertEqual(_sql_count, limit)
@@ -513,8 +406,6 @@ class TestTable(unittest.TestCase):
         _table4 = get_table_03("interval4", sqlite_object=_sqlite)
         _table5 = get_table_03("interval5", sqlite_object=_sqlite)
         _table6 = get_table_03("interval6", sqlite_object=_sqlite)
-
-        _check_connect = _sqlite.connect()
 
         _tables = [
             _table0,
@@ -537,11 +428,6 @@ class TestTable(unittest.TestCase):
         self._load_table(_table4, 20000)
         self._load_table(_table5, 50000)
         self._load_table(_table6, 100000)
-
-        _check_disconnect = _sqlite.disconnect()
-
-        self.assertTrue(_check_connect)
-        self.assertTrue(_check_disconnect)
         return
 
     def test_load_02(self):
@@ -549,18 +435,13 @@ class TestTable(unittest.TestCase):
 
         _table = get_table_01(sqlite_object=_sqlite)
 
-        _check_connect = _sqlite.connect()
-
         _check_init = _table.init()
-        _sqlite.connection = None
-        _count = _table.load()
 
-        _check_disconnect = _sqlite.disconnect()
+        with mock.patch('sqlite3.connect', new=get_sqlite_operational_error()):
+            _count = _table.load()
 
-        self.assertTrue(_check_connect)
         self.assertTrue(_check_init)
         self.assertEqual(_count, 0)
-        self.assertTrue(_check_disconnect)
         return
 
     def test_clear_01(self):
@@ -568,19 +449,14 @@ class TestTable(unittest.TestCase):
 
         _table = get_table_01(sqlite_object=_sqlite)
 
-        _check_connect = _sqlite.connect()
-
         _check_init = _table.init()
         _count1 = _table.load()
 
         _table.clear()
 
         _count2 = _table.data_count
-        _check_disconnect = _sqlite.disconnect()
 
-        self.assertTrue(_check_connect)
         self.assertTrue(_check_init)
         self.assertEqual(_count1, 6)
         self.assertEqual(_count2, 0)
-        self.assertTrue(_check_disconnect)
         return

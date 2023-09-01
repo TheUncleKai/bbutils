@@ -18,6 +18,8 @@
 
 import os
 
+from shutil import copyfile
+
 import bbutil
 from bbutil.logging import Logging
 from bbutil.app.manager import ModuleManager
@@ -36,6 +38,7 @@ __all__ = [
     "worker",
 
     "get_sqlite",
+    "copy_sqlite",
     "set_log",
     "set_module",
     "reset_module"
@@ -55,6 +58,20 @@ def get_sqlite(filename: str, path: str = os.getcwd(), clean: bool = False) -> S
 
     if (os.path.exists(_testfile) is True) and (clean is True):
         os.remove(_testfile)
+
+    _sqlite = SQLite(filename=_testfile, name="Test")
+    return _sqlite
+
+
+def copy_sqlite(filename: str, path: str = os.getcwd(), clean: bool = False) -> SQLite:
+    _sourcefile = full_path("{0:s}/{1:s}".format(path, filename))
+    _name = "Test"
+    _testfile = "{0:s}/{1:s}".format(os.getcwd(), filename)
+
+    if os.path.exists(_testfile):
+        os.remove(_testfile)
+
+    copyfile(_sourcefile, _testfile)
 
     _sqlite = SQLite(filename=_testfile, name="Test")
     return _sqlite
