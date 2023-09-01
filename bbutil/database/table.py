@@ -249,5 +249,8 @@ class Table(object):
         for _item in _items:
             self.add(_item)
             _progress.inc()
+
         bbutil.log.clear()
+
+        _count = self.data_count
         return _count
