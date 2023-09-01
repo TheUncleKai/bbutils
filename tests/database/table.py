@@ -16,12 +16,13 @@
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
 
+import os
 import unittest
 import unittest.mock as mock
 
 import bbutil
 
-from bbutil.database import Table, Types
+from bbutil.database import Table, Types, SQLite
 
 from tests.helper import get_sqlite, set_log
 from tests.helper.table import TestData, get_table_01, get_table_02, get_table_03, get_table_04
@@ -38,6 +39,12 @@ class TestTable(unittest.TestCase):
 
     def setUp(self):
         set_log()
+        return
+
+    @staticmethod
+    def _clean(sqlite: SQLite):
+        if os.path.exists(sqlite.filename) is True:
+            os.remove(sqlite.filename)
         return
 
     def assertHasAttr(self, obj, intended_attr):
@@ -83,6 +90,7 @@ class TestTable(unittest.TestCase):
         self.assertListEqual(_names, _table.names)
         self.assertListEqual(_column_list, _table.column_list)
         self.assertListEqual(_unique_list, _table.unique_list)
+        self._clean(_table.sqlite)
         return
 
     def test_add_column_02(self):
@@ -96,6 +104,7 @@ class TestTable(unittest.TestCase):
         _count1 = len(_table.names)
 
         self.assertEqual(_count1, 1)
+        self._clean(_table.sqlite)
         return
 
     def test_new_data_01(self):
@@ -108,6 +117,7 @@ class TestTable(unittest.TestCase):
         self.assertHasAttr(_data, "use_test")
         self.assertHasAttr(_data, "testname")
         self.assertHasAttr(_data, "path")
+        self._clean(_table.sqlite)
         return
 
     def test_init_01(self):
@@ -214,6 +224,7 @@ class TestTable(unittest.TestCase):
 
         self.assertTrue(_check2)
         self.assertEqual(_count, 1)
+        self._clean(_table.sqlite)
         return
 
     def test_store_02(self):
@@ -241,6 +252,7 @@ class TestTable(unittest.TestCase):
 
         self.assertTrue(_check2)
         self.assertEqual(_count, 2)
+        self._clean(_table.sqlite)
         return
 
     def test_store_03(self):
@@ -275,6 +287,7 @@ class TestTable(unittest.TestCase):
 
         self.assertTrue(_check2)
         self.assertEqual(_count, 2)
+        self._clean(_table.sqlite)
         return
 
     def test_add_01(self):
@@ -311,6 +324,7 @@ class TestTable(unittest.TestCase):
         self.assertTrue(_check2)
         self.assertEqual(len(_list1), 2)
         self.assertEqual(len(_list2), 1)
+        self._clean(_table.sqlite)
         return
 
     def test_add_02(self):
@@ -340,6 +354,7 @@ class TestTable(unittest.TestCase):
 
         self.assertTrue(_check2)
         self.assertEqual(len(_list1), 1)
+        self._clean(_table.sqlite)
         return
 
     def test_update_01(self):
@@ -370,6 +385,7 @@ class TestTable(unittest.TestCase):
         self.assertTrue(_check3)
         self.assertTrue(_check4)
         self.assertEqual(_count, 1)
+        self._clean(_table.sqlite)
         return
 
     def _load_table(self, table: Table, limit: int):
