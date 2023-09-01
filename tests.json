@@ -292,7 +292,8 @@
                 "test_select_04",
                 "test_select_05",
                 "test_select_06",
-                "test_select_07"
+                "test_select_07",
+                "test_bulk_insert_select_01"
             ]
         },
         {

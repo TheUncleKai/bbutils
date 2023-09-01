@@ -753,3 +753,22 @@ class TestSQLite(unittest.TestCase):
 
         self.assertIsNone(_data_list)
         return
+
+    def test_bulk_insert_select_01(self):
+        _sqlite = copy_sqlite(filename="test_check_table.sqlite", path="testdata/database")
+        _sqlite.prepare()
+
+        _table = get_table_01(_sqlite)
+        _table.name = "tester01"
+
+        self._fill_bulk(_table, 500)
+
+        count = _sqlite.insert(_table.name, _table.names, _table.data)
+        self.assertEqual(count, 500)
+
+        data = _sqlite.select(_table.name, _table.names, "", [])
+        count = len(data)
+        self.assertEqual(count, 500)
+
+        self._clean(_sqlite)
+        return
