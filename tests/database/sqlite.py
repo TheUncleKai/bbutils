@@ -20,7 +20,7 @@ import os
 import unittest
 import unittest.mock as mock
 
-from bbutil.database import SQLite
+from bbutil.database import SQLite, Table
 from bbutil.utils import full_path
 
 from tests.helper.sqlite import get_sqlite_operational_error, get_sqlite_integrity_error, get_sqlite_return_false
@@ -404,6 +404,126 @@ class TestSQLite(unittest.TestCase):
 
         count = _sqlite.insert(_table.name, _table.names, _data)
         self.assertEqual(count, -1)
+
+        self._clean(_sqlite)
+        return
+
+    @staticmethod
+    def _fill_bulk(table: Table, max_range: int = 0):
+        _range = range(0, max_range)
+        _width = len(str(max_range))
+
+        for _number in _range:
+            _data = table.new_data()
+            _data.testid = _number
+            _data.use_test = True
+            _testname = "Test{0:s}".format(str(_number).rjust(_width, "0"))
+            _data.testname = _testname
+            _data.path = "/blo/bka/{0:s}".format(_testname)
+            table.add(_data)
+        return
+
+    def test_bulk_insert_01(self):
+        _sqlite = copy_sqlite(filename="test_check_table.sqlite", path="testdata/database")
+        _sqlite.prepare()
+
+        _table = get_table_01(_sqlite)
+        _table.name = "tester01"
+
+        self._fill_bulk(_table, 500)
+
+        count = _sqlite.insert(_table.name, _table.names, _table.data)
+        self.assertEqual(count, 500)
+
+        self._clean(_sqlite)
+        return
+
+    def test_bulk_insert_02(self):
+        _sqlite = copy_sqlite(filename="test_check_table.sqlite", path="testdata/database")
+        _sqlite.prepare()
+
+        _table = get_table_01(_sqlite)
+        _table.name = "tester01"
+
+        self._fill_bulk(_table, 1000)
+
+        count = _sqlite.insert(_table.name, _table.names, _table.data)
+        self.assertEqual(count, 1000)
+
+        self._clean(_sqlite)
+        return
+
+    def test_bulk_insert_03(self):
+        _sqlite = copy_sqlite(filename="test_check_table.sqlite", path="testdata/database")
+        _sqlite.prepare()
+
+        _table = get_table_01(_sqlite)
+        _table.name = "tester01"
+
+        self._fill_bulk(_table, 5000)
+
+        count = _sqlite.insert(_table.name, _table.names, _table.data)
+        self.assertEqual(count, 5000)
+
+        self._clean(_sqlite)
+        return
+
+    def test_bulk_insert_04(self):
+        _sqlite = copy_sqlite(filename="test_check_table.sqlite", path="testdata/database")
+        _sqlite.prepare()
+
+        _table = get_table_01(_sqlite)
+        _table.name = "tester01"
+
+        self._fill_bulk(_table, 10000)
+
+        count = _sqlite.insert(_table.name, _table.names, _table.data)
+        self.assertEqual(count, 10000)
+
+        self._clean(_sqlite)
+        return
+
+    def test_bulk_insert_05(self):
+        _sqlite = copy_sqlite(filename="test_check_table.sqlite", path="testdata/database")
+        _sqlite.prepare()
+
+        _table = get_table_01(_sqlite)
+        _table.name = "tester01"
+
+        self._fill_bulk(_table, 20000)
+
+        count = _sqlite.insert(_table.name, _table.names, _table.data)
+        self.assertEqual(count, 20000)
+
+        self._clean(_sqlite)
+        return
+
+    def test_bulk_insert_06(self):
+        _sqlite = copy_sqlite(filename="test_check_table.sqlite", path="testdata/database")
+        _sqlite.prepare()
+
+        _table = get_table_01(_sqlite)
+        _table.name = "tester01"
+
+        self._fill_bulk(_table, 50000)
+
+        count = _sqlite.insert(_table.name, _table.names, _table.data)
+        self.assertEqual(count, 50000)
+
+        self._clean(_sqlite)
+        return
+
+    def test_bulk_insert_07(self):
+        _sqlite = copy_sqlite(filename="test_check_table.sqlite", path="testdata/database")
+        _sqlite.prepare()
+
+        _table = get_table_01(_sqlite)
+        _table.name = "tester01"
+
+        self._fill_bulk(_table, 100000)
+
+        count = _sqlite.insert(_table.name, _table.names, _table.data)
+        self.assertEqual(count, 100000)
 
         self._clean(_sqlite)
         return
