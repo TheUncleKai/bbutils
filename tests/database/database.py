@@ -149,4 +149,26 @@ class TestDatabase(unittest.TestCase):
 
         self.assertTrue(_check1)
         self.assertEqual(_count, 2)
+        self.assertEqual(_database.table01.data_count, 1)
+        self.assertEqual(_database.table02.data_count, 1)
+        return
+
+    def test_clear_01(self):
+        _filename = "{0:s}/testdata/database/test_database.sqlite".format(os.getcwd())
+        _database = TestData(filename=_filename)
+
+        _check1 = _database.start()
+        self.assertIsNotNone(_database.table01)
+        self.assertIsNotNone(_database.table02)
+
+        _count = _database.load()
+
+        self.assertTrue(_check1)
+        self.assertEqual(_count, 2)
+        self.assertEqual(_database.table01.data_count, 1)
+        self.assertEqual(_database.table02.data_count, 1)
+
+        _database.clear()
+        self.assertEqual(_database.table01.data_count, 0)
+        self.assertEqual(_database.table02.data_count, 0)
         return

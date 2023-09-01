@@ -359,7 +359,8 @@
                 "test_start_03",
                 "test_start_04",
                 "test_store_01",
-                "test_load_01"
+                "test_load_01",
+                "test_clear_01"
             ]
         },
         {
