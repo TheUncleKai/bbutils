@@ -754,6 +754,27 @@ class TestSQLite(unittest.TestCase):
         self.assertIsNone(_data_list)
         return
 
+    def _compare_bulk(self, data):
+        _width = len(str(500))
+
+        _number = 0
+        for item in data:
+            item_testid = item[0]
+            item_use_test = item[1]
+            item_testname = item[2]
+            item_path = item[3]
+
+            self.assertEqual(item_testid, _number)
+            self.assertTrue(item_use_test)
+
+            _testname = "Test{0:s}".format(str(_number).rjust(_width, "0"))
+            _path = "/blo/bka/{0:s}".format(_testname)
+            self.assertEqual(item_testname, _testname)
+            self.assertEqual(item_path, _path)
+
+            _number += 1
+        return
+
     def test_bulk_insert_select_01(self):
         _sqlite = copy_sqlite(filename="test_check_table.sqlite", path="testdata/database")
         _sqlite.prepare()
@@ -769,6 +790,8 @@ class TestSQLite(unittest.TestCase):
         data = _sqlite.select(_table.name, _table.names, "", [])
         count = len(data)
         self.assertEqual(count, 500)
+
+        self._compare_bulk(data)
 
         self._clean(_sqlite)
         return
