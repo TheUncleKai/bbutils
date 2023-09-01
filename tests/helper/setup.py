@@ -40,9 +40,11 @@ testdata1 = [
     (
        "data/database",
        [
-          "testdata/database/test_select.sqlite",
-          "testdata/database/test_bulk.sqlite",
-          "testdata/database/test_check_table.sqlite"
+           "testdata/database/test_update.sqlite",
+           "testdata/database/test_select.sqlite",
+           "testdata/database/test_database.sqlite",
+           "testdata/database/test_bulk.sqlite",
+           "testdata/database/test_check_table.sqlite"
        ]
     ),
     (
@@ -64,9 +66,11 @@ testdata2 = [
     (
         'data/database',
         [
-            'testdata/database/test_select.sqlite',
-            'testdata/database/test_bulk.sqlite',
-            'testdata/database/test_check_table.sqlite'
+            "testdata/database/test_update.sqlite",
+            "testdata/database/test_select.sqlite",
+            "testdata/database/test_database.sqlite",
+            "testdata/database/test_bulk.sqlite",
+            "testdata/database/test_check_table.sqlite"
         ]
     )
 ]

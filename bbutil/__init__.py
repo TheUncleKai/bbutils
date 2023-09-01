@@ -75,7 +75,7 @@ __milestone__ = 0
 __major__ = 5
 
 #: version minor
-__minor__ = 1
+__minor__ = 5
 
 #: version patch
 __patch__ = 0
