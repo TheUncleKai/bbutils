@@ -246,6 +246,18 @@ class TestSQLite(unittest.TestCase):
         self._clean(_sqlite)
         return
 
+    def test_prepare_table_08(self):
+        _sqlite = get_sqlite(filename="test.sqlite", clean=True)
+        _sqlite.prepare()
+        _table = get_table_01(_sqlite)
+
+        with mock.patch('sqlite3.connect', new=get_sqlite_operational_error()):
+            _count = _sqlite.prepare_table(_table.name, _table.column_list, _table.unique_list)
+        self.assertEqual(_count, -1)
+
+        self._clean(_sqlite)
+        return
+
     def test_insert_01(self):
         _sqlite = get_sqlite(filename="test.sqlite", clean=True)
         _sqlite.prepare()
@@ -524,6 +536,26 @@ class TestSQLite(unittest.TestCase):
 
         count = _sqlite.insert(_table.name, _table.names, _table.data)
         self.assertEqual(count, 100000)
+
+        self._clean(_sqlite)
+        return
+
+    def test_bulk_insert_08(self):
+        _sqlite = copy_sqlite(filename="test_check_table.sqlite", path="testdata/database")
+        _sqlite.prepare()
+
+        _table = get_table_01(_sqlite)
+        _table.name = "tester01"
+
+        self._fill_bulk(_table, 10)
+
+        count = _sqlite.insert(_table.name, _table.names, _table.data)
+        self.assertEqual(count, 10)
+
+        self._fill_bulk(_table, 10)
+
+        count = _sqlite.insert(_table.name, _table.names, _table.data)
+        self.assertEqual(count, 0)
 
         self._clean(_sqlite)
         return
