@@ -92,7 +92,7 @@ config_modules = [
         "workers": [
             {
                 "path": "testdata.app.commands.prepact2",
-                "classname": "Worker01"
+                "classname": "Worker03"
             }
         ]
     }

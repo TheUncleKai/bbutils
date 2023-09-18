@@ -178,5 +178,5 @@ class TestConsole(unittest.TestCase):
             _ret = _console.execute()
 
         self.assertTrue(_check1)
-        self.assertEqual(_ret, 0)
+        self.assertEqual(_ret, 3)
         return
