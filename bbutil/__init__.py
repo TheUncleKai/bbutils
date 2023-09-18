@@ -72,10 +72,10 @@ __credits__ = [__author__]
 __milestone__ = 0
 
 #: version major
-__major__ = 5
+__major__ = 6
 
 #: version minor
-__minor__ = 5
+__minor__ = 0
 
 #: version patch
 __patch__ = 0
