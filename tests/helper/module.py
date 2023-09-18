@@ -18,7 +18,8 @@
 
 __all__ = [
     "config_testone",
-    "config_testone_xx"
+    "config_testone_xx",
+    "config_modules"
 ]
 
 
@@ -28,11 +29,11 @@ config_testone = {
     "desc": "the first test",
     "workers": [
         {
-            "path": "testdata.app.commands.testone.prepact",
+            "path": "testdata.app.commands.prepact",
             "classname": "Worker01"
         },
         {
-            "path": "testdata.app.commands.testone.runact",
+            "path": "testdata.app.commands.runact",
             "classname": "Worker02"
         }
     ]
@@ -45,12 +46,42 @@ config_testone_xx = {
     "desc": "the first test",
     "workers": [
         {
-            "path": "testdata.appx.commands.testone.prepact",
+            "path": "testdata.appx.commands.prepact",
             "classname": "Worker01"
         },
         {
-            "path": "testdata.app.commands.testone.runact",
+            "path": "testdata.app.commands.runact",
             "classname": "Worker02"
         }
     ]
 }
+
+
+config_modules = [
+    {
+        "name": "testone",
+        "command": "test01",
+        "desc": "the first test",
+        "workers": [
+            {
+                "path": "testdata.app.commands.prepact",
+                "classname": "Worker01"
+            },
+            {
+                "path": "testdata.app.commands.runact",
+                "classname": "Worker02"
+            }
+        ]
+    },
+    {
+        "name": "testtwo",
+        "command": "test02",
+        "desc": "the second test",
+        "workers": [
+            {
+                "path": "testdata.app.commands.prepact",
+                "classname": "Worker01"
+            }
+        ]
+    }
+]
