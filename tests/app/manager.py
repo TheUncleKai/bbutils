@@ -23,6 +23,7 @@ import unittest.mock as mock
 from bbutil.app.manager import ModuleManager
 
 from tests.helper import set_log, reset_module
+from tests.helper.module import config_modules
 
 
 __all__ = [
@@ -43,8 +44,8 @@ class TestManager(unittest.TestCase):
         return
 
     def test_init_01(self):
-        _module = ModuleManager(module_path="testdata.app.commands")
-        _check1 = _module.init()
+        _module = ModuleManager()
+        _check1 = _module.init(config_modules)
 
         _command1 = _module.get_command("test01")
         _command2 = _module.get_command("test01xx")
@@ -56,13 +57,6 @@ class TestManager(unittest.TestCase):
         self.assertFalse(_check3)
         self.assertIsNotNone(_command1)
         self.assertIsNone(_command2)
-        self.assertEqual(len(_module.commands), 4)
-        self.assertEqual(len(_module.modules), 4)
-        return
-
-    def test_init_02(self):
-        _module = ModuleManager(module_path="testdata.app.xcommands")
-        _check1 = _module.init()
-
-        self.assertFalse(_check1)
+        self.assertEqual(len(_module.commands), 3)
+        self.assertEqual(len(_module.modules), 3)
         return

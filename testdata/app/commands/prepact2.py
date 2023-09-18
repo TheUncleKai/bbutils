@@ -23,22 +23,19 @@ import bbutil
 
 from bbutil.worker import Worker
 
-__worker__ = "Worker02"
-
 __all__ = [
-    "Worker02"
+    "Worker03"
 ]
 
 
 @dataclass
-class Worker02(Worker):
+class Worker03(Worker):
 
     max: int = 50000
     iterate_list: List[int] = field(default_factory=list)
-    do_fail: bool = False
 
     def init(self):
-        self.set_id("Act02")
+        self.set_id("Act01")
         return
 
     def prepare(self) -> bool:
@@ -77,4 +74,4 @@ class Worker02(Worker):
             n += 1
 
         bbutil.log.clear()
-        return True
+        return False

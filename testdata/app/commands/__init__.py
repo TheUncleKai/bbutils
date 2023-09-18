@@ -17,10 +17,7 @@
 #
 
 __all__ = [
-    "testone",
-    "testtwo",
-    "testthree",
-    "testfour",
-    "testfive",
-    "testsix"
+    "prepact",
+    "prepact2",
+    "runact"
 ]

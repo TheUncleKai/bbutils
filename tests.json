@@ -432,13 +432,7 @@
             "classname": "TestModule",
             "tests": [
                 "test_init_01",
-                "test_init_02",
-                "test_init_03",
-                "test_init_04",
-                "test_load_01",
-                "test_load_02",
-                "test_load_03",
-                "test_load_04"
+                "test_init_02"
             ]
         },
         {
@@ -469,8 +463,7 @@
             "path": "tests.app.manager",
             "classname": "TestManager",
             "tests": [
-                "test_init_01",
-                "test_init_02"
+                "test_init_01"
             ]
         },
         {
@@ -481,7 +474,6 @@
                 "test_setup_01",
                 "test_setup_02",
                 "test_setup_03",
-                "test_setup_04",
                 "test_execute_01",
                 "test_execute_02",
                 "test_execute_03",

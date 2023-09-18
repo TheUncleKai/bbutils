@@ -21,6 +21,7 @@ import unittest
 import unittest.mock as mock
 
 from tests.helper import set_log
+from tests.helper.module import config_testone, config_testone_xx
 
 from bbutil.app.module import Module
 
@@ -41,104 +42,26 @@ class TestModule(unittest.TestCase):
         return
 
     def test_init_01(self):
-        _module = Module()
+        _module = Module(**config_testone)
 
-        _path = "testdata.app.commands"
-        _name = "testone"
-        _check1 = _module.init(_path, _name)
-
-        self.assertTrue(_check1)
         self.assertEqual(_module.command, "test01")
         self.assertEqual(_module.desc, "the first test")
-        return
+        self.assertEqual(_module.count, 0)
 
-    def test_init_02(self):
-        _module = Module()
-
-        _path = "testdata.app.commands"
-        _name = "testonex"
-        _check1 = _module.init(_path, _name)
-
-        self.assertFalse(_check1)
-        return
-
-    def test_init_03(self):
-        _module = Module()
-
-        _path = "testdata.app.commands"
-        _name = "testfour"
-        _check1 = _module.init(_path, _name)
-
-        self.assertFalse(_check1)
-        return
-
-    def test_init_04(self):
-        _module = Module()
-
-        _path = "testdata.app.commands"
-        _name = "testfive"
-        _check1 = _module.init(_path, _name)
-
-        self.assertFalse(_check1)
-        return
-
-    def test_load_01(self):
-        _module = Module()
-
-        _path = "testdata.app.commands"
-        _name = "testone"
-        _check1 = _module.init(_path, _name)
-        _check2 = _module.load()
-
-        self.assertTrue(_check1)
-        self.assertTrue(_check2)
-        self.assertEqual(_module.command, "test01")
-        self.assertEqual(_module.desc, "the first test")
-        return
-
-    def test_load_02(self):
-        _module = Module()
-
-        _path = "testdata.app.commands"
-        _name = "testtwo"
-        _check1 = _module.init(_path, _name)
-        _check2 = _module.load()
-
-        self.assertTrue(_check1)
-        self.assertFalse(_check2)
-        self.assertEqual(_module.command, "test02")
-        self.assertEqual(_module.desc, "the second test")
-        return
-
-    def test_load_03(self):
-        _module = Module()
-
-        _path = "testdata.app.commands"
-        _name = "testthree"
-        _check1 = _module.init(_path, _name)
-        _check2 = _module.load()
+        _check = _module.load()
+        self.assertTrue(_check)
+        self.assertEqual(_module.count, 2)
 
         _worker = _module.get_worker("Act01")
+        self.assertIsNotNone(_worker)
 
-        self.assertTrue(_check1)
-        self.assertFalse(_check2)
-        self.assertEqual(_module.command, "test03")
-        self.assertEqual(_module.desc, "the third test")
+        _worker = _module.get_worker("Act00")
         self.assertIsNone(_worker)
         return
 
-    def test_load_04(self):
-        _module = Module()
+    def test_init_02(self):
+        _module = Module(**config_testone_xx)
 
-        _path = "testdata.app.commands"
-        _name = "testone"
-        _check1 = _module.init(_path, _name)
-        _check2 = _module.load()
-
-        _worker = _module.get_worker("Act01")
-
-        self.assertTrue(_check1)
-        self.assertEqual(_module.command, "test01")
-        self.assertEqual(_module.desc, "the first test")
-        self.assertIsNotNone(_worker)
+        _check = _module.load()
+        self.assertFalse(_check)
         return

@@ -16,39 +16,26 @@
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
 
-from dataclasses import dataclass, field
 from typing import List, Optional
 
-import bbutil
 from bbutil.app.module import Module
-from bbutil.utils import get_attribute
 
 __all__ = [
     "ModuleManager"
 ]
 
 
-@dataclass
 class ModuleManager(object):
 
-    module_path: str = ""
-    modules: List[Module] = field(default_factory=list)
-    commands: List[str] = field(default_factory=list)
+    def __init__(self):
+        self.modules: List[Module] = []
+        self.commands: List[str] = []
+        return
 
-    def init(self) -> bool:
+    def init(self, config: list) -> bool:
 
-        try:
-            _commands = get_attribute(self.module_path, "__all__")
-        except ImportError as e:
-            bbutil.log.error("Unable to find commands: {0:s}".format(self.module_path))
-            return False
-
-        for _name in _commands:
-            _module = Module()
-
-            check = _module.init(self.module_path, _name)
-            if check is False:
-                continue
+        for _config in config:
+            _module = Module(**_config)
 
             self.commands.append(_module.command)
             self.modules.append(_module)
