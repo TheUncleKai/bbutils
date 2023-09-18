@@ -21,6 +21,7 @@ import unittest
 import unittest.mock as mock
 
 from tests.helper import set_log
+from tests.helper.module import config_testone
 
 from bbutil.app.module import Module
 
@@ -41,15 +42,21 @@ class TestModule(unittest.TestCase):
         return
 
     def test_init_01(self):
-        _module = Module()
+        _module = Module(**config_testone)
 
-        _path = "testdata.app.commands"
-        _name = "testone"
-        _check1 = _module.init(_path, _name)
-
-        self.assertTrue(_check1)
         self.assertEqual(_module.command, "test01")
         self.assertEqual(_module.desc, "the first test")
+        self.assertEqual(_module.count, 0)
+
+        _check = _module.load()
+        self.assertTrue(_check)
+        self.assertEqual(_module.count, 2)
+
+        _worker = _module.get_worker("Act01")
+        self.assertIsNotNone(_worker)
+
+        _worker = _module.get_worker("Act00")
+        self.assertIsNone(_worker)
         return
 
     def test_init_02(self):

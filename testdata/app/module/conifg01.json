@@ -1,0 +1,19 @@
+{
+    "modules": [
+        {
+            "name": "testone",
+            "command": "test01",
+            "desc": "the first test",
+            "workers": [
+                {
+                    "path": "testdata.app.commands.testone.prepact",
+                    "classname": "Worker01"
+                },
+                {
+                    "path": "testdata.app.commands.testone.runact",
+                    "classname": "Worker02"
+                }
+            ]
+        }
+    ]
+}

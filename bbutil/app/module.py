@@ -16,6 +16,7 @@
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
 
+from dataclasses import dataclass, field
 from typing import Optional, List
 
 import bbutil
@@ -27,17 +28,26 @@ __all__ = [
 ]
 
 
+@dataclass
+class _Worker(object):
+
+    path: str = ""
+    classname: str = ""
+
+
+@dataclass
 class Module(object):
 
-    def __init__(self):
-        self.name: str = ""
-        self.path: str = ""
+    name: str = ""
+    command: str = ""
+    desc: str = ""
+    workers: List[Worker] = field(default_factory=list)
 
-        self.command: str = ""
-        self.desc: str = ""
-        self.workers: List[Worker] = []
-        self._module = None
-        return
+    _workers: List[_Worker] = field(default_factory=list)
+
+    @property
+    def count(self) -> int:
+        return len(self.workers)
 
     def get_worker(self, worker_id: str) -> Optional[Worker]:
         for _worker in self.workers:
@@ -45,46 +55,23 @@ class Module(object):
                 return _worker
         return None
 
-    def init(self, path: str, name: str) -> bool:
-        self.name = name
-        self.path = "{0:s}.{1:s}".format(path, name)
+    def __post_init__(self):
+        for _conifg in self.workers:
 
-        try:
-            _module = get_attribute(path, name)
-        except ImportError as e:
-            bbutil.log.exception(e)
-            return False
+            # noinspection PyArgumentList
+            _worker = _Worker(**_conifg)
 
-        if hasattr(_module, "__command__") is False:
-            bbutil.log.error("No commands for {0:s}!".format(name))
-            return False
+            self._workers.append(_worker)
 
-        if hasattr(_module, "__desc__") is False:
-            bbutil.log.error("No description for {0:s}!".format(name))
-            return False
-
-        self.command = _module.__command__
-        self.desc = _module.__desc__
-
-        self._module = _module
-        return True
+        self.workers.clear()
+        return
 
     def load(self) -> bool:
 
-        _worker_list = self._module.__all__
-
-        for item in _worker_list:
-            _path = "{0:s}.{1:s}".format(self.path, item)
+        for item in self._workers:
 
             try:
-                _name = get_attribute(_path, "__worker__")
-            except ImportError as e:
-                bbutil.log.error("Unable to get worker name!")
-                bbutil.log.exception(e)
-                return False
-
-            try:
-                c = get_attribute(_path, _name)
+                c = get_attribute(item.path, item.classname)
             except ImportError as e:
                 bbutil.log.error("Unable to get worker class!")
                 bbutil.log.exception(e)

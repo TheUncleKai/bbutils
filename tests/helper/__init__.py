@@ -32,6 +32,7 @@ __all__ = [
     "database",
     "execute",
     "file",
+    "module",
     "setup",
     "sqlite",
     "table",
