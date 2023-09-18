@@ -19,7 +19,8 @@
 __all__ = [
     "config_testone",
     "config_testone_xx",
-    "config_modules"
+    "config_modules",
+    "config_modules_2"
 ]
 
 
@@ -80,6 +81,36 @@ config_modules = [
         "workers": [
             {
                 "path": "testdata.app.commands.prepact",
+                "classname": "Worker01"
+            }
+        ]
+    }
+]
+
+
+config_modules_2 = [
+    {
+        "name": "testone",
+        "command": "test01",
+        "desc": "the first test",
+        "workers": [
+            {
+                "path": "testdata.appx.commands.prepact",
+                "classname": "Worker01"
+            },
+            {
+                "path": "testdata.appx.commands.runact",
+                "classname": "Worker02"
+            }
+        ]
+    },
+    {
+        "name": "testtwo",
+        "command": "test02",
+        "desc": "the second test",
+        "workers": [
+            {
+                "path": "testdata.appx.commands.prepact",
                 "classname": "Worker01"
             }
         ]

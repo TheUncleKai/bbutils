@@ -22,6 +22,7 @@ from unittest.mock import patch, Mock
 
 import bbutil
 from tests.helper.console import AppConsole
+from tests.helper.module import config_modules, config_modules_2
 
 
 __all__ = [
@@ -40,14 +41,14 @@ class TestConsole(unittest.TestCase):
         return
 
     def test_setup_01(self):
-        _console = AppConsole()
+        _console = AppConsole(module_config=config_modules)
 
         _check = _console.setup()
         self.assertTrue(_check)
         return
 
     def test_setup_02(self):
-        _console = AppConsole()
+        _console = AppConsole(module_config=[])
         _console.module_path = "testdata.app.xcommands"
 
         _check = _console.setup()
@@ -55,23 +56,15 @@ class TestConsole(unittest.TestCase):
         return
 
     def test_setup_03(self):
-        _console = AppConsole()
+        _console = AppConsole(module_config=config_modules)
         _console.filename = "fuhhhhhhh"
 
         _check = _console.setup()
         self.assertFalse(_check)
         return
 
-    def test_setup_04(self):
-        _console = AppConsole()
-        _console.module_path = ""
-
-        _check = _console.setup()
-        self.assertFalse(_check)
-        return
-
     def test_execute_01(self):
-        _console = AppConsole()
+        _console = AppConsole(module_config=config_modules)
 
         _argv = [
             "run-tests.py",
@@ -88,7 +81,7 @@ class TestConsole(unittest.TestCase):
         return
 
     def test_execute_02(self):
-        _console = AppConsole()
+        _console = AppConsole(module_config=config_modules)
 
         _check1 = _console.setup()
 
@@ -102,7 +95,7 @@ class TestConsole(unittest.TestCase):
         return
 
     def test_execute_03(self):
-        _console = AppConsole()
+        _console = AppConsole(module_config=config_modules)
 
         _argv = [
             "run-tests.py",
@@ -119,11 +112,11 @@ class TestConsole(unittest.TestCase):
         return
 
     def test_execute_04(self):
-        _console = AppConsole()
+        _console = AppConsole(module_config=config_modules_2)
 
         _argv = [
             "run-tests.py",
-            "test02"
+            "test01"
         ]
 
         _check1 = _console.setup()
@@ -136,7 +129,7 @@ class TestConsole(unittest.TestCase):
         return
 
     def test_execute_05(self):
-        _console = AppConsole()
+        _console = AppConsole(module_config=config_modules)
 
         _argv = [
             "run-tests.py",

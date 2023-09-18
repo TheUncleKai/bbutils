@@ -19,9 +19,7 @@
 from dataclasses import dataclass, field
 from typing import List, Optional
 
-import bbutil
 from bbutil.app.module import Module
-from bbutil.utils import get_attribute
 
 __all__ = [
     "ModuleManager"
@@ -34,7 +32,7 @@ class ModuleManager(object):
     modules: List[Module] = field(default_factory=list)
     commands: List[str] = field(default_factory=list)
 
-    def init(self, config: dict) -> bool:
+    def init(self, config: list) -> bool:
 
         for _config in config:
             _module = Module(**_config)

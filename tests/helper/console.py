@@ -63,7 +63,6 @@ class AppConsole(Console):
         return _config
 
     def init(self):
-        self.module_path = "testdata.app.commands"
         self.filename = full_path("{0:s}/testdata/config01.json".format(os.getcwd()))
         return
 

@@ -7,8 +7,8 @@
 import abc
 import sys
 
-from dataclasses import dataclass
-from typing import Optional
+from dataclasses import dataclass, field
+from typing import Optional, List
 from abc import ABCMeta
 
 import bbutil
@@ -28,7 +28,7 @@ class Console(metaclass=ABCMeta):
 
     command_id: str = ""
     module: Optional[Module] = None
-    module_path: str = ""
+    module_config: List[dict] = field(default_factory=list)
 
     def __post_init__(self):
         self.init()
@@ -80,15 +80,13 @@ class Console(metaclass=ABCMeta):
         pass
 
     def _setup_module(self) -> bool:
-        if self.module_path == "":
-            bbutil.log.error("Module path for console it missing!")
+        if len(self.module_config) == 0:
+            bbutil.log.error("No modules!")
             return False
 
-        _modules = ModuleManager(self.module_path)
+        _modules = ModuleManager()
 
-        check = _modules.init()
-        if check is False:
-            return False
+        _modules.init(self.module_config)
 
         bbutil.set_module(_modules)
         return True
