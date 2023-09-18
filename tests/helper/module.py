@@ -84,6 +84,17 @@ config_modules = [
                 "classname": "Worker01"
             }
         ]
+    },
+    {
+        "name": "testthree",
+        "command": "test03",
+        "desc": "the third test",
+        "workers": [
+            {
+                "path": "testdata.app.commands.prepact2",
+                "classname": "Worker01"
+            }
+        ]
     }
 ]
 

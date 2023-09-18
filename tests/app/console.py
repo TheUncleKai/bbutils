@@ -147,7 +147,7 @@ class TestConsole(unittest.TestCase):
         return
 
     def test_execute_06(self):
-        _console = AppConsole()
+        _console = AppConsole(module_config=config_modules)
 
         _argv = [
             "run-tests.py",
@@ -165,11 +165,11 @@ class TestConsole(unittest.TestCase):
         return
 
     def test_execute_07(self):
-        _console = AppConsole()
+        _console = AppConsole(module_config=config_modules)
 
         _argv = [
             "run-tests.py",
-            "test06"
+            "test03"
         ]
 
         _check1 = _console.setup()
@@ -178,5 +178,5 @@ class TestConsole(unittest.TestCase):
             _ret = _console.execute()
 
         self.assertTrue(_check1)
-        self.assertEqual(_ret, 3)
+        self.assertEqual(_ret, 0)
         return

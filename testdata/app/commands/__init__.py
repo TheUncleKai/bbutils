@@ -18,5 +18,6 @@
 
 __all__ = [
     "prepact",
+    "prepact2",
     "runact"
 ]
