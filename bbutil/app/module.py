@@ -35,15 +35,40 @@ class _Worker(object):
     classname: str = ""
 
 
-@dataclass
 class Module(object):
 
-    name: str = ""
-    command: str = ""
-    desc: str = ""
-    workers: List[Worker] = field(default_factory=list)
+    def __init__(self, **kwargs):
+        self.name: str = ""
+        self.command: str = ""
+        self.desc: str = ""
+        self.workers: List[Worker] = []
+        self._workers: List[_Worker] = []
 
-    _workers: List[_Worker] = field(default_factory=list)
+        _value = kwargs.get("name", None)
+        if _value is not None:
+            self.name = _value
+
+        _value = kwargs.get("command", None)
+        if _value is not None:
+            self.command = _value
+
+        _value = kwargs.get("desc", None)
+        if _value is not None:
+            self.desc = _value
+
+        _value = kwargs.get("workers", None)
+        if _value is not None:
+            self._parse_workers(_value)
+        return
+
+    def _parse_workers(self, workers: list):
+        for _conifg in workers:
+
+            # noinspection PyArgumentList
+            _worker = _Worker(**_conifg)
+
+            self._workers.append(_worker)
+        return
 
     @property
     def count(self) -> int:
@@ -54,17 +79,6 @@ class Module(object):
             if _worker.id == worker_id:
                 return _worker
         return None
-
-    def __post_init__(self):
-        for _conifg in self.workers:
-
-            # noinspection PyArgumentList
-            _worker = _Worker(**_conifg)
-
-            self._workers.append(_worker)
-
-        self.workers.clear()
-        return
 
     def load(self) -> bool:
 
