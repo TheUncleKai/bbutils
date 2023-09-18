@@ -93,12 +93,53 @@ def set_log():
     return
 
 
+_config_modules = [
+    {
+        "name": "testone",
+        "command": "test01",
+        "desc": "the first test",
+        "workers": [
+            {
+                "path": "testdata.app.commands.prepact",
+                "classname": "Worker01"
+            },
+            {
+                "path": "testdata.app.commands.runact",
+                "classname": "Worker02"
+            }
+        ]
+    },
+    {
+        "name": "testtwo",
+        "command": "test02",
+        "desc": "the second test",
+        "workers": [
+            {
+                "path": "testdata.app.commands.prepact",
+                "classname": "Worker01"
+            }
+        ]
+    },
+    {
+        "name": "testthree",
+        "command": "test03",
+        "desc": "the third test",
+        "workers": [
+            {
+                "path": "testdata.app.commands.prepact2",
+                "classname": "Worker03"
+            }
+        ]
+    }
+]
+
+
 def set_module():
     if bbutil.module is not None:
         return
 
-    _module = ModuleManager(module_path="testdata.app.commands")
-    _check = _module.init()
+    _module = ModuleManager()
+    _check = _module.init(_config_modules)
 
     if _check is False:
         return
