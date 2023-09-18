@@ -431,7 +431,8 @@
             "path": "tests.app.module",
             "classname": "TestModule",
             "tests": [
-                "test_init_01"
+                "test_init_01",
+                "test_init_02"
             ]
         },
         {

@@ -17,7 +17,8 @@
 #
 
 __all__ = [
-    "config_testone"
+    "config_testone",
+    "config_testone_xx"
 ]
 
 
@@ -28,6 +29,23 @@ config_testone = {
     "workers": [
         {
             "path": "testdata.app.commands.testone.prepact",
+            "classname": "Worker01"
+        },
+        {
+            "path": "testdata.app.commands.testone.runact",
+            "classname": "Worker02"
+        }
+    ]
+}
+
+
+config_testone_xx = {
+    "name": "testone",
+    "command": "test01",
+    "desc": "the first test",
+    "workers": [
+        {
+            "path": "testdata.appx.commands.testone.prepact",
             "classname": "Worker01"
         },
         {

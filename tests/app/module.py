@@ -21,7 +21,7 @@ import unittest
 import unittest.mock as mock
 
 from tests.helper import set_log
-from tests.helper.module import config_testone
+from tests.helper.module import config_testone, config_testone_xx
 
 from bbutil.app.module import Module
 
@@ -60,13 +60,10 @@ class TestModule(unittest.TestCase):
         return
 
     def test_init_02(self):
-        _module = Module()
+        _module = Module(**config_testone_xx)
 
-        _path = "testdata.app.commands"
-        _name = "testonex"
-        _check1 = _module.init(_path, _name)
-
-        self.assertFalse(_check1)
+        _check = _module.load()
+        self.assertFalse(_check)
         return
 
     def test_init_03(self):

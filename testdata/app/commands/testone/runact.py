@@ -23,8 +23,6 @@ import bbutil
 
 from bbutil.worker import Worker
 
-__worker__ = "Worker02"
-
 __all__ = [
     "Worker02"
 ]
