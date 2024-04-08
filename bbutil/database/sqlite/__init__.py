@@ -218,6 +218,9 @@ class SQLite(object):
         if _check is False:
             return None
 
+        if len(_fetchlist) == 0:
+            return None
+
         return _fetchlist
 
     @staticmethod
