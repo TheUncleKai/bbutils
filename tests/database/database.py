@@ -99,16 +99,12 @@ class TestDatabase(unittest.TestCase):
         return
 
     def test_start_05(self):
-        _filename = "{0:s}/test.sqlite".format(os.getcwd())
-
-        _database = TestData2(filename=_filename)
+        _filename = "{0:s}/testdata/database/test_database.sqlite".format(os.getcwd())
+        _database = TestData(filename=_filename)
 
         _check1 = _database.start()
         self.assertIsNotNone(_database.table01)
         self.assertIsNotNone(_database.table02)
-        self.assertIsNotNone(_database.version)
-
-        self._clean(_database)
         return
 
     def test_store_01(self):

@@ -234,6 +234,9 @@ class Table(object):
         _list.append(item)
         return
 
+    def check(self) -> bool:
+        return True
+
     def load(self) -> int:
         bbutil.log.inform(self.name, "Load {0:s}...".format(self.name))
 

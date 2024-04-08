@@ -53,6 +53,12 @@ class Database(metaclass=ABCMeta):
     def clear_data(self):
         pass
 
+    def get_table(self, name: str) -> Optional[Table]:
+        for _table in self.tables:
+            if _table.name == name:
+                return _table
+        return None
+
     @property
     def version(self) -> Optional[Table]:
         return self._version
@@ -76,31 +82,6 @@ class Database(metaclass=ABCMeta):
             _count += _table.load()
         return _count
 
-    def _prepare_version(self):
-        skip = True
-
-        for _table in self.tables:
-            if _table.version > 0:
-                skip = False
-
-        if skip is True:
-            return
-
-        _table = Table(name="_table_version", sqlite=self.sqlite)
-        _table.add_column(name="table_name", data_type=Types.string, primarykey=True)
-        _table.add_column(name="table_version", data_type=Types.integer)
-        self._version = _table
-        self.tables.append(_table)
-
-        for _table in self.tables:
-            if _table.version == 0:
-                continue
-            data = _table.new_data()
-            data.table_name = _table.name
-            data.table_version = _table.version
-            _table.add(data)
-        return
-
     def start(self) -> bool:
         self.init()
 
@@ -117,11 +98,8 @@ class Database(metaclass=ABCMeta):
             bbutil.log.error("Preparation of tables has failed!")
             return False
 
-        self._prepare_version()
-
         for _table in self.tables:
             _check = _table.init()
             if _check is False:
                 return False
-
         return True
