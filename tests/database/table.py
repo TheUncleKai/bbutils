@@ -227,6 +227,18 @@ class TestTable(unittest.TestCase):
         self.assertFalse(_check1)
         return
 
+    def test_check_scheme_06(self):
+        bbutil.set_log(None)
+        _sqlite = get_sqlite(filename="test_database.sqlite", path="testdata/database")
+
+        _table = Table(name="tester04", sqlite=_sqlite)
+
+        _table.sqlite.prepare()
+        _check1 = _table.check_scheme()
+
+        self.assertFalse(_check1)
+        return
+
     def test_select_01(self):
         _sqlite = get_sqlite(filename="test_select.sqlite", path="testdata/database")
         _table = get_table_01(sqlite_object=_sqlite)
