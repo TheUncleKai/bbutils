@@ -265,6 +265,7 @@ class Table(object):
                                                                                                     self.name,
                                                                                                     _value,
                                                                                                     expected_value)
+                bbutil.log.error(_error)
                 return False
         return True
 
