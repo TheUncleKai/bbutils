@@ -38,6 +38,7 @@ class Database(metaclass=ABCMeta):
     name: str = ""
     sqlite: Optional[SQLite] = None
     tables: List[Table] = field(default_factory=list)
+    _version: Optional[Table] = None
     filename: str = ""
 
     @abc.abstractmethod
@@ -51,6 +52,10 @@ class Database(metaclass=ABCMeta):
     @abc.abstractmethod
     def clear_data(self):
         pass
+
+    @property
+    def version(self) -> Optional[Table]:
+        return self._version
 
     def clear(self):
         for _table in self.tables:
@@ -84,6 +89,7 @@ class Database(metaclass=ABCMeta):
         _table = Table(name="_table_version", sqlite=self.sqlite)
         _table.add_column(name="table_name", data_type=Types.string, primarykey=True)
         _table.add_column(name="table_version", data_type=Types.integer)
+        self._version = _table
         self.tables.append(_table)
 
         for _table in self.tables:
