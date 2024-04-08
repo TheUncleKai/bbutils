@@ -36,6 +36,7 @@ class Table(object):
     name: str = ""
     _counter: int = 0
     keyword: str = ""
+    version: int = 0
     sqlite: Optional[SQLite] = None
     data: List[Data] = field(default_factory=list)
     index: Dict[Any, List[Data]] = field(default_factory=dict)
