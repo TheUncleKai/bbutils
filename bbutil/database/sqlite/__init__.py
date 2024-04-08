@@ -190,6 +190,36 @@ class SQLite(object):
             return -1
         return 0
 
+    def get_scheme(self, table_name: str) -> Optional[list]:
+        _check = self.manager.connect()
+        if _check is False:
+            return None
+
+        _connection = self.manager.connection
+        c = _connection.cursor()
+
+        command = "SELECT name, type FROM pragma_table_info('{0:s}')".format(table_name)
+
+        try:
+            c.execute(command)
+        except sqlite3.OperationalError as e:
+            bbutil.log.error("Unable to create table: {0:s}".format(table_name))
+            bbutil.log.exception(e)
+            print(command)
+            self.manager.abort()
+            return None
+
+        _fetchlist = []
+
+        for _data in c:
+            _fetchlist.append(_data)
+
+        _check = self.manager.release()
+        if _check is False:
+            return None
+
+        return _fetchlist
+
     @staticmethod
     def _single_execute(table_name: str, names: list, data: Data) -> Optional[Execute]:
         _data = []

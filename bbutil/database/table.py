@@ -36,7 +36,6 @@ class Table(object):
     name: str = ""
     _counter: int = 0
     keyword: str = ""
-    version: int = 0
     sqlite: Optional[SQLite] = None
     data: List[Data] = field(default_factory=list)
     index: Dict[Any, List[Data]] = field(default_factory=dict)
@@ -234,7 +233,39 @@ class Table(object):
         _list.append(item)
         return
 
-    def check(self) -> bool:
+    def check_scheme(self) -> bool:
+        if bbutil.log is None:
+            return False
+
+        if len(self.columns) == 0:
+            bbutil.log.error("No columns: {0:s}".format(self.name))
+            return False
+
+        _scheme = {}
+
+        _data = self.sqlite.get_scheme(self.name)
+        if _data is None:
+            bbutil.log.error("Scheme for {0:s} not found!".format(self.name))
+            return False
+
+        for item in _data:
+            _scheme[item[0]] = item[1]
+
+        for _column in self.columns:
+            try:
+                _value = _scheme[_column.name]
+            except KeyError:
+                bbutil.log.error("Column {0:s} in {1:s} not found!".format(_column.name, self.name))
+                return False
+
+            expected_value = _column.type.value.type
+
+            if expected_value != _value:
+                _error = "Column {0:s} in {1:s} does not match: found {2:s}, expected {3:s}".format(_column.name,
+                                                                                                    self.name,
+                                                                                                    _value,
+                                                                                                    expected_value)
+                return False
         return True
 
     def load(self) -> int:
