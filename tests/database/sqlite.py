@@ -20,7 +20,7 @@ import os
 import unittest
 import unittest.mock as mock
 
-from bbutil.database import SQLite, Table
+from bbutil.database import SQLite, Table, Types
 from bbutil.utils import full_path
 
 from tests.helper.sqlite import get_sqlite_operational_error, get_sqlite_integrity_error, get_sqlite_return_false
@@ -256,6 +256,32 @@ class TestSQLite(unittest.TestCase):
         self.assertEqual(_count, -1)
 
         self._clean(_sqlite)
+        return
+
+    def test_get_scheme_01(self):
+        _sqlite = get_sqlite(filename="test_database.sqlite", path="testdata/database")
+
+        _table = Table(name="tester01", sqlite=_sqlite)
+        _table.add_column(name="testid", data_type=Types.integer, primarykey=True)
+        _table.add_column(name="use_test", data_type=Types.string)
+        _table.add_column(name="testname", data_type=Types.string)
+        _table.add_column(name="path", data_type=Types.string)
+
+        _sqlite.prepare()
+
+        _data = _sqlite.get_scheme(_table.name)
+
+        self.assertIsNotNone(_data)
+        return
+
+    @mock.patch('bbutil.database.sqlite.manager.Connection.connect', new=get_sqlite_return_false())
+    def test_get_scheme_02(self):
+        _sqlite = get_sqlite(filename="test_database.sqlite", path="testdata/database")
+        _sqlite.prepare()
+
+        _data = _sqlite.get_scheme("test")
+
+        self.assertIsNone(_data)
         return
 
     def test_insert_01(self):
