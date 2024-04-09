@@ -25,7 +25,6 @@ import bbutil
 
 from bbutil.database.sqlite import SQLite
 from bbutil.database.table import Table
-from bbutil.database.types import Types
 
 __all__ = [
     "Database"
