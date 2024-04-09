@@ -50,6 +50,32 @@ class SQLite(object):
         self.manager.setup(use_memory=self.use_memory, filename=self.filename)
         return
 
+    @staticmethod
+    def check_minmal_version(major: int, minor: int, patch: int = 0) -> bool:
+        _info = sqlite3.sqlite_version_info
+
+        _version = "{0:d}.{1:d}.{2:d}".format(major, minor, patch)
+        _error = "Version check failed! Minimum version requierd is {0:s}, current version is {1:s}!".format(_version,
+                                                                                                             sqlite3.sqlite_version)
+
+        _major = _info[0]
+        _minor = _info[1]
+        _patch = _info[2]
+
+        if major < _major:
+            bbutil.log.error(_error)
+            return False
+
+        if minor < _minor:
+            bbutil.log.error(_error)
+            return False
+
+        if patch < _patch:
+            bbutil.log.error(_error)
+            return False
+
+        return True
+
     def check(self, table_name: str) -> int:
         _check = self.manager.connect()
         if _check is False:
@@ -262,7 +288,7 @@ class SQLite(object):
         _connection = self.manager.connection
         c = _connection.cursor()
 
-        command = 'ALTER TABLE "{0:s}" DROP COLUMN {1:s}'.format(table_name, column_data)
+        command = 'ALTER TABLE "{0:s}" DROP COLUMN "{1:s}";'.format(table_name, column_data)
 
         try:
             c.execute(command)
@@ -276,6 +302,10 @@ class SQLite(object):
 
     def drop_columns(self, table_name: str, column_list: list) -> bool:
         _check = self.manager.connect()
+        if _check is False:
+            return False
+
+        _check = self.check_minmal_version(3, 35, 0)
         if _check is False:
             return False
 
