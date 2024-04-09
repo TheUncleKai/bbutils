@@ -38,7 +38,6 @@ class Database(metaclass=ABCMeta):
     name: str = ""
     sqlite: Optional[SQLite] = None
     tables: List[Table] = field(default_factory=list)
-    _version: Optional[Table] = None
     filename: str = ""
 
     @abc.abstractmethod
@@ -58,10 +57,6 @@ class Database(metaclass=ABCMeta):
             if _table.name == name:
                 return _table
         return None
-
-    @property
-    def version(self) -> Optional[Table]:
-        return self._version
 
     def clear(self):
         for _table in self.tables:
