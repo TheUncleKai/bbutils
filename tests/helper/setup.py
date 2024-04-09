@@ -44,6 +44,7 @@ testdata1 = [
            "testdata/database/test_select.sqlite",
            "testdata/database/test_database.sqlite",
            "testdata/database/test_bulk.sqlite",
+           "testdata/database/test_add_columns.sqlite",
            "testdata/database/test_check_table.sqlite"
        ]
     ),
@@ -70,6 +71,7 @@ testdata2 = [
             "testdata/database/test_select.sqlite",
             "testdata/database/test_database.sqlite",
             "testdata/database/test_bulk.sqlite",
+            "testdata/database/test_add_columns.sqlite",
             "testdata/database/test_check_table.sqlite"
         ]
     )
