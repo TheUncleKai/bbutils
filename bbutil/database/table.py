@@ -103,6 +103,12 @@ class Table(object):
             self.names.append(name)
         return
 
+    def get_column(self, name: str) -> Optional[Column]:
+        for _column in self.columns:
+            if _column.name == name:
+                return _column
+        return None
+
     def _process_datalist(self, data_list: List[Tuple], verbose: bool = True) -> Optional[List[Data]]:
         if data_list is None:
             if (self.suppress_warnings is False) and (verbose is True):

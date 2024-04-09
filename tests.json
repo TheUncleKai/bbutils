@@ -267,6 +267,7 @@
                 "test_get_scheme_03",
                 "test_get_scheme_04",
                 "test_get_scheme_05",
+                "test_add_columns_01",
                 "test_insert_01",
                 "test_insert_02",
                 "test_insert_03",
