@@ -270,6 +270,7 @@
                 "test_add_columns_01",
                 "test_add_columns_02",
                 "test_add_columns_03",
+                "test_add_columns_04",
                 "test_insert_01",
                 "test_insert_02",
                 "test_insert_03",
