@@ -326,6 +326,8 @@ class TestSQLite(unittest.TestCase):
         count1 = _sqlite.prepare_table(_table.name, _table.column_list, _table.unique_list)
         self.assertEqual(count1, 0)
 
+        _scheme1 = _sqlite.get_scheme(_table.name)
+
         _table.add_column(name="new1", data_type=Types.string)
         _table.add_column(name="new2", data_type=Types.string)
         _column1 = _table.get_column("new1")
@@ -341,6 +343,27 @@ class TestSQLite(unittest.TestCase):
 
         _check = _sqlite.add_columns(_table.name, _column_list)
         self.assertTrue(_check)
+
+        _scheme2 = _sqlite.get_scheme(_table.name)
+        _test_scheme1 = [
+            ('testid', 'INTEGER'),
+            ('use_test', 'BOOLEAN'),
+            ('testname', 'TEXT'),
+            ('path', 'TEXT')
+        ]
+
+        _test_scheme2 = [
+            ('testid', 'INTEGER'),
+            ('use_test', 'BOOLEAN'),
+            ('testname', 'TEXT'),
+            ('path', 'TEXT'),
+            ('new1', 'TEXT'),
+            ('new2', 'TEXT')
+        ]
+
+        self.assertListEqual(_scheme1, _test_scheme1)
+        self.assertListEqual(_scheme2, _test_scheme2)
+
         self._clean(_sqlite)
         return
 

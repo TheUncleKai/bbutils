@@ -258,6 +258,41 @@ class SQLite(object):
             return False
         return True
 
+    def _drop_columns(self, table_name: str, column_data: str) -> bool:
+        _connection = self.manager.connection
+        c = _connection.cursor()
+
+        command = 'ALTER TABLE "{0:s}" DROP COLUMN {1:s}'.format(table_name, column_data)
+
+        try:
+            c.execute(command)
+        except sqlite3.OperationalError as e:
+            bbutil.log.error("Unable to alter table: {0:s}".format(table_name))
+            bbutil.log.exception(e)
+            print(command)
+            self.manager.abort()
+            return False
+        return True
+
+    def drop_columns(self, table_name: str, column_list: list) -> bool:
+        _check = self.manager.connect()
+        if _check is False:
+            return False
+
+        _columns = ""
+
+        for _line in column_list:
+            _check = self._drop_columns(table_name, _line)
+            if _check is False:
+                return False
+
+        bbutil.log.debug1(self.name, "Alter table: {0:s}".format(table_name))
+
+        _check = self.manager.release()
+        if _check is False:
+            return False
+        return True
+
     @staticmethod
     def _single_execute(table_name: str, names: list, data: Data) -> Optional[Execute]:
         _data = []
