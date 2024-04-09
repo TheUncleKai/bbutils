@@ -343,6 +343,58 @@ class TestSQLite(unittest.TestCase):
         self.assertTrue(_check)
         return
 
+    @mock.patch('bbutil.database.sqlite.manager.Connection.connect', new=get_sqlite_return_false())
+    def test_add_columns_02(self):
+        _sqlite = get_sqlite(filename="test.sqlite", clean=True)
+        _sqlite.prepare()
+
+        _table = Table(name="tester01", sqlite=_sqlite)
+        _table.add_column(name="testid", data_type=Types.integer, unique=True)
+        _table.add_column(name="use_test", data_type=Types.bool)
+        _table.add_column(name="testname", data_type=Types.string)
+        _table.add_column(name="path", data_type=Types.string)
+        _table.add_column(name="new1", data_type=Types.string)
+
+        _column1 = _table.get_column("new1")
+
+        self.assertIsNotNone(_column1)
+
+        _column_list = [
+            _column1.create,
+        ]
+
+        _check = _sqlite.add_columns(_table.name, _column_list)
+        self.assertFalse(_check)
+        return
+
+    # @mock.patch('bbutil.database.sqlite.manager.Connection.release', new=get_sqlite_return_false())
+    def test_add_columns_03(self):
+        _sqlite = get_sqlite(filename="test_add_columns.sqlite", path="testdata/database")
+        _sqlite.prepare()
+
+        _table = Table(name="tester01", sqlite=_sqlite)
+        _table.add_column(name="testid", data_type=Types.integer, unique=True)
+        _table.add_column(name="use_test", data_type=Types.bool)
+        _table.add_column(name="testname", data_type=Types.string)
+        _table.add_column(name="path", data_type=Types.string)
+
+        _table.add_column(name="new1", data_type=Types.string)
+        _table.add_column(name="new2", data_type=Types.string)
+        _column1 = _table.get_column("new1")
+        _column2 = _table.get_column("new2")
+
+        self.assertIsNotNone(_column1)
+        self.assertIsNotNone(_column2)
+
+        _column_list = [
+            _column1.create,
+            _column2.create
+        ]
+
+        # _check = _sqlite.add_columns(_table.name, _column_list)
+        # self.assertFalse(_check)
+        return
+
     def test_insert_01(self):
         _sqlite = get_sqlite(filename="test.sqlite", clean=True)
         _sqlite.prepare()
