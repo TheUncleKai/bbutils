@@ -40,6 +40,7 @@ class Table(object):
     data: List[Data] = field(default_factory=list)
     index: Dict[Any, List[Data]] = field(default_factory=dict)
     columns: List[Column] = field(default_factory=list)
+    drop: List[str] = field(default_factory=list)
     names: List[str] = field(default_factory=list)
     suppress_warnings: bool = False
 
@@ -108,6 +109,34 @@ class Table(object):
             if _column.name == name:
                 return _column
         return None
+
+    def drop_column(self, name: str) -> bool:
+        _columns: List[Column] = []
+        _names: List[str] = []
+        _drop: Optional[Column] = self.get_column(name)
+
+        if _drop is None:
+            bbutil.log.error("Column {0:s} not found!".format(name))
+            return False
+
+        if _drop.primarykey is True:
+            bbutil.log.error("Unable to drop primary key column!")
+            return False
+
+        if self.keyword == name:
+            self.keyword = ""
+
+        for _column in self.columns:
+            if _column.name == name:
+                self.drop.append(name)
+                continue
+
+            _columns.append(_column)
+            _names.append(_column.name)
+
+        self.columns = _columns
+        self.names = _names
+        return True
 
     def _process_datalist(self, data_list: List[Tuple], verbose: bool = True) -> Optional[List[Data]]:
         if data_list is None:
