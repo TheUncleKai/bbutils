@@ -284,6 +284,35 @@ class TestSQLite(unittest.TestCase):
         self.assertIsNone(_data)
         return
 
+    def test_get_scheme_03(self):
+        _sqlite = get_sqlite(filename="test_database.sqlite", path="testdata/database")
+        _sqlite.prepare()
+
+        _data = _sqlite.get_scheme("test")
+
+        self.assertIsNone(_data)
+        return
+
+    @mock.patch('sqlite3.connect', new=get_sqlite_operational_error())
+    def test_get_scheme_04(self):
+        _sqlite = get_sqlite(filename="test_database.sqlite", path="testdata/database")
+        _sqlite.prepare()
+
+        _data = _sqlite.get_scheme("test")
+
+        self.assertIsNone(_data)
+        return
+
+    @mock.patch('bbutil.database.sqlite.manager.Connection.release', new=get_sqlite_return_false())
+    def test_get_scheme_05(self):
+        _sqlite = get_sqlite(filename="test_database.sqlite", path="testdata/database")
+        _sqlite.prepare()
+
+        _data = _sqlite.get_scheme("test")
+
+        self.assertIsNone(_data)
+        return
+
     def test_insert_01(self):
         _sqlite = get_sqlite(filename="test.sqlite", clean=True)
         _sqlite.prepare()
