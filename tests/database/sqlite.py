@@ -367,9 +367,9 @@ class TestSQLite(unittest.TestCase):
         self.assertFalse(_check)
         return
 
-    # @mock.patch('bbutil.database.sqlite.manager.Connection.release', new=get_sqlite_return_false())
+    @mock.patch('bbutil.database.sqlite.manager.Connection.release', new=get_sqlite_return_false())
     def test_add_columns_03(self):
-        _sqlite = get_sqlite(filename="test_add_columns.sqlite", path="testdata/database")
+        _sqlite = copy_sqlite(filename="test_add_columns.sqlite", path="testdata/database")
         _sqlite.prepare()
 
         _table = Table(name="tester01", sqlite=_sqlite)
@@ -391,8 +391,9 @@ class TestSQLite(unittest.TestCase):
             _column2.create
         ]
 
-        # _check = _sqlite.add_columns(_table.name, _column_list)
-        # self.assertFalse(_check)
+        _check = _sqlite.add_columns(_table.name, _column_list)
+        self.assertFalse(_check)
+        self._clean(_sqlite)
         return
 
     def test_insert_01(self):
