@@ -20,12 +20,10 @@ import os
 import unittest
 import unittest.mock as mock
 
-from unittest.mock import Mock
-
 from bbutil.database import Database
 
 from tests.helper import set_log
-from tests.helper.database import TestData, TestData2
+from tests.helper.database import TestData
 
 from tests.helper.sqlite import (mock_operational_error, sqlite_operational_error)
 
@@ -105,6 +103,22 @@ class TestDatabase(unittest.TestCase):
         _check1 = _database.start()
         self.assertIsNotNone(_database.table01)
         self.assertIsNotNone(_database.table02)
+        return
+
+    def test_get_table_01(self):
+        _filename = "{0:s}/testdata/database/test_database.sqlite".format(os.getcwd())
+        _database = TestData(filename=_filename)
+
+        _check1 = _database.start()
+
+        _table1 = _database.get_table("tester01")
+        _table2 = _database.get_table("tester01XXXX")
+
+        self.assertTrue(_check1)
+        self.assertIsNotNone(_database.table01)
+        self.assertIsNotNone(_database.table02)
+        self.assertIsNotNone(_table1)
+        self.assertIsNone(_table2)
         return
 
     def test_store_01(self):
