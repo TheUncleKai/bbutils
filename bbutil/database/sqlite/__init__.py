@@ -367,8 +367,6 @@ class SQLite(object):
         _connection = self.manager.connection
         c = _connection.cursor()
 
-        # RENAME COLUMN TO
-
         command = 'ALTER TABLE "{0:s}" RENAME COLUMN "{1:s}" TO "{2:s}"'.format(table_name,
                                                                                 column_name,
                                                                                 new_name)
