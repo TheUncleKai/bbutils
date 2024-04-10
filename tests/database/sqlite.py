@@ -597,6 +597,30 @@ class TestSQLite(unittest.TestCase):
         self._clean(_sqlite)
         return
 
+    def test_rename_column_01(self):
+        _sqlite = copy_sqlite(filename="test_add_columns.sqlite", path="testdata/database")
+        _sqlite.prepare()
+
+        _table = Table(name="tester01", sqlite=_sqlite)
+        _table.add_column(name="testid", data_type=Types.integer, unique=True)
+        _table.add_column(name="use_test", data_type=Types.bool)
+        _table.add_column(name="testname", data_type=Types.string)
+        _table.add_column(name="path", data_type=Types.string)
+
+        _check = _sqlite.rename_column(_table.name, "use_test", "use_test_new")
+        self.assertTrue(_check)
+
+        _scheme = _sqlite.get_scheme("newtester01")
+        _test_scheme = [
+            ('testid', 'INTEGER'),
+            ('use_test_new', 'BOOLEAN'),
+            ('testname', 'TEXT'),
+            ('path', 'TEXT')
+        ]
+        self.assertListEqual(_scheme, _test_scheme)
+        self._clean(_sqlite)
+        return
+
     def test_insert_01(self):
         _sqlite = get_sqlite(filename="test.sqlite", clean=True)
         _sqlite.prepare()

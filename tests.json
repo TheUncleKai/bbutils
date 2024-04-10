@@ -276,6 +276,7 @@
                 "test_rename_table_02",
                 "test_rename_table_03",
                 "test_rename_table_04",
+                "test_rename_column_01",
                 "test_insert_01",
                 "test_insert_02",
                 "test_insert_03",
