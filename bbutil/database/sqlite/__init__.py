@@ -59,9 +59,9 @@ class SQLite(object):
         _error2 = "Minimum version requierd is {0:s}, current version is {1:s}!".format(_version,
                                                                                         sqlite3.sqlite_version)
 
-        _major = _info[0]
-        _minor = _info[1]
-        _patch = _info[2]
+        _major = int(_info[0])
+        _minor = int(_info[1])
+        _patch = int(_info[2])
 
         if _major < major:
             bbutil.log.error(_error1)
@@ -358,6 +358,12 @@ class SQLite(object):
         return True
 
     def rename_column(self, table_name: str, column_name: str, new_name: str) -> bool:
+        _check = self.check_minmal_version(3, 25, 0)
+        if _check is False:
+            return False
+
+        print(sqlite3.sqlite_version_info)
+
         _check = self.manager.connect()
         if _check is False:
             return False

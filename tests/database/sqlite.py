@@ -631,6 +631,91 @@ class TestSQLite(unittest.TestCase):
         self._clean(_sqlite)
         return
 
+    @mock.patch('bbutil.database.sqlite.manager.Connection.connect', new=get_sqlite_return_false())
+    def test_rename_column_02(self):
+        # The drop functionality needs a minimal version to work
+        _check = self.check_minmal_version(3, 25, 0)
+        if _check is False:
+            return
+
+        _sqlite = copy_sqlite(filename="test_add_columns.sqlite", path="testdata/database")
+        _sqlite.prepare()
+
+        _table = Table(name="tester01", sqlite=_sqlite)
+        _table.add_column(name="testid", data_type=Types.integer, unique=True)
+        _table.add_column(name="use_test", data_type=Types.bool)
+        _table.add_column(name="testname", data_type=Types.string)
+        _table.add_column(name="path", data_type=Types.string)
+
+        _check = _sqlite.rename_column(_table.name, "use_test", "use_test_new")
+        self.assertFalse(_check)
+
+        self._clean(_sqlite)
+        return
+
+    @mock.patch('bbutil.database.sqlite.manager.Connection.release', new=get_sqlite_return_false())
+    def test_rename_column_03(self):
+        # The drop functionality needs a minimal version to work
+        _check = self.check_minmal_version(3, 25, 0)
+        if _check is False:
+            return
+
+        _sqlite = copy_sqlite(filename="test_add_columns.sqlite", path="testdata/database")
+        _sqlite.prepare()
+
+        _table = Table(name="tester01", sqlite=_sqlite)
+        _table.add_column(name="testid", data_type=Types.integer, unique=True)
+        _table.add_column(name="use_test", data_type=Types.bool)
+        _table.add_column(name="testname", data_type=Types.string)
+        _table.add_column(name="path", data_type=Types.string)
+
+        _check = _sqlite.rename_column(_table.name, "use_test", "use_test_new")
+        self.assertFalse(_check)
+
+        self._clean(_sqlite)
+        return
+
+    @mock.patch('sqlite3.connect', new=get_sqlite_operational_error())
+    def test_rename_column_04(self):
+        # The drop functionality needs a minimal version to work
+        _check = self.check_minmal_version(3, 25, 0)
+        if _check is False:
+            return
+
+        _sqlite = copy_sqlite(filename="test_add_columns.sqlite", path="testdata/database")
+        _sqlite.prepare()
+
+        _table = Table(name="tester01", sqlite=_sqlite)
+        _table.add_column(name="testid", data_type=Types.integer, unique=True)
+        _table.add_column(name="use_test", data_type=Types.bool)
+        _table.add_column(name="testname", data_type=Types.string)
+        _table.add_column(name="path", data_type=Types.string)
+
+        _check = _sqlite.rename_column(_table.name, "use_test", "use_test_new")
+        self.assertFalse(_check)
+
+        self._clean(_sqlite)
+        return
+
+    @mock.patch('sqlite3.sqlite_version_info', new=(3, 20, 0))
+    def test_rename_column_05(self):
+
+        # sqlite3.sqlite_version_info
+        _sqlite = copy_sqlite(filename="test_add_columns.sqlite", path="testdata/database")
+        _sqlite.prepare()
+
+        _table = Table(name="tester01", sqlite=_sqlite)
+        _table.add_column(name="testid", data_type=Types.integer, unique=True)
+        _table.add_column(name="use_test", data_type=Types.bool)
+        _table.add_column(name="testname", data_type=Types.string)
+        _table.add_column(name="path", data_type=Types.string)
+
+        _check = _sqlite.rename_column(_table.name, "use_test", "use_test_new")
+        self.assertFalse(_check)
+
+        self._clean(_sqlite)
+        return
+
     def test_insert_01(self):
         _sqlite = get_sqlite(filename="test.sqlite", clean=True)
         _sqlite.prepare()
