@@ -328,10 +328,6 @@ class SQLite(object):
         return True
 
     def rename_table(self, table_name: str, new_name: str) -> bool:
-        _check = self.check_minmal_version(3, 20, 0)
-        if _check is False:
-            return False
-
         _check = self.manager.connect()
         if _check is False:
             return False
