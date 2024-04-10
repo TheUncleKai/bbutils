@@ -42,17 +42,22 @@ class TestSQLite(unittest.TestCase):
     def check_minmal_version(major: int, minor: int, patch: int = 0) -> bool:
         _info = sqlite3.sqlite_version_info
 
-        _major = _info[0]
-        _minor = _info[1]
-        _patch = _info[2]
+        _major = int(_info[0])
+        _minor = int(_info[1])
+        _patch = int(_info[2])
 
-        if major < _major:
+        _version = "{0:d}.{1:d}.{2:d}".format(major, minor, patch)
+        _error = "Version check failed! Minimum version requierd is {0:s}, current version is {1:s}!".format(_version,
+                                                                                                             sqlite3.sqlite_version)
+
+        if _major < major:
+            print("Major: {0:d}/{1:d}".format(major, _major))
+            print(_error)
             return False
 
-        if minor < _minor:
-            return False
-
-        if patch < _patch:
+        if _minor < minor:
+            print("Major: {0:d}/{1:d}".format(minor, _minor))
+            print(_error)
             return False
 
         return True
@@ -598,6 +603,11 @@ class TestSQLite(unittest.TestCase):
         return
 
     def test_rename_column_01(self):
+        # The drop functionality needs a minimal version to work
+        _check = self.check_minmal_version(3, 20, 0)
+        if _check is False:
+            return
+
         _sqlite = copy_sqlite(filename="test_add_columns.sqlite", path="testdata/database")
         _sqlite.prepare()
 
