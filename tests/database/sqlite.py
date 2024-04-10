@@ -16,6 +16,7 @@
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
 
+import sqlite3
 import os
 import unittest
 import unittest.mock as mock
@@ -36,6 +37,25 @@ __all__ = [
 
 class TestSQLite(unittest.TestCase):
     """Testing class for locking module."""
+
+    @staticmethod
+    def check_minmal_version(major: int, minor: int, patch: int = 0) -> bool:
+        _info = sqlite3.sqlite_version_info
+
+        _major = _info[0]
+        _minor = _info[1]
+        _patch = _info[2]
+
+        if major < _major:
+            return False
+
+        if minor < _minor:
+            return False
+
+        if patch < _patch:
+            return False
+
+        return True
 
     def setUp(self):
         set_log()
@@ -451,6 +471,11 @@ class TestSQLite(unittest.TestCase):
         return
 
     def test_drop_columns_01(self):
+        # The drop functionality needs a minimal version to work
+        _check = self.check_minmal_version(3, 35, 0)
+        if _check is False:
+            return
+
         _sqlite = get_sqlite(filename="test.sqlite", clean=True)
         _sqlite.prepare()
 
@@ -493,6 +518,81 @@ class TestSQLite(unittest.TestCase):
             ('path', 'TEXT')
         ]
         self.assertListEqual(_scheme2, _test_scheme2)
+
+        self._clean(_sqlite)
+        return
+
+    def test_rename_table_01(self):
+        _sqlite = copy_sqlite(filename="test_add_columns.sqlite", path="testdata/database")
+        _sqlite.prepare()
+
+        _table = Table(name="tester01", sqlite=_sqlite)
+        _table.add_column(name="testid", data_type=Types.integer, unique=True)
+        _table.add_column(name="use_test", data_type=Types.bool)
+        _table.add_column(name="testname", data_type=Types.string)
+        _table.add_column(name="path", data_type=Types.string)
+
+        _check = _sqlite.rename_table(_table.name, "newtester01")
+        self.assertTrue(_check)
+
+        _scheme = _sqlite.get_scheme("newtester01")
+        _test_scheme = [
+            ('testid', 'INTEGER'),
+            ('use_test', 'BOOLEAN'),
+            ('testname', 'TEXT'),
+            ('path', 'TEXT')
+        ]
+        self.assertListEqual(_scheme, _test_scheme)
+        self._clean(_sqlite)
+        return
+
+    @mock.patch('bbutil.database.sqlite.manager.Connection.connect', new=get_sqlite_return_false())
+    def test_rename_table_02(self):
+        _sqlite = copy_sqlite(filename="test_add_columns.sqlite", path="testdata/database")
+        _sqlite.prepare()
+
+        _table = Table(name="tester01", sqlite=_sqlite)
+        _table.add_column(name="testid", data_type=Types.integer, unique=True)
+        _table.add_column(name="use_test", data_type=Types.bool)
+        _table.add_column(name="testname", data_type=Types.string)
+        _table.add_column(name="path", data_type=Types.string)
+
+        _check = _sqlite.rename_table(_table.name, "newtester01")
+        self.assertFalse(_check)
+
+        self._clean(_sqlite)
+        return
+
+    @mock.patch('bbutil.database.sqlite.manager.Connection.release', new=get_sqlite_return_false())
+    def test_rename_table_03(self):
+        _sqlite = copy_sqlite(filename="test_add_columns.sqlite", path="testdata/database")
+        _sqlite.prepare()
+
+        _table = Table(name="tester01", sqlite=_sqlite)
+        _table.add_column(name="testid", data_type=Types.integer, unique=True)
+        _table.add_column(name="use_test", data_type=Types.bool)
+        _table.add_column(name="testname", data_type=Types.string)
+        _table.add_column(name="path", data_type=Types.string)
+
+        _check = _sqlite.rename_table(_table.name, "newtester01")
+        self.assertFalse(_check)
+
+        self._clean(_sqlite)
+        return
+
+    @mock.patch('sqlite3.connect', new=get_sqlite_operational_error())
+    def test_rename_table_04(self):
+        _sqlite = copy_sqlite(filename="test_add_columns.sqlite", path="testdata/database")
+        _sqlite.prepare()
+
+        _table = Table(name="tester01", sqlite=_sqlite)
+        _table.add_column(name="testid", data_type=Types.integer, unique=True)
+        _table.add_column(name="use_test", data_type=Types.bool)
+        _table.add_column(name="testname", data_type=Types.string)
+        _table.add_column(name="path", data_type=Types.string)
+
+        _check = _sqlite.rename_table(_table.name, "newtester01")
+        self.assertFalse(_check)
 
         self._clean(_sqlite)
         return

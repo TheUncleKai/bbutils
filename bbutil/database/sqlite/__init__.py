@@ -323,6 +323,32 @@ class SQLite(object):
             return False
         return True
 
+    def rename_table(self, table_name: str, new_name: str) -> bool:
+        _check = self.manager.connect()
+        if _check is False:
+            return False
+
+        _connection = self.manager.connection
+        c = _connection.cursor()
+
+        command = 'ALTER TABLE "{0:s}" RENAME TO "{1:s}";'.format(table_name, new_name)
+
+        try:
+            c.execute(command)
+        except sqlite3.OperationalError as e:
+            bbutil.log.error("Unable to rename table: {0:s}".format(table_name))
+            bbutil.log.exception(e)
+            print(command)
+            self.manager.abort()
+            return False
+
+        bbutil.log.debug1(self.name, "Rename table: {0:s}".format(table_name))
+
+        _check = self.manager.release()
+        if _check is False:
+            return False
+        return True
+
     @staticmethod
     def _single_execute(table_name: str, names: list, data: Data) -> Optional[Execute]:
         _data = []
