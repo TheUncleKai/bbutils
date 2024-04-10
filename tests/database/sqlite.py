@@ -604,7 +604,7 @@ class TestSQLite(unittest.TestCase):
 
     def test_rename_column_01(self):
         # The drop functionality needs a minimal version to work
-        _check = self.check_minmal_version(3, 20, 0)
+        _check = self.check_minmal_version(3, 25, 0)
         if _check is False:
             return
 
@@ -620,7 +620,7 @@ class TestSQLite(unittest.TestCase):
         _check = _sqlite.rename_column(_table.name, "use_test", "use_test_new")
         self.assertTrue(_check)
 
-        _scheme = _sqlite.get_scheme("newtester01")
+        _scheme = _sqlite.get_scheme(_table.name)
         _test_scheme = [
             ('testid', 'INTEGER'),
             ('use_test_new', 'BOOLEAN'),
