@@ -47,17 +47,18 @@ class TestSQLite(unittest.TestCase):
         _patch = int(_info[2])
 
         _version = "{0:d}.{1:d}.{2:d}".format(major, minor, patch)
-        _error = "Version check failed! Minimum version requierd is {0:s}, current version is {1:s}!".format(_version,
-                                                                                                             sqlite3.sqlite_version)
+        _error1 = "Version check failed!"
+        _error2 = "Minimum version requierd is {0:s}, current version is {1:s}!".format(_version,
+                                                                                        sqlite3.sqlite_version)
 
         if _major < major:
-            print("Major: {0:d}/{1:d}".format(major, _major))
-            print(_error)
+            print(_error1)
+            print(_error2)
             return False
 
         if _minor < minor:
-            print("Major: {0:d}/{1:d}".format(minor, _minor))
-            print(_error)
+            print(_error1)
+            print(_error2)
             return False
 
         return True
@@ -473,6 +474,9 @@ class TestSQLite(unittest.TestCase):
         _check = _sqlite.add_columns(_table.name, _column_list)
         self.assertFalse(_check)
         self._clean(_sqlite)
+        return
+
+    def _test_drop_columns_01_simul(self):
         return
 
     def test_drop_columns_01(self):
