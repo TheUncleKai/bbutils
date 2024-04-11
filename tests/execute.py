@@ -32,7 +32,7 @@ __all__ = [
 
 
 if sys.platform == "win32":
-    _ls = "dir"
+    _ls = "dir.bat"
     _param = "/L"
 else:
     _ls = "/usr/bin/ls"
