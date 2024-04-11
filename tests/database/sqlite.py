@@ -797,6 +797,7 @@ class TestSQLite(unittest.TestCase):
         _data = get_data_02()
         count2 = _sqlite.insert(_table.name, _table.names, _data)
 
+        _con = _sqlite.manager.connection
         _sqlite.manager.reset()
 
         count3 = _sqlite.count(_table.name)
@@ -804,7 +805,12 @@ class TestSQLite(unittest.TestCase):
         self.assertEqual(count1, 0)
         self.assertEqual(count2, -1)
         self.assertEqual(count3, 0)
-        self._clean(_sqlite)
+
+        if _con is not None:
+            _con.close()
+
+        if os.path.exists(_sqlite.filename) is True:
+            os.remove(_sqlite.filename)
         return
 
     @mock.patch('sqlite3.connect', new=get_sqlite_operational_error())
