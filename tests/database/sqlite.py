@@ -768,7 +768,7 @@ class TestSQLite(unittest.TestCase):
 
         self.assertEqual(count, -1)
 
-        os.remove(_sqlite.filename)
+        self._clean(_sqlite)
         return
 
     @mock.patch('bbutil.database.sqlite.manager.Connection.commit', new=get_sqlite_return_false())
@@ -783,7 +783,7 @@ class TestSQLite(unittest.TestCase):
 
         self.assertEqual(count, -1)
 
-        os.remove(_sqlite.filename)
+        self._clean(_sqlite)
         return
 
     def test_insert_05(self):
