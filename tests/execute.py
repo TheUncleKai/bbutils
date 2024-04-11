@@ -16,6 +16,7 @@
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
 
+import sys
 import unittest
 
 import unittest.mock as mock
@@ -28,6 +29,14 @@ from tests.helper.execute import CatchBacks, MockPopen1, MockPopen2, MockPopen3
 __all__ = [
     "TestExecute"
 ]
+
+
+if sys.platform == "win32":
+    _ls = "dir"
+    _param = "/L"
+else:
+    _ls = "/usr/bin/ls"
+    _param = "-lA"
 
 
 oserror = OSError("Something strange did happen!")
@@ -46,7 +55,7 @@ class TestExecute(unittest.TestCase):
         _execute = Execute()
 
         _commands = [
-            "/usr/bin/ls"
+            _ls
         ]
 
         _execute.setup(name="Test", desc="Print ls", commands=_commands)
@@ -60,7 +69,7 @@ class TestExecute(unittest.TestCase):
 
     def test_setup_02(self):
         _commands = [
-            "/usr/bin/ls"
+            _ls
         ]
 
         _execute = Execute(name="Test", desc="Print ls", commands=_commands)
@@ -77,8 +86,8 @@ class TestExecute(unittest.TestCase):
 
         _execute = Execute()
         _commands = [
-            "/usr/bin/ls",
-            "-lA"
+            _ls,
+            _param
         ]
 
         _execute.setup(name="Test", desc="Print ls", commands=_commands, stdout="TEST", stderr="TEST", stdin="TEST")
@@ -98,7 +107,7 @@ class TestExecute(unittest.TestCase):
 
         _execute = Execute()
         _commands = [
-            "/usr/bin/ls"
+            _ls
         ]
 
         _execute.setup(name="Test", desc="Print ls", commands=_commands,
@@ -121,7 +130,7 @@ class TestExecute(unittest.TestCase):
 
         _execute = Execute()
         _commands = [
-            "/usr/bin/ls"
+            _ls
         ]
 
         _execute.setup(name="Test", desc="Print ls", commands=_commands,
