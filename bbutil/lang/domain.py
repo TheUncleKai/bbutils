@@ -61,7 +61,14 @@ class Domain(object):
             self.used_lang
         ]
 
-        self.gettext = gettext.translation(self.domain, localedir=self.localedir, languages=used_catalog)
+        try:
+            self.gettext = gettext.translation(self.domain, localedir=self.localedir, languages=used_catalog)
+        except FileNotFoundError as e:
+            print(self.domain)
+            print(self.localedir)
+            print(used_catalog)
+            raise e
+
         self.gettext.install()
 
         self.lang = self.gettext.gettext
