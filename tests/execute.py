@@ -58,6 +58,8 @@ class TestExecute(unittest.TestCase):
             _ls
         ]
 
+        print(_commands)
+
         _execute.setup(name="Test", desc="Print ls", commands=_commands)
 
         _check = _execute.execute()
