@@ -30,7 +30,6 @@ __all__ = [
     "TestExecute"
 ]
 
-
 if sys.platform == "win32":
     _ls = "dir.bat"
     _param = "/L"
