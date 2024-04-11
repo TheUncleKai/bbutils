@@ -69,6 +69,11 @@ class TestSQLite(unittest.TestCase):
 
     @staticmethod
     def _clean(sqlite: SQLite):
+        _con = sqlite.manager.connection
+
+        if _con is not None:
+            _con.close()
+
         if os.path.exists(sqlite.filename) is True:
             os.remove(sqlite.filename)
         return
