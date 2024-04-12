@@ -124,7 +124,7 @@ class TestConfig(unittest.TestCase):
     def test_init_06(self):
         self.assertIsNotNone(bbutil.module)
 
-        _work = "{0:s}/test".format(os.getcwd())
+        _work = full_path("{0:s}/test".format(os.getcwd()))
         if os.path.exists(_work) is False:
             os.mkdir(_work)
 
@@ -132,6 +132,7 @@ class TestConfig(unittest.TestCase):
             _filename = full_path("{0:s}/testdata/config01_win.json".format(os.getcwd()))
         else:
             _filename = full_path("{0:s}/testdata/config01.json".format(os.getcwd()))
+
         _config = AppConfig(use_config=True, config_filename=_filename)
 
         _check2 = _config.init()
@@ -157,7 +158,11 @@ class TestConfig(unittest.TestCase):
     def test_init_08(self):
         self.assertIsNotNone(bbutil.module)
 
-        _filename = full_path("{0:s}/testdata/config02.json".format(os.getcwd()))
+        if sys.platform == "win32":
+            _filename = full_path("{0:s}/testdata/config02_win.json".format(os.getcwd()))
+        else:
+            _filename = full_path("{0:s}/testdata/config02.json".format(os.getcwd()))
+
         _config = AppConfig(use_config=True, config_filename=_filename)
 
         _check2 = _config.init()
@@ -201,7 +206,11 @@ class TestConfig(unittest.TestCase):
     def test_init_12(self):
         self.assertIsNotNone(bbutil.module)
 
-        _filename = full_path("{0:s}/testdata/config04.json".format(os.getcwd()))
+        if sys.platform == "win32":
+            _filename = full_path("{0:s}/testdata/config04_win.json".format(os.getcwd()))
+        else:
+            _filename = full_path("{0:s}/testdata/config04.json".format(os.getcwd()))
+
         _config = AppConfig(use_config=True, config_filename=_filename)
 
         _check2 = _config.init()
