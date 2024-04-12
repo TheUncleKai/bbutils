@@ -128,7 +128,10 @@ class TestConfig(unittest.TestCase):
         if os.path.exists(_work) is False:
             os.mkdir(_work)
 
-        _filename = full_path("{0:s}/testdata/config01.json".format(os.getcwd()))
+        if sys.platform == "win32":
+            _filename = full_path("{0:s}/testdata/config01_win.json".format(os.getcwd()))
+        else:
+            _filename = full_path("{0:s}/testdata/config01.json".format(os.getcwd()))
         _config = AppConfig(use_config=True, config_filename=_filename)
 
         _check2 = _config.init()
