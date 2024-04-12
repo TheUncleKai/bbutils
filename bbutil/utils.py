@@ -16,6 +16,7 @@
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
 
+import sys
 import subprocess
 import os
 import platform
@@ -27,6 +28,8 @@ __all__ = [
     "check_dict",
     "check_object",
     "openjson",
+    "fix_path",
+    "fix_sep",
     "full_path",
     "get_attribute",
     "get_terminal_size",
@@ -64,6 +67,19 @@ def openjson(filename: str) -> Union[dict, None]:
     data = json.load(f)
     f.close()
     return data
+
+
+def fix_path(pathname: str) -> str:
+    _path = pathname
+    if sys.platform == "win32":
+        _path = "{0:s}\\".format(pathname)
+
+    return _path
+
+
+def fix_sep(pathname: str) -> str:
+    _path = pathname.replace(os.sep, "/")
+    return _path
 
 
 def full_path(pathname: str) -> str:

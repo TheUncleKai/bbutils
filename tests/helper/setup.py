@@ -27,25 +27,25 @@ testdata1 = [
        "data",
        [
           "testdata/testos1.py",
-          "testdata/testos3.py",
-          "testdata/testos2.py"
+          "testdata/testos2.py",
+          "testdata/testos3.py"
+       ]
+    ),
+    (
+       "data/database",
+       [
+           "testdata/database/test_add_columns.sqlite",
+           "testdata/database/test_bulk.sqlite",
+           "testdata/database/test_check_table.sqlite",
+           "testdata/database/test_database.sqlite",
+           "testdata/database/test_select.sqlite",
+           "testdata/database/test_update.sqlite"
        ]
     ),
     (
        "data/testlang",
        [
           "testdata/testlang/__init__.py"
-       ]
-    ),
-    (
-       "data/database",
-       [
-           "testdata/database/test_update.sqlite",
-           "testdata/database/test_select.sqlite",
-           "testdata/database/test_database.sqlite",
-           "testdata/database/test_bulk.sqlite",
-           "testdata/database/test_add_columns.sqlite",
-           "testdata/database/test_check_table.sqlite"
        ]
     ),
     (
@@ -67,12 +67,12 @@ testdata2 = [
     (
         'data/database',
         [
-            "testdata/database/test_update.sqlite",
-            "testdata/database/test_select.sqlite",
-            "testdata/database/test_database.sqlite",
-            "testdata/database/test_bulk.sqlite",
             "testdata/database/test_add_columns.sqlite",
-            "testdata/database/test_check_table.sqlite"
+            "testdata/database/test_bulk.sqlite",
+            "testdata/database/test_check_table.sqlite",
+            "testdata/database/test_database.sqlite",
+            "testdata/database/test_select.sqlite",
+            "testdata/database/test_update.sqlite"
         ]
     )
 ]
