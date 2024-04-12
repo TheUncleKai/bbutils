@@ -604,6 +604,23 @@ class TestSQLite(unittest.TestCase):
         self._clean(_sqlite)
         return
 
+    @mock.patch('sqlite3.sqlite_version_info', new=(3, 20, 0))
+    def test_drop_columns_05(self):
+        _sqlite = copy_sqlite(filename="test_add_columns.sqlite", path="testdata/database")
+        _sqlite.prepare()
+
+        _table = Table(name="tester01", sqlite=_sqlite)
+        _table.add_column(name="testid", data_type=Types.integer, unique=True)
+        _table.add_column(name="use_test", data_type=Types.bool)
+        _table.add_column(name="testname", data_type=Types.string)
+        _table.add_column(name="path", data_type=Types.string)
+
+        _check = _sqlite.drop_columns(_table.name, ["path"])
+        self.assertFalse(_check)
+
+        self._clean(_sqlite)
+        return
+
     def test_rename_table_01(self):
         _sqlite = copy_sqlite(filename="test_add_columns.sqlite", path="testdata/database")
         _sqlite.prepare()
