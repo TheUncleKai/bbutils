@@ -16,6 +16,7 @@
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
 
+import sys
 from dataclasses import dataclass, asdict
 
 import bbutil
@@ -27,6 +28,11 @@ from bbutil.utils import check_object, check_dict, full_path
 __all__ = [
     "AppConfig"
 ]
+
+if sys.platform == "win32":
+    _ls = "dir.bat"
+else:
+    _ls = "/usr/bin/ls"
 
 
 @dataclass
@@ -40,7 +46,7 @@ class AppConfig(Config):
     def setup_parser(self):
         self.parser.add_argument("-b", "--bla", help="bla binary", type=str, default="/usr/bin/bla")
         self.parser.add_argument("-e", "--bleb", help="bleb settings", type=int, default=5)
-        self.parser.add_argument("-l", "--ls", help="bleb settings", type=str, default="/usr/bin/ls")
+        self.parser.add_argument("-l", "--ls", help="bleb settings", type=str, default=_ls)
         self.parser.add_argument("-w", "--work", help="work folder", type=str, default="test")
         return
 
