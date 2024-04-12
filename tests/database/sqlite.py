@@ -536,6 +536,30 @@ class TestSQLite(unittest.TestCase):
         self._clean(_sqlite)
         return
 
+    @mock.patch('bbutil.database.sqlite.manager.Connection.connect', new=get_sqlite_return_false())
+    def test_drop_columns_02(self):
+        # The drop functionality needs a minimal version to work
+        _check = self.check_minmal_version(3, 35, 0)
+        if _check is False:
+            return
+
+        _sqlite = get_sqlite(filename="test.sqlite", clean=True)
+        _sqlite.prepare()
+
+        _table = Table(name="tester01", sqlite=_sqlite)
+        _table.add_column(name="testid", data_type=Types.integer, unique=True)
+        _table.add_column(name="use_test", data_type=Types.bool)
+        _table.add_column(name="testname", data_type=Types.string)
+        _table.add_column(name="path", data_type=Types.string)
+        _table.add_column(name="new1", data_type=Types.string)
+        _table.add_column(name="new2", data_type=Types.string)
+
+        _check = _sqlite.drop_columns(_table.name, _table.drop)
+        self.assertFalse(_check)
+
+        self._clean(_sqlite)
+        return
+
     def test_rename_table_01(self):
         _sqlite = copy_sqlite(filename="test_add_columns.sqlite", path="testdata/database")
         _sqlite.prepare()
