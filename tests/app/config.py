@@ -17,6 +17,7 @@
 #
 
 import os
+import sys
 import unittest
 
 import unittest.mock as mock
@@ -38,6 +39,11 @@ oserror = OSError("Something strange did happen!")
 mock_oserror = mock.Mock(side_effect=oserror)
 mock_remove = mock.Mock()
 
+if sys.platform == "win32":
+    _ls = "dir.bat"
+else:
+    _ls = "/usr/bin/ls"
+
 
 class TestConfig(unittest.TestCase):
     """Testing class for locking module."""
@@ -51,7 +57,7 @@ class TestConfig(unittest.TestCase):
     def test_init_01(self):
         self.assertIsNotNone(bbutil.module)
 
-        _work = "{0:s}/test".format(os.getcwd())
+        _work = full_path("{0:s}/test".format(os.getcwd()))
         if os.path.exists(_work) is False:
             os.mkdir(_work)
 
@@ -63,7 +69,7 @@ class TestConfig(unittest.TestCase):
         self.assertEqual(_config.verbose, 0)
         self.assertEqual(_config.bla, "/usr/local/bin/bla")
         self.assertEqual(_config.bleb, 10)
-        self.assertEqual(_config.ls, "/usr/bin/ls")
+        self.assertEqual(_config.ls, _ls)
         self.assertEqual(_config.work, _work)
         return
 
@@ -131,7 +137,7 @@ class TestConfig(unittest.TestCase):
         self.assertEqual(_config.verbose, 0)
         self.assertEqual(_config.bla, "/usr/local/bin/bla")
         self.assertEqual(_config.bleb, 10)
-        self.assertEqual(_config.ls, "/usr/bin/ls")
+        self.assertEqual(_config.ls, _ls)
         self.assertEqual(_config.work, _work)
         return
 
@@ -233,7 +239,7 @@ class TestConfig(unittest.TestCase):
         self.assertEqual(_data["verbose"], 0)
         self.assertEqual(_data["bla"], "/usr/local/bin/bla")
         self.assertEqual(_data["bleb"], 10)
-        self.assertEqual(_data["ls"], "/usr/bin/ls")
+        self.assertEqual(_data["ls"], _ls)
         self.assertEqual(_data["work"], _work)
         return
 

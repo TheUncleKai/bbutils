@@ -16,6 +16,8 @@
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
 
+import sys
+
 from unittest.mock import Mock
 
 __all__ = [
@@ -29,6 +31,11 @@ __all__ = [
 
 mock_open = Mock(side_effect=OSError("BUMM!"))
 
+if sys.platform == "win32":
+    _ls = "dir.bat"
+else:
+    _ls = "/usr/bin/ls"
+
 
 class _Options01(object):
 
@@ -36,7 +43,7 @@ class _Options01(object):
         self.bla = "/usr/local/bin/bla"
         self.bleb = 10
         self.verbose = 0
-        self.ls = "/usr/bin/ls"
+        self.ls = _ls
         self.work = "test"
         return
 
@@ -54,7 +61,7 @@ class _Options02(object):
     def __init__(self):
         self.bla = "/usr/local/bin/bla"
         self.bleb = 10
-        self.ls = "/usr/bin/ls"
+        self.ls = _ls
         self.work = "test"
         return
 
