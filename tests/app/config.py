@@ -221,11 +221,15 @@ class TestConfig(unittest.TestCase):
     def test_store_01(self):
         self.assertIsNotNone(bbutil.module)
 
-        _work = "{0:s}/test".format(os.getcwd())
+        _work = full_path("{0:s}/test".format(os.getcwd()))
         if os.path.exists(_work) is False:
             os.mkdir(_work)
 
-        _filename1 = full_path("{0:s}/testdata/config01.json".format(os.getcwd()))
+        if sys.platform == "win32":
+            _filename1 = full_path("{0:s}/testdata/config01_win.json".format(os.getcwd()))
+        else:
+            _filename1 = full_path("{0:s}/testdata/config01.json".format(os.getcwd()))
+
         _filename2 = full_path("{0:s}/config01.json".format(os.getcwd()))
 
         _config = AppConfig(use_config=True, config_filename=_filename1)
@@ -258,11 +262,15 @@ class TestConfig(unittest.TestCase):
     def test_store_02(self):
         self.assertIsNotNone(bbutil.module)
 
-        _work = "{0:s}/test".format(os.getcwd())
+        _work = full_path("{0:s}/test".format(os.getcwd()))
         if os.path.exists(_work) is False:
             os.mkdir(_work)
 
-        _filename1 = full_path("{0:s}/testdata/config01.json".format(os.getcwd()))
+        if sys.platform == "win32":
+            _filename1 = full_path("{0:s}/testdata/config01_win.json".format(os.getcwd()))
+        else:
+            _filename1 = full_path("{0:s}/testdata/config01.json".format(os.getcwd()))
+
         _filename2 = full_path("{0:s}/config01.json".format(os.getcwd()))
 
         _config = AppConfig(use_config=True, config_filename=_filename1)
@@ -285,11 +293,15 @@ class TestConfig(unittest.TestCase):
     def test_store_03(self):
         self.assertIsNotNone(bbutil.module)
 
-        _work = "{0:s}/test".format(os.getcwd())
+        _work = full_path("{0:s}/test".format(os.getcwd()))
         if os.path.exists(_work) is False:
             os.mkdir(_work)
 
-        _filename1 = full_path("{0:s}/testdata/config01.json".format(os.getcwd()))
+        if sys.platform == "win32":
+            _filename1 = full_path("{0:s}/testdata/config01_win.json".format(os.getcwd()))
+        else:
+            _filename1 = full_path("{0:s}/testdata/config01.json".format(os.getcwd()))
+
         _filename2 = full_path("{0:s}/config01.json".format(os.getcwd()))
 
         _config = AppConfig(use_config=True, config_filename=_filename1)
@@ -312,11 +324,15 @@ class TestConfig(unittest.TestCase):
     def test_store_04(self):
         self.assertIsNotNone(bbutil.module)
 
-        _work = "{0:s}/test".format(os.getcwd())
+        _work = full_path("{0:s}/test".format(os.getcwd()))
         if os.path.exists(_work) is False:
             os.mkdir(_work)
 
-        _filename1 = full_path("{0:s}/testdata/config01.json".format(os.getcwd()))
+        if sys.platform == "win32":
+            _filename1 = full_path("{0:s}/testdata/config01_win.json".format(os.getcwd()))
+        else:
+            _filename1 = full_path("{0:s}/testdata/config01.json".format(os.getcwd()))
+
         _filename2 = full_path("{0:s}/config01.json".format(os.getcwd()))
 
         _config = AppConfig(use_config=True, config_filename=_filename1)
