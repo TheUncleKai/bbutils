@@ -274,6 +274,7 @@
                 "test_drop_columns_01",
                 "test_drop_columns_02",
                 "test_drop_columns_03",
+                "test_drop_columns_04",
                 "test_rename_table_01",
                 "test_rename_table_02",
                 "test_rename_table_03",
