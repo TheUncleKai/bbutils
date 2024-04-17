@@ -34,6 +34,7 @@ __all__ = [
 class Table(object):
 
     name: str = ""
+    old_name: str = ""
     _counter: int = 0
     keyword: str = ""
     sqlite: Optional[SQLite] = None

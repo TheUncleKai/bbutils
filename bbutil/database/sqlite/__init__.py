@@ -143,7 +143,12 @@ class SQLite(object):
 
         return _count
 
-    def _check_table(self, table_name: str) -> bool:
+    def check_table(self, table_name: str, connect: bool = True) -> bool:
+        if connect is True:
+            _check = self.manager.connect()
+            if _check is False:
+                return False
+
         _connection = self.manager.connection
         c = _connection.cursor()
         command = "SELECT name FROM sqlite_master WHERE type='table' AND name='{0:s}';".format(table_name)
@@ -155,11 +160,20 @@ class SQLite(object):
         except sqlite3.OperationalError as e:
             bbutil.log.error("Unable to check for table: {0:s}".format(table_name))
             bbutil.log.exception(e)
+            if connect is True:
+                self.manager.release()
             return False
 
         result = c.fetchone()
         if result is None:
+            if connect is True:
+                self.manager.release()
             return False
+
+        if connect is True:
+            _check = self.manager.release()
+            if _check is False:
+                return False
         return True
 
     def prepare_table(self, table_name: str, column_list: list, unique_list: list, skip_check: bool = False) -> int:
@@ -168,7 +182,7 @@ class SQLite(object):
             return -1
 
         if skip_check is False:
-            _check = self._check_table(table_name)
+            _check = self.check_table(table_name, connect=False)
             if _check is True:
                 _count = self._count_table(table_name)
 

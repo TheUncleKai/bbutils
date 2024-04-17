@@ -273,6 +273,49 @@ class TestSQLite(unittest.TestCase):
         self.assertEqual(_count, -1)
         return
 
+    def test_check_table_01(self):
+        _sqlite = get_sqlite(filename="test_select.sqlite", path="testdata/database")
+        _sqlite.prepare()
+
+        _check = _sqlite.check_table("tester01")
+        self.assertTrue(_check)
+        return
+
+    def test_check_table_02(self):
+        _sqlite = get_sqlite(filename="test_select.sqlite", path="testdata/database")
+        _sqlite.prepare()
+
+        _check = _sqlite.check_table("tester01CXXX")
+        self.assertFalse(_check)
+        return
+
+    @mock.patch('bbutil.database.sqlite.manager.Connection.connect', new=get_sqlite_return_false())
+    def test_check_table_03(self):
+        _sqlite = get_sqlite(filename="test_select.sqlite", path="testdata/database")
+        _sqlite.prepare()
+
+        _check = _sqlite.check_table("tester01")
+        self.assertFalse(_check)
+        return
+
+    @mock.patch('bbutil.database.sqlite.manager.Connection.release', new=get_sqlite_return_false())
+    def test_check_table_04(self):
+        _sqlite = get_sqlite(filename="test_select.sqlite", path="testdata/database")
+        _sqlite.prepare()
+
+        _check = _sqlite.check_table("tester01")
+        self.assertFalse(_check)
+        return
+
+    @mock.patch('sqlite3.connect', new=get_sqlite_operational_error())
+    def test_check_table_05(self):
+        _sqlite = get_sqlite(filename="test_select.sqlite", path="testdata/database")
+        _sqlite.prepare()
+
+        _check = _sqlite.check_table("tester01")
+        self.assertFalse(_check)
+        return
+
     def test_prepare_table_01(self):
         _sqlite = get_sqlite(filename="test.sqlite", clean=True)
         _sqlite.prepare()
