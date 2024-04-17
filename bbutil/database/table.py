@@ -243,6 +243,17 @@ class Table(object):
 
         self.sqlite.prepare()
 
+        _check = self.sqlite.check_table(self.name)
+
+        if _check is True:
+            _count = self.sqlite.count(self.name)
+
+            if _count == -1:
+                return False
+
+            self._counter = _count
+            return True
+
         _count = self.sqlite.prepare_table(self.name, _columns, _unique)
         if _count == -1:
             return False
