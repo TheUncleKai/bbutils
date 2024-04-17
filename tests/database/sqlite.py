@@ -35,6 +35,17 @@ __all__ = [
 ]
 
 
+def _get_sqlite_version(major_diff: int, minor_diff: int, patch_diff: int = 0) -> tuple:
+    _info = sqlite3.sqlite_version_info
+
+    _major = _info[0] + major_diff
+    _minor = _info[0] + minor_diff
+    _patch = _info[0] + patch_diff
+
+    _version = (_major, 0, 0)
+    return _version
+
+
 class TestSQLite(unittest.TestCase):
     """Testing class for locking module."""
 
@@ -69,7 +80,10 @@ class TestSQLite(unittest.TestCase):
 
     @staticmethod
     def _clean(sqlite: SQLite):
-        _con = sqlite.manager.connection
+        _con = None
+
+        if sqlite.manager is not None:
+            _con = sqlite.manager.connection
 
         if _con is not None:
             _con.close()
@@ -151,6 +165,42 @@ class TestSQLite(unittest.TestCase):
 
         _check = _sqlite.check("tester01")
         self.assertFalse(_check)
+        return
+
+    def test_check_minmal_version_01(self):
+        _sqlite = copy_sqlite(filename="test_add_columns.sqlite", path="testdata/database")
+        _major, _minor, patch = sqlite3.sqlite_version_info
+
+        _check = _sqlite.check_minmal_version(_major, _minor, patch)
+        self.assertTrue(_check)
+        self._clean(_sqlite)
+        return
+
+    def test_check_minmal_version_02(self):
+        _sqlite = copy_sqlite(filename="test_add_columns.sqlite", path="testdata/database")
+        _major, _minor, patch = sqlite3.sqlite_version_info
+
+        _check = _sqlite.check_minmal_version(_major + 1, _minor, patch)
+        self.assertFalse(_check)
+        self._clean(_sqlite)
+        return
+
+    def test_check_minmal_version_03(self):
+        _sqlite = copy_sqlite(filename="test_add_columns.sqlite", path="testdata/database")
+        _major, _minor, patch = sqlite3.sqlite_version_info
+
+        _check = _sqlite.check_minmal_version(_major, _minor + 1, patch)
+        self.assertFalse(_check)
+        self._clean(_sqlite)
+        return
+
+    def test_check_minmal_version_04(self):
+        _sqlite = copy_sqlite(filename="test_add_columns.sqlite", path="testdata/database")
+        _major, _minor, patch = sqlite3.sqlite_version_info
+
+        _check = _sqlite.check_minmal_version(_major, _minor, patch + 1)
+        self.assertFalse(_check)
+        self._clean(_sqlite)
         return
 
     def test_count_01(self):
