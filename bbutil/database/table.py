@@ -252,10 +252,6 @@ class Table(object):
         return _type
 
     def _create_table(self) -> bool:
-        if len(self.columns) == 0:
-            bbutil.log.error("No columns: {0:s}".format(self.name))
-            return False
-
         _columns = []
         for _col in self.columns:
             _columns.append(_col.create)

@@ -20,6 +20,8 @@ import os
 import unittest
 import unittest.mock as mock
 
+from unittest.mock import Mock
+
 import bbutil
 
 from bbutil.database import Table, Types, SQLite
@@ -32,6 +34,9 @@ from tests.helper.sqlite import get_sqlite_operational_error, get_sqlite_integri
 __all__ = [
     "TestTable"
 ]
+
+def return_count_01() -> int:
+    return -1
 
 
 class TestTable(unittest.TestCase):
@@ -170,6 +175,34 @@ class TestTable(unittest.TestCase):
 
         _check = _table.init()
         self.assertTrue(_check)
+
+        self._clean(_sqlite)
+        return
+
+    @mock.patch('bbutil.database.sqlite.SQLite.count', new=Mock(return_value=-1))
+    def test_init_06(self):
+        _sqlite = copy_sqlite(filename="test_check_table.sqlite", path="testdata/database")
+        _table = get_table_01(sqlite_object=_sqlite)
+
+        _table.old_name = "tester01"
+        _table.name = "tester_new"
+
+        _check = _table.init()
+        self.assertFalse(_check)
+
+        self._clean(_sqlite)
+        return
+
+    @mock.patch('bbutil.database.sqlite.SQLite.rename_table', new=Mock(return_value=False))
+    def test_init_07(self):
+        _sqlite = copy_sqlite(filename="test_check_table.sqlite", path="testdata/database")
+        _table = get_table_01(sqlite_object=_sqlite)
+
+        _table.old_name = "tester01"
+        _table.name = "tester_new"
+
+        _check = _table.init()
+        self.assertFalse(_check)
 
         self._clean(_sqlite)
         return
