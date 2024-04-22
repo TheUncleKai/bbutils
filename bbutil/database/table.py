@@ -36,6 +36,7 @@ class _InitType(Enum):
     has_table = 0
     has_old_table = 1
     has_no_table = 2
+    has_no_columns = 3
 
 
 @dataclass
@@ -234,6 +235,10 @@ class Table(object):
     def _check_table(self) -> _InitType:
         _type = _InitType.has_no_table
 
+        if len(self.columns) == 0:
+            _type = _InitType.has_no_columns
+            return _type
+
         _check = self.sqlite.check_table(self.name)
         if _check is True:
             _type = _InitType.has_table
@@ -281,6 +286,9 @@ class Table(object):
         _type = self._check_table()
 
         _check = False
+
+        if _type is _InitType.has_no_columns:
+            _check = False
 
         if _type is _InitType.has_no_table:
             _check = self._create_table()
