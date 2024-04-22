@@ -18,6 +18,7 @@
 
 from dataclasses import dataclass, field
 from typing import Optional, List, Dict, Any, Tuple
+from enum import Enum
 
 import bbutil
 
@@ -28,6 +29,13 @@ from bbutil.database.sqlite import SQLite
 __all__ = [
     "Table"
 ]
+
+
+class _InitType(Enum):
+
+    has_table = 0
+    has_old_table = 1
+    has_no_table = 2
 
 
 @dataclass
@@ -223,10 +231,22 @@ class Table(object):
         _check = self.sqlite.update(self.name, self.names, data, data_filter, filter_value)
         return _check
 
-    def init(self) -> bool:
-        if bbutil.log is None:
-            return False
+    def _check_table(self) -> _InitType:
+        _type = _InitType.has_no_table
 
+        _check = self.sqlite.check_table(self.name)
+        if _check is True:
+            _type = _InitType.has_table
+        else:
+
+            if self.old_name != "":
+                _check = self.sqlite.check_table(self.old_name)
+                if _check is True:
+                    _type = _InitType.has_old_table
+
+        return _type
+
+    def _create_table(self) -> bool:
         if len(self.columns) == 0:
             bbutil.log.error("No columns: {0:s}".format(self.name))
             return False
@@ -241,20 +261,37 @@ class Table(object):
                 continue
             _unique.append(_col.name)
 
+        _check = self.sqlite.create_table(self.name, _columns, _unique)
+        if _check is False:
+            return False
+        return True
+
+    def _rename_table(self) -> bool:
+        _check = self.sqlite.rename_table(self.old_name, self.name)
+        if _check is False:
+            return False
+        return True
+
+    def init(self) -> bool:
+        if bbutil.log is None:
+            return False
+
         self.sqlite.prepare()
 
-        _check = self.sqlite.check_table(self.name)
+        _type = self._check_table()
 
-        if _check is True:
-            _count = self.sqlite.count(self.name)
+        _check = False
 
-            if _count == -1:
-                return False
+        if _type is _InitType.has_no_table:
+            _check = self._create_table()
 
-            self._counter = _count
-            return True
+        if _type is _InitType.has_old_table:
+            _check = self._rename_table()
 
-        _count = self.sqlite.prepare_table(self.name, _columns, _unique)
+        if _check is False:
+            return False
+
+        _count = self.sqlite.count(self.name)
         if _count == -1:
             return False
 
