@@ -288,6 +288,9 @@ class Table(object):
         if _type is _InitType.has_old_table:
             _check = self._rename_table()
 
+        if _type is _InitType.has_table:
+            _check = True
+
         if _check is False:
             return False
 
