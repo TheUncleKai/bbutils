@@ -234,7 +234,11 @@ class TestTable(unittest.TestCase):
 
         _check1 = _table.init()
         _check2 = _table.check_scheme()
+        _count1 = len(_table.missing_columns)
+        _count2 = len(_table.invalid_columns)
 
+        self.assertEqual(_count1, 0)
+        self.assertEqual(_count2, 1)
         self.assertTrue(_check1)
         self.assertFalse(_check2)
         return
@@ -250,7 +254,11 @@ class TestTable(unittest.TestCase):
 
         _check1 = _table.init()
         _check2 = _table.check_scheme()
+        _count1 = len(_table.missing_columns)
+        _count2 = len(_table.invalid_columns)
 
+        self.assertEqual(_count1, 1)
+        self.assertEqual(_count2, 0)
         self.assertTrue(_check1)
         self.assertFalse(_check2)
         return

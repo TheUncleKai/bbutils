@@ -50,6 +50,8 @@ class Table(object):
     data: List[Data] = field(default_factory=list)
     index: Dict[Any, List[Data]] = field(default_factory=dict)
     columns: List[Column] = field(default_factory=list)
+    missing_columns: List[Column] = field(default_factory=list)
+    invalid_columns: List[Column] = field(default_factory=list)
     drop: List[str] = field(default_factory=list)
     names: List[str] = field(default_factory=list)
     suppress_warnings: bool = False
@@ -347,6 +349,7 @@ class Table(object):
                 _value = _scheme[_column.name]
             except KeyError:
                 bbutil.log.error("Column {0:s} in {1:s} not found!".format(_column.name, self.name))
+                self.missing_columns.append(_column)
                 return False
 
             expected_value = _column.type.value.type
@@ -357,6 +360,7 @@ class Table(object):
                                                                                                     _value,
                                                                                                     expected_value)
                 bbutil.log.error(_error)
+                self.invalid_columns.append(_column)
                 return False
         return True
 
