@@ -176,21 +176,10 @@ class SQLite(object):
                 return False
         return True
 
-    def prepare_table(self, table_name: str, column_list: list, unique_list: list, skip_check: bool = False) -> int:
+    def create_table(self, table_name: str, column_list: list, unique_list: list) -> bool:
         _check = self.manager.connect()
         if _check is False:
-            return -1
-
-        if skip_check is False:
-            _check = self.check_table(table_name, connect=False)
-            if _check is True:
-                _count = self._count_table(table_name)
-
-                _check = self.manager.release()
-                if _check is False:
-                    return -1
-
-                return _count
+            return False
 
         _connection = self.manager.connection
         c = _connection.cursor()
@@ -220,19 +209,19 @@ class SQLite(object):
             bbutil.log.exception(e)
             print(command)
             self.manager.abort()
-            return -1
+            return False
 
         bbutil.log.debug1(self.name, "Create table: {0:s}".format(table_name))
 
         _check = self.manager.commit()
         if _check is False:
             self.manager.release()
-            return -1
+            return False
 
         _check = self.manager.release()
         if _check is False:
-            return -1
-        return 0
+            return False
+        return True
 
     def get_scheme(self, table_name: str) -> Optional[list]:
         _check = self.manager.connect()
