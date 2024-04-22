@@ -24,7 +24,7 @@ import bbutil
 
 from bbutil.database import Table, Types, SQLite
 
-from tests.helper import get_sqlite, set_log
+from tests.helper import get_sqlite, set_log, copy_sqlite
 from tests.helper.table import TestData, get_table_01, get_table_02, get_table_03, get_table_04
 
 from tests.helper.sqlite import get_sqlite_operational_error, get_sqlite_integrity_error, get_sqlite_return_false
@@ -43,6 +43,14 @@ class TestTable(unittest.TestCase):
 
     @staticmethod
     def _clean(sqlite: SQLite):
+        _con = None
+
+        if sqlite.manager is not None:
+            _con = sqlite.manager.connection
+
+        if _con is not None:
+            _con.close()
+
         if os.path.exists(sqlite.filename) is True:
             os.remove(sqlite.filename)
         return
@@ -151,6 +159,19 @@ class TestTable(unittest.TestCase):
         _table = Table(name="Testos")
         _check1 = _table.init()
         self.assertFalse(_check1)
+        return
+
+    def test_init_05(self):
+        _sqlite = copy_sqlite(filename="test_check_table.sqlite", path="testdata/database")
+        _table = get_table_01(sqlite_object=_sqlite)
+
+        _table.old_name = "tester01"
+        _table.name = "tester_new"
+
+        _check = _table.init()
+        self.assertTrue(_check)
+
+        self._clean(_sqlite)
         return
 
     def test_check_scheme_01(self):
