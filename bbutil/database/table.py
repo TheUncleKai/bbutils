@@ -52,7 +52,7 @@ class Table(object):
     columns: List[Column] = field(default_factory=list)
     missing_columns: List[Column] = field(default_factory=list)
     invalid_columns: List[Column] = field(default_factory=list)
-    drop: List[str] = field(default_factory=list)
+    drop_columns: List[str] = field(default_factory=list)
     names: List[str] = field(default_factory=list)
     suppress_warnings: bool = False
 
@@ -252,7 +252,6 @@ class Table(object):
         if check is True:
             return True
 
-        count_missing = len(self.missing_columns)
         count_invalid = len(self.invalid_columns)
 
         if count_invalid > 0:
