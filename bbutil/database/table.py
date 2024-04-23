@@ -273,6 +273,17 @@ class Table(object):
         if check is False:
             return False
 
+        if len(self.drop_columns) == 0:
+            return True
+
+        check = self.sqlite.check_minmal_version(3, 35, 0)
+        if check is False:
+            return True
+
+        check = self.sqlite.drop_columns(self.name, self.drop_columns)
+        if check is False:
+            return False
+
         return True
 
     def init(self) -> bool:
