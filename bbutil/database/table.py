@@ -287,9 +287,6 @@ class Table(object):
             bbutil.log.error("Unable to change columns!")
             return False
 
-        if count_missing == 0:
-            return True
-
         _columns = []
         for column in self.missing_columns:
             if column.primarykey is True:
