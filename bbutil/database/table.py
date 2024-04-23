@@ -355,6 +355,7 @@ class Table(object):
             try:
                 _col = _columns[_name]
             except KeyError:
+                bbutil.log.error("Column {0:s} found, but no definition exists!".format(_name))
                 self.drop_columns.append(_name)
 
         for _column in self.columns:
@@ -375,6 +376,10 @@ class Table(object):
                 bbutil.log.error(_error)
                 self.invalid_columns.append(_column)
                 return False
+
+        if len(self.drop_columns) > 0:
+            return False
+
         return True
 
     def load(self) -> int:

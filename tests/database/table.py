@@ -443,6 +443,20 @@ class TestTable(unittest.TestCase):
         self.assertFalse(_check1)
         return
 
+    def test_check_scheme_07(self):
+        _sqlite = get_sqlite(filename="test_database.sqlite", path="testdata/database")
+
+        _table = Table(name="tester01", sqlite=_sqlite)
+        _table.add_column(name="testid", data_type=Types.integer, primarykey=True)
+        _table.add_column(name="use_test", data_type=Types.bool)
+        _table.add_column(name="testname", data_type=Types.string)
+
+        _table.sqlite.prepare()
+        _check1 = _table.check_scheme()
+
+        self.assertFalse(_check1)
+        return
+
     def test_select_01(self):
         _sqlite = get_sqlite(filename="test_select.sqlite", path="testdata/database")
         _table = get_table_01(sqlite_object=_sqlite)
