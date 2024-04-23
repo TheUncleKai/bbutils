@@ -614,13 +614,10 @@ class TestSQLite(unittest.TestCase):
         ]
         self.assertListEqual(_scheme1, _test_scheme1)
 
-        _check1 = _table.drop_column("new1")
-        _check2 = _table.drop_column("new2")
+        _table.drop_columns.append("new1")
+        _table.drop_columns.append("new2")
 
-        self.assertTrue(_check1)
-        self.assertTrue(_check2)
-
-        _check = _sqlite.drop_columns(_table.name, _table.drop)
+        _check = _sqlite.drop_columns(_table.name, _table.drop_columns)
         self.assertTrue(_check)
 
         _scheme2 = _sqlite.get_scheme(_table.name)
@@ -653,7 +650,7 @@ class TestSQLite(unittest.TestCase):
         _table.add_column(name="new1", data_type=Types.string)
         _table.add_column(name="new2", data_type=Types.string)
 
-        _check = _sqlite.drop_columns(_table.name, _table.drop)
+        _check = _sqlite.drop_columns(_table.name, _table.drop_columns)
         self.assertFalse(_check)
 
         self._clean(_sqlite)
