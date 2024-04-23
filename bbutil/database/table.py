@@ -355,6 +355,7 @@ class Table(object):
 
         self.missing_columns.clear()
         self.invalid_columns.clear()
+        self.drop_columns.clear()
 
         for item in _data:
             _schemes[item[0]] = item[1]
