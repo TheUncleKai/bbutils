@@ -275,6 +275,34 @@ class Table(object):
             return False
         return True
 
+    def upgrade(self) -> bool:
+        check = self.check_scheme()
+        if check is True:
+            return True
+
+        count_missing = len(self.missing_columns)
+        count_invalid = len(self.invalid_columns)
+
+        if count_invalid > 0:
+            bbutil.log.error("Unable to change columns!")
+            return False
+
+        if count_missing == 0:
+            return True
+
+        _columns = []
+        for column in self.missing_columns:
+            if column.primarykey is True:
+                bbutil.log.error("Unable to add new primarykey column: {0:s}".format(column.name))
+                return False
+            _columns.append(column.create)
+
+        check = self.sqlite.add_columns(self.name, _columns)
+        if check is False:
+            return False
+
+        return True
+
     def init(self) -> bool:
         if bbutil.log is None:
             return False
@@ -340,6 +368,9 @@ class Table(object):
         if _data is None:
             bbutil.log.error("Scheme for {0:s} not found!".format(self.name))
             return False
+
+        self.missing_columns.clear()
+        self.invalid_columns.clear()
 
         for item in _data:
             _scheme[item[0]] = item[1]
