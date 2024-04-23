@@ -16,6 +16,7 @@
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
 
+import sqlite3
 import os
 import unittest
 import unittest.mock as mock
@@ -36,6 +37,15 @@ __all__ = [
 
 class TestSQLiteManager(unittest.TestCase):
     """Testing class for locking module."""
+
+    @staticmethod
+    def _clean(filename: str, connection: sqlite3.Connection = None):
+        if connection is not None:
+            connection.close()
+
+        if os.path.exists(filename) is True:
+            os.remove(filename)
+        return
 
     def setUp(self):
         set_log()
@@ -103,10 +113,14 @@ class TestSQLiteManager(unittest.TestCase):
 
         _check = _connection.connect()
 
+        _con = _connection.connection
+
         self.assertIsNotNone(_connection.connection)
 
         _connection.reset()
         self.assertIsNone(_connection.connection)
+
+        self._clean(_testfile, _con)
         return
 
     def test_connect_01(self):

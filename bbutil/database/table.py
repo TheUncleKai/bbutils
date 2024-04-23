@@ -18,6 +18,7 @@
 
 from dataclasses import dataclass, field
 from typing import Optional, List, Dict, Any, Tuple
+from enum import Enum
 
 import bbutil
 
@@ -30,16 +31,28 @@ __all__ = [
 ]
 
 
+class _InitType(Enum):
+
+    has_table = 0
+    has_old_table = 1
+    has_no_table = 2
+    has_no_columns = 3
+
+
 @dataclass
 class Table(object):
 
     name: str = ""
+    old_name: str = ""
     _counter: int = 0
     keyword: str = ""
     sqlite: Optional[SQLite] = None
     data: List[Data] = field(default_factory=list)
     index: Dict[Any, List[Data]] = field(default_factory=dict)
     columns: List[Column] = field(default_factory=list)
+    missing_columns: List[Column] = field(default_factory=list)
+    invalid_columns: List[Column] = field(default_factory=list)
+    drop_columns: List[str] = field(default_factory=list)
     names: List[str] = field(default_factory=list)
     suppress_warnings: bool = False
 
@@ -102,6 +115,12 @@ class Table(object):
         if primarykey is False:
             self.names.append(name)
         return
+
+    def get_column(self, name: str) -> Optional[Column]:
+        for _column in self.columns:
+            if _column.name == name:
+                return _column
+        return None
 
     def _process_datalist(self, data_list: List[Tuple], verbose: bool = True) -> Optional[List[Data]]:
         if data_list is None:
@@ -187,14 +206,26 @@ class Table(object):
         _check = self.sqlite.update(self.name, self.names, data, data_filter, filter_value)
         return _check
 
-    def init(self) -> bool:
-        if bbutil.log is None:
-            return False
+    def _check_table(self) -> _InitType:
+        _type = _InitType.has_no_table
 
         if len(self.columns) == 0:
-            bbutil.log.error("No columns: {0:s}".format(self.name))
-            return False
+            _type = _InitType.has_no_columns
+            return _type
 
+        _check = self.sqlite.check_table(self.name)
+        if _check is True:
+            _type = _InitType.has_table
+        else:
+
+            if self.old_name != "":
+                _check = self.sqlite.check_table(self.old_name)
+                if _check is True:
+                    _type = _InitType.has_old_table
+
+        return _type
+
+    def _create_table(self) -> bool:
         _columns = []
         for _col in self.columns:
             _columns.append(_col.create)
@@ -205,9 +236,82 @@ class Table(object):
                 continue
             _unique.append(_col.name)
 
+        _check = self.sqlite.create_table(self.name, _columns, _unique)
+        if _check is False:
+            return False
+        return True
+
+    def _rename_table(self) -> bool:
+        _check = self.sqlite.rename_table(self.old_name, self.name)
+        if _check is False:
+            return False
+        return True
+
+    def upgrade(self) -> bool:
+        check = self.check_scheme()
+        if check is True:
+            return True
+
+        count_invalid = len(self.invalid_columns)
+
+        if count_invalid > 0:
+            bbutil.log.error("Unable to change columns!")
+            return False
+
+        _columns = []
+        for column in self.missing_columns:
+            if column.primarykey is True:
+                bbutil.log.error("Unable to add new primarykey column: {0:s}".format(column.name))
+                return False
+
+            if column.unique is True:
+                bbutil.log.error("Unable to add new unique column: {0:s}".format(column.name))
+                return False
+            _columns.append(column.create)
+
+        check = self.sqlite.add_columns(self.name, _columns)
+        if check is False:
+            return False
+
+        if len(self.drop_columns) == 0:
+            return True
+
+        check = self.sqlite.check_minmal_version(3, 35, 0)
+        if check is False:
+            return True
+
+        check = self.sqlite.drop_columns(self.name, self.drop_columns)
+        if check is False:
+            return False
+
+        return True
+
+    def init(self) -> bool:
+        if bbutil.log is None:
+            return False
+
         self.sqlite.prepare()
 
-        _count = self.sqlite.prepare_table(self.name, _columns, _unique)
+        _type = self._check_table()
+
+        _check = False
+
+        if _type is _InitType.has_no_columns:
+            _check = False
+
+        if _type is _InitType.has_no_table:
+            _check = self._create_table()
+
+        if _type is _InitType.has_old_table:
+            _check = self._rename_table()
+
+        if _type is _InitType.has_table:
+            _check = True
+
+        if _check is False:
+            return False
+
+        _count = self.sqlite.count(self.name)
         if _count == -1:
             return False
 
@@ -232,6 +336,63 @@ class Table(object):
 
         _list.append(item)
         return
+
+    def check_scheme(self) -> bool:
+        if bbutil.log is None:
+            return False
+
+        if len(self.columns) == 0:
+            bbutil.log.error("No columns: {0:s}".format(self.name))
+            return False
+
+        _schemes = {}
+        _columns = {}
+
+        _data = self.sqlite.get_scheme(self.name)
+        if _data is None:
+            bbutil.log.error("Scheme for {0:s} not found!".format(self.name))
+            return False
+
+        self.missing_columns.clear()
+        self.invalid_columns.clear()
+        self.drop_columns.clear()
+
+        for item in _data:
+            _schemes[item[0]] = item[1]
+
+        for _col in self.columns:
+            _columns[_col.name] = _col
+
+        for _name in _schemes:
+            try:
+                _col = _columns[_name]
+            except KeyError:
+                bbutil.log.error("Column {0:s} found, but no definition exists!".format(_name))
+                self.drop_columns.append(_name)
+
+        for _column in self.columns:
+            try:
+                _value = _schemes[_column.name]
+            except KeyError:
+                bbutil.log.error("Column {0:s} in {1:s} not found!".format(_column.name, self.name))
+                self.missing_columns.append(_column)
+                return False
+
+            expected_value = _column.type.value.type
+
+            if expected_value != _value:
+                _error = "Column {0:s} in {1:s} does not match: found {2:s}, expected {3:s}".format(_column.name,
+                                                                                                    self.name,
+                                                                                                    _value,
+                                                                                                    expected_value)
+                bbutil.log.error(_error)
+                self.invalid_columns.append(_column)
+                return False
+
+        if len(self.drop_columns) > 0:
+            return False
+
+        return True
 
     def load(self) -> int:
         bbutil.log.inform(self.name, "Load {0:s}...".format(self.name))

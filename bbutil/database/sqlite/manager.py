@@ -97,6 +97,10 @@ class Connection(object):
             _check = self._connect_memory()
         else:
             _check = self._connect_file()
+
+        if _check is False:
+            self._lock.release()
+
         return _check
 
     def commit(self) -> bool:

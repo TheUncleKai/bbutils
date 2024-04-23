@@ -6,7 +6,7 @@
 
 import os
 
-from bbutil.utils import full_path
+from bbutil.utils import full_path, fix_sep
 
 
 __all__ = [
@@ -16,7 +16,7 @@ __all__ = [
 
 def _find_folders(path: str, folders: list, exlude_list: list):
     for root, dirs, files in os.walk(path, topdown=True):
-        for name in dirs:
+        for name in sorted(dirs):
 
             _item = full_path("{0:s}/{1:s}".format(root, name))
 
@@ -38,7 +38,7 @@ def _find_folders(path: str, folders: list, exlude_list: list):
 
 def _find_files(path: str, current_path: str, exlude_list: list) -> list:
     _files = []
-    for _item in os.listdir(path):
+    for _item in sorted(os.listdir(path)):
 
         _fullname = full_path("{0:s}/{1:s}".format(path, _item))
         _path = _fullname.replace(current_path, "")
@@ -58,12 +58,13 @@ def _find_files(path: str, current_path: str, exlude_list: list) -> list:
         if os.path.isdir(_fullname) is True:
             continue
 
+        _path = fix_sep(_path)
         _files.append(_path)
     return _files
 
 
 def find_data_files(folder: str, target: str, package_files: list, exlude_list: list):
-    current_path = "{0:s}/".format(os.getcwd())
+    current_path = "{0:s}{1:s}".format(os.getcwd(), os.sep)
     target_folder = full_path("{0:s}/{1:s}".format(current_path, folder))
 
     _folders = [
@@ -74,12 +75,15 @@ def find_data_files(folder: str, target: str, package_files: list, exlude_list: 
 
     for _item in _folders:
         _files = _find_files(_item, current_path, exlude_list)
-        _name = _item.replace("{0:s}/".format(target_folder), "")
+
+        _target_folder = "{0:s}{1:s}".format(target_folder, os.sep)
+        _name = _item.replace(_target_folder, "")
 
         if _name == target_folder:
             _name = target
         else:
             _name = "{0:s}/{1:s}".format(target, _name)
+            _name = fix_sep(_name)
 
         _count = len(_files)
         if _count == 0:

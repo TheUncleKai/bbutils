@@ -50,6 +50,36 @@ class SQLite(object):
         self.manager.setup(use_memory=self.use_memory, filename=self.filename)
         return
 
+    @staticmethod
+    def check_minmal_version(major: int, minor: int, patch: int = 0) -> bool:
+        _info = sqlite3.sqlite_version_info
+
+        _version = "{0:d}.{1:d}.{2:d}".format(major, minor, patch)
+        _error1 = "Version check failed!"
+        _error2 = "Minimum version requierd is {0:s}, current version is {1:s}!".format(_version,
+                                                                                        sqlite3.sqlite_version)
+
+        _major = int(_info[0])
+        _minor = int(_info[1])
+        _patch = int(_info[2])
+
+        if _major < major:
+            bbutil.log.error(_error1)
+            bbutil.log.error(_error2)
+            return False
+
+        if _minor < minor:
+            bbutil.log.error(_error1)
+            bbutil.log.error(_error2)
+            return False
+
+        if _patch < patch:
+            bbutil.log.error(_error1)
+            bbutil.log.error(_error2)
+            return False
+
+        return True
+
     def check(self, table_name: str) -> int:
         _check = self.manager.connect()
         if _check is False:
@@ -113,7 +143,12 @@ class SQLite(object):
 
         return _count
 
-    def _check_table(self, table_name: str) -> bool:
+    def check_table(self, table_name: str, connect: bool = True) -> bool:
+        if connect is True:
+            _check = self.manager.connect()
+            if _check is False:
+                return False
+
         _connection = self.manager.connection
         c = _connection.cursor()
         command = "SELECT name FROM sqlite_master WHERE type='table' AND name='{0:s}';".format(table_name)
@@ -125,28 +160,26 @@ class SQLite(object):
         except sqlite3.OperationalError as e:
             bbutil.log.error("Unable to check for table: {0:s}".format(table_name))
             bbutil.log.exception(e)
+            if connect is True:
+                self.manager.release()
             return False
 
         result = c.fetchone()
         if result is None:
+            if connect is True:
+                self.manager.release()
             return False
+
+        if connect is True:
+            _check = self.manager.release()
+            if _check is False:
+                return False
         return True
 
-    def prepare_table(self, table_name: str, column_list: list, unique_list: list, skip_check: bool = False) -> int:
+    def create_table(self, table_name: str, column_list: list, unique_list: list) -> bool:
         _check = self.manager.connect()
         if _check is False:
-            return -1
-
-        if skip_check is False:
-            _check = self._check_table(table_name)
-            if _check is True:
-                _count = self._count_table(table_name)
-
-                _check = self.manager.release()
-                if _check is False:
-                    return -1
-
-                return _count
+            return False
 
         _connection = self.manager.connection
         c = _connection.cursor()
@@ -176,19 +209,186 @@ class SQLite(object):
             bbutil.log.exception(e)
             print(command)
             self.manager.abort()
-            return -1
+            return False
 
         bbutil.log.debug1(self.name, "Create table: {0:s}".format(table_name))
 
         _check = self.manager.commit()
         if _check is False:
             self.manager.release()
-            return -1
+            return False
 
         _check = self.manager.release()
         if _check is False:
-            return -1
-        return 0
+            return False
+        return True
+
+    def get_scheme(self, table_name: str) -> Optional[list]:
+        _check = self.manager.connect()
+        if _check is False:
+            return None
+
+        _connection = self.manager.connection
+        c = _connection.cursor()
+
+        command = "SELECT name, type FROM pragma_table_info('{0:s}')".format(table_name)
+
+        try:
+            c.execute(command)
+        except sqlite3.OperationalError as e:
+            bbutil.log.error("Unable to create table: {0:s}".format(table_name))
+            bbutil.log.exception(e)
+            print(command)
+            self.manager.abort()
+            return None
+
+        _fetchlist = []
+
+        for _data in c:
+            _fetchlist.append(_data)
+
+        _check = self.manager.release()
+        if _check is False:
+            return None
+
+        if len(_fetchlist) == 0:
+            return None
+
+        return _fetchlist
+
+    def _add_columns(self, table_name: str, column_data: str) -> bool:
+        _connection = self.manager.connection
+        c = _connection.cursor()
+
+        command = 'ALTER TABLE "{0:s}" ADD COLUMN {1:s}'.format(table_name, column_data)
+
+        try:
+            c.execute(command)
+        except sqlite3.OperationalError as e:
+            bbutil.log.error("Unable to alter table: {0:s}".format(table_name))
+            bbutil.log.exception(e)
+            print(command)
+            self.manager.abort()
+            return False
+        return True
+
+    def add_columns(self, table_name: str, column_list: list) -> bool:
+        _check = self.manager.connect()
+        if _check is False:
+            return False
+
+        _columns = ""
+
+        for _line in column_list:
+            _check = self._add_columns(table_name, _line)
+            if _check is False:
+                return False
+
+        bbutil.log.debug1(self.name, "Alter table: {0:s}".format(table_name))
+
+        _check = self.manager.release()
+        if _check is False:
+            return False
+        return True
+
+    def _drop_columns(self, table_name: str, column_data: str) -> bool:
+        _connection = self.manager.connection
+        c = _connection.cursor()
+
+        command = 'ALTER TABLE "{0:s}" DROP COLUMN {1:s};'.format(table_name, column_data)
+
+        try:
+            c.execute(command)
+        except sqlite3.OperationalError as e:
+            bbutil.log.error("Unable to alter table: {0:s}".format(table_name))
+            bbutil.log.exception(e)
+            print(command)
+            self.manager.abort()
+            return False
+        return True
+
+    def drop_columns(self, table_name: str, column_list: list) -> bool:
+        _check = self.check_minmal_version(3, 35, 0)
+        if _check is False:
+            return False
+
+        _check = self.manager.connect()
+        if _check is False:
+            return False
+
+        _columns = ""
+
+        for _line in column_list:
+            _check = self._drop_columns(table_name, _line)
+            if _check is False:
+                return False
+
+        bbutil.log.debug1(self.name, "Alter table: {0:s}".format(table_name))
+
+        _check = self.manager.release()
+        if _check is False:
+            return False
+        return True
+
+    def rename_table(self, table_name: str, new_name: str) -> bool:
+        _check = self.manager.connect()
+        if _check is False:
+            return False
+
+        _connection = self.manager.connection
+        c = _connection.cursor()
+
+        command = 'ALTER TABLE "{0:s}" RENAME TO "{1:s}";'.format(table_name, new_name)
+
+        try:
+            c.execute(command)
+        except sqlite3.OperationalError as e:
+            bbutil.log.error("Unable to rename table: {0:s}".format(table_name))
+            bbutil.log.exception(e)
+            print(command)
+            self.manager.abort()
+            return False
+
+        bbutil.log.debug1(self.name, "Rename table: {0:s}".format(table_name))
+
+        _check = self.manager.release()
+        if _check is False:
+            return False
+        return True
+
+    def rename_column(self, table_name: str, column_name: str, new_name: str) -> bool:
+        _check = self.check_minmal_version(3, 25, 0)
+        if _check is False:
+            return False
+
+        print(sqlite3.sqlite_version_info)
+
+        _check = self.manager.connect()
+        if _check is False:
+            return False
+
+        _connection = self.manager.connection
+        c = _connection.cursor()
+
+        command = 'ALTER TABLE "{0:s}" RENAME COLUMN "{1:s}" TO "{2:s}"'.format(table_name,
+                                                                                column_name,
+                                                                                new_name)
+
+        try:
+            c.execute(command)
+        except sqlite3.OperationalError as e:
+            bbutil.log.error("Unable to rename column: {0:s}".format(table_name))
+            bbutil.log.exception(e)
+            print(command)
+            self.manager.abort()
+            return False
+
+        bbutil.log.debug1(self.name, "Rename column: {0:s}".format(table_name))
+
+        _check = self.manager.release()
+        if _check is False:
+            return False
+        return True
 
     @staticmethod
     def _single_execute(table_name: str, names: list, data: Data) -> Optional[Execute]:

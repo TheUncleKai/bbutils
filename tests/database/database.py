@@ -20,8 +20,6 @@ import os
 import unittest
 import unittest.mock as mock
 
-from unittest.mock import Mock
-
 from bbutil.database import Database
 
 from tests.helper import set_log
@@ -45,6 +43,14 @@ class TestDatabase(unittest.TestCase):
     def _clean(database: Database):
         if database.sqlite is None:
             return
+
+        _con = None
+
+        if database.sqlite.manager is not None:
+            _con = database.sqlite.manager.connection
+
+        if _con is not None:
+            _con.close()
 
         if os.path.exists(database.sqlite.filename) is True:
             os.remove(database.sqlite.filename)
@@ -96,6 +102,31 @@ class TestDatabase(unittest.TestCase):
 
         self.assertFalse(_check1)
         self._clean(_database)
+        return
+
+    def test_start_05(self):
+        _filename = "{0:s}/testdata/database/test_database.sqlite".format(os.getcwd())
+        _database = TestData(filename=_filename)
+
+        _check1 = _database.start()
+        self.assertIsNotNone(_database.table01)
+        self.assertIsNotNone(_database.table02)
+        return
+
+    def test_get_table_01(self):
+        _filename = "{0:s}/testdata/database/test_database.sqlite".format(os.getcwd())
+        _database = TestData(filename=_filename)
+
+        _check1 = _database.start()
+
+        _table1 = _database.get_table("tester01")
+        _table2 = _database.get_table("tester01XXXX")
+
+        self.assertTrue(_check1)
+        self.assertIsNotNone(_database.table01)
+        self.assertIsNotNone(_database.table02)
+        self.assertIsNotNone(_table1)
+        self.assertIsNone(_table2)
         return
 
     def test_store_01(self):

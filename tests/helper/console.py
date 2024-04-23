@@ -16,6 +16,7 @@
 #    Copyright (C) 2017, Kai Raphahn <kai.raphahn@laburec.de>
 #
 
+import sys
 import os
 
 from dataclasses import dataclass
@@ -36,6 +37,11 @@ _index = {
     2: ["INFORM", "DEBUG1", "DEBUG2", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"],
     3: ["INFORM", "DEBUG1", "DEBUG2", "DEBUG3", "WARN", "ERROR", "EXCEPTION", "TIMER", "PROGRESS"]
 }
+
+if sys.platform == "win32":
+    _filename1 = full_path("{0:s}/testdata/config01_win.json".format(os.getcwd()))
+else:
+    _filename1 = full_path("{0:s}/testdata/config01.json".format(os.getcwd()))
 
 
 @dataclass
@@ -63,7 +69,7 @@ class AppConsole(Console):
         return _config
 
     def init(self):
-        self.filename = full_path("{0:s}/testdata/config01.json".format(os.getcwd()))
+        self.filename = _filename1
         return
 
     def start(self) -> bool:

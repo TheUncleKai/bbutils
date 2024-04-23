@@ -20,11 +20,13 @@ import os
 import unittest
 import unittest.mock as mock
 
+from unittest.mock import Mock
+
 import bbutil
 
 from bbutil.database import Table, Types, SQLite
 
-from tests.helper import get_sqlite, set_log
+from tests.helper import get_sqlite, set_log, copy_sqlite
 from tests.helper.table import TestData, get_table_01, get_table_02, get_table_03, get_table_04
 
 from tests.helper.sqlite import get_sqlite_operational_error, get_sqlite_integrity_error, get_sqlite_return_false
@@ -32,6 +34,9 @@ from tests.helper.sqlite import get_sqlite_operational_error, get_sqlite_integri
 __all__ = [
     "TestTable"
 ]
+
+def return_count_01() -> int:
+    return -1
 
 
 class TestTable(unittest.TestCase):
@@ -43,6 +48,14 @@ class TestTable(unittest.TestCase):
 
     @staticmethod
     def _clean(sqlite: SQLite):
+        _con = None
+
+        if sqlite.manager is not None:
+            _con = sqlite.manager.connection
+
+        if _con is not None:
+            _con.close()
+
         if os.path.exists(sqlite.filename) is True:
             os.remove(sqlite.filename)
         return
@@ -150,6 +163,359 @@ class TestTable(unittest.TestCase):
 
         _table = Table(name="Testos")
         _check1 = _table.init()
+        self.assertFalse(_check1)
+        return
+
+    def test_init_05(self):
+        _sqlite = copy_sqlite(filename="test_check_table.sqlite", path="testdata/database")
+        _table = get_table_01(sqlite_object=_sqlite)
+
+        _table.old_name = "tester01"
+        _table.name = "tester_new"
+
+        _check = _table.init()
+        self.assertTrue(_check)
+
+        self._clean(_sqlite)
+        return
+
+    @mock.patch('bbutil.database.sqlite.SQLite.count', new=Mock(return_value=-1))
+    def test_init_06(self):
+        _sqlite = copy_sqlite(filename="test_check_table.sqlite", path="testdata/database")
+        _table = get_table_01(sqlite_object=_sqlite)
+
+        _table.old_name = "tester01"
+        _table.name = "tester_new"
+
+        _check = _table.init()
+        self.assertFalse(_check)
+
+        self._clean(_sqlite)
+        return
+
+    @mock.patch('bbutil.database.sqlite.SQLite.rename_table', new=Mock(return_value=False))
+    def test_init_07(self):
+        _sqlite = copy_sqlite(filename="test_check_table.sqlite", path="testdata/database")
+        _table = get_table_01(sqlite_object=_sqlite)
+
+        _table.old_name = "tester01"
+        _table.name = "tester_new"
+
+        _check = _table.init()
+        self.assertFalse(_check)
+
+        self._clean(_sqlite)
+        return
+
+    def test_upgrade_01(self):
+        _sqlite = copy_sqlite(filename="test_database.sqlite", path="testdata/database")
+
+        _table = Table(name="tester01", sqlite=_sqlite)
+        _table.add_column(name="testid", data_type=Types.integer, primarykey=True)
+        _table.add_column(name="use_test", data_type=Types.bool)
+        _table.add_column(name="testname", data_type=Types.string)
+        _table.add_column(name="path", data_type=Types.string)
+        _table.add_column(name="use_test_name", data_type=Types.string)
+
+        _check = _table.init()
+        self.assertTrue(_check)
+
+        _check = _table.check_scheme()
+        self.assertFalse(_check)
+
+        _check = _table.upgrade()
+        self.assertTrue(_check)
+
+        _check = _table.check_scheme()
+        self.assertTrue(_check)
+
+        self._clean(_sqlite)
+        return
+
+    def test_upgrade_02(self):
+        _sqlite = copy_sqlite(filename="test_database.sqlite", path="testdata/database")
+
+        _table = Table(name="tester01", sqlite=_sqlite)
+        _table.add_column(name="testid", data_type=Types.integer, primarykey=True)
+        _table.add_column(name="use_test", data_type=Types.bool)
+        _table.add_column(name="testname", data_type=Types.string)
+        _table.add_column(name="path", data_type=Types.string)
+
+        _check = _table.init()
+        self.assertTrue(_check)
+
+        _check = _table.upgrade()
+        self.assertTrue(_check)
+
+        self._clean(_sqlite)
+        return
+
+    def test_upgrade_03(self):
+        _sqlite = copy_sqlite(filename="test_database.sqlite", path="testdata/database")
+
+        _table = Table(name="tester01", sqlite=_sqlite)
+        _table.add_column(name="testid", data_type=Types.integer, primarykey=True)
+        _table.add_column(name="use_test", data_type=Types.string)
+        _table.add_column(name="testname", data_type=Types.string)
+        _table.add_column(name="path", data_type=Types.string)
+
+        _check = _table.init()
+        self.assertTrue(_check)
+
+        _check = _table.upgrade()
+        self.assertFalse(_check)
+
+        self._clean(_sqlite)
+        return
+
+    def test_upgrade_04(self):
+        _sqlite = copy_sqlite(filename="test_database.sqlite", path="testdata/database")
+
+        _table = Table(name="tester01", sqlite=_sqlite)
+        _table.add_column(name="testid", data_type=Types.integer, primarykey=True)
+        _table.add_column(name="use_test", data_type=Types.bool)
+        _table.add_column(name="testname", data_type=Types.string)
+        _table.add_column(name="path", data_type=Types.string)
+        _table.add_column(name="use_test_id", data_type=Types.integer, primarykey=True)
+
+        _check = _table.init()
+        self.assertTrue(_check)
+
+        _check = _table.upgrade()
+        self.assertFalse(_check)
+
+        self._clean(_sqlite)
+        return
+
+    def test_upgrade_05(self):
+        _sqlite = copy_sqlite(filename="test_database.sqlite", path="testdata/database")
+
+        _table = Table(name="tester01", sqlite=_sqlite)
+        _table.add_column(name="testid", data_type=Types.integer, primarykey=True)
+        _table.add_column(name="use_test", data_type=Types.bool)
+        _table.add_column(name="testname", data_type=Types.string)
+        _table.add_column(name="path", data_type=Types.string)
+        _table.add_column(name="use_test_id", data_type=Types.integer, unique=True)
+
+        _check = _table.init()
+        self.assertTrue(_check)
+
+        _check = _table.upgrade()
+        self.assertFalse(_check)
+
+        self._clean(_sqlite)
+        return
+
+    @mock.patch('bbutil.database.sqlite.SQLite.add_columns', new=Mock(return_value=False))
+    def test_upgrade_06(self):
+        _sqlite = copy_sqlite(filename="test_database.sqlite", path="testdata/database")
+
+        _table = Table(name="tester01", sqlite=_sqlite)
+        _table.add_column(name="testid", data_type=Types.integer, primarykey=True)
+        _table.add_column(name="use_test", data_type=Types.bool)
+        _table.add_column(name="testname", data_type=Types.string)
+        _table.add_column(name="path", data_type=Types.string)
+        _table.add_column(name="use_test_id", data_type=Types.integer)
+
+        _check = _table.init()
+        self.assertTrue(_check)
+
+        _check = _table.upgrade()
+        self.assertFalse(_check)
+
+        self._clean(_sqlite)
+        return
+
+    def test_upgrade_07(self):
+        _sqlite = copy_sqlite(filename="test_database.sqlite", path="testdata/database")
+
+        _table = Table(name="tester01", sqlite=_sqlite)
+        _table.add_column(name="testid", data_type=Types.integer, primarykey=True)
+        _table.add_column(name="use_test", data_type=Types.bool)
+        _table.add_column(name="testname", data_type=Types.string)
+
+        _check = _table.init()
+        self.assertTrue(_check)
+
+        _check = _table.check_scheme()
+        self.assertFalse(_check)
+
+        _check = _table.upgrade()
+        self.assertTrue(_check)
+
+        self._clean(_sqlite)
+        return
+
+    @mock.patch('bbutil.database.sqlite.SQLite.drop_columns', new=Mock(return_value=False))
+    @mock.patch('bbutil.database.sqlite.SQLite.check_minmal_version', new=Mock(return_value=True))
+    def test_upgrade_08(self):
+        _sqlite = copy_sqlite(filename="test_database.sqlite", path="testdata/database")
+
+        _table = Table(name="tester01", sqlite=_sqlite)
+        _table.add_column(name="testid", data_type=Types.integer, primarykey=True)
+        _table.add_column(name="use_test", data_type=Types.bool)
+        _table.add_column(name="testname", data_type=Types.string)
+
+        _check = _table.init()
+        self.assertTrue(_check)
+
+        _check = _table.check_scheme()
+        self.assertFalse(_check)
+
+        _check = _table.upgrade()
+        self.assertFalse(_check)
+
+        self._clean(_sqlite)
+        return
+
+    @mock.patch('bbutil.database.sqlite.SQLite.check_minmal_version', new=Mock(return_value=False))
+    def test_upgrade_09(self):
+        _sqlite = copy_sqlite(filename="test_database.sqlite", path="testdata/database")
+
+        _table = Table(name="tester01", sqlite=_sqlite)
+        _table.add_column(name="testid", data_type=Types.integer, primarykey=True)
+        _table.add_column(name="use_test", data_type=Types.bool)
+        _table.add_column(name="testname", data_type=Types.string)
+
+        _check = _table.init()
+        self.assertTrue(_check)
+
+        _check = _table.check_scheme()
+        self.assertFalse(_check)
+
+        _check = _table.upgrade()
+        self.assertTrue(_check)
+
+        _check = _table.check_scheme()
+        self.assertFalse(_check)
+
+        self._clean(_sqlite)
+        return
+
+    def test_get_column_01(self):
+        _table = Table(name="tester01")
+        _table.add_column(name="testid", data_type=Types.integer, primarykey=True)
+        _table.add_column(name="use_test", data_type=Types.bool)
+        _table.add_column(name="testname", data_type=Types.string)
+        _table.add_column(name="path", data_type=Types.string)
+        _table.add_column(name="use_test_id", data_type=Types.integer)
+
+        _column = _table.get_column("testid")
+        self.assertIsNotNone(_column)
+
+        self.assertEqual(_column.name, "testid")
+        self.assertTrue(_column.primarykey)
+        self.assertEqual(_column.type, Types.integer)
+
+        _column = _table.get_column("testidxx")
+        self.assertIsNone(_column)
+        return
+
+    def test_check_scheme_01(self):
+        _sqlite = get_sqlite(filename="test_database.sqlite", path="testdata/database")
+
+        _table = Table(name="tester01", sqlite=_sqlite)
+        _table.add_column(name="testid", data_type=Types.integer, primarykey=True)
+        _table.add_column(name="use_test", data_type=Types.bool)
+        _table.add_column(name="testname", data_type=Types.string)
+        _table.add_column(name="path", data_type=Types.string)
+
+        _check1 = _table.init()
+        _check2 = _table.check_scheme()
+
+        self.assertTrue(_check1)
+        self.assertTrue(_check2)
+        return
+
+    def test_check_scheme_02(self):
+        _sqlite = get_sqlite(filename="test_database.sqlite", path="testdata/database")
+
+        _table = Table(name="tester01", sqlite=_sqlite)
+        _table.add_column(name="testid", data_type=Types.integer, primarykey=True)
+        _table.add_column(name="use_test", data_type=Types.string)
+        _table.add_column(name="testname", data_type=Types.string)
+        _table.add_column(name="path", data_type=Types.string)
+
+        _check1 = _table.init()
+        _check2 = _table.check_scheme()
+        _count1 = len(_table.missing_columns)
+        _count2 = len(_table.invalid_columns)
+
+        self.assertEqual(_count1, 0)
+        self.assertEqual(_count2, 1)
+        self.assertTrue(_check1)
+        self.assertFalse(_check2)
+        return
+
+    def test_check_scheme_03(self):
+        _sqlite = get_sqlite(filename="test_database.sqlite", path="testdata/database")
+
+        _table = Table(name="tester01", sqlite=_sqlite)
+        _table.add_column(name="testid", data_type=Types.integer, primarykey=True)
+        _table.add_column(name="use_test_now", data_type=Types.bool)
+        _table.add_column(name="testname", data_type=Types.string)
+        _table.add_column(name="path", data_type=Types.string)
+
+        _check1 = _table.init()
+        _check2 = _table.check_scheme()
+        _count1 = len(_table.missing_columns)
+        _count2 = len(_table.invalid_columns)
+
+        self.assertEqual(_count1, 1)
+        self.assertEqual(_count2, 0)
+        self.assertTrue(_check1)
+        self.assertFalse(_check2)
+        return
+
+    def test_check_scheme_04(self):
+        _sqlite = get_sqlite(filename="test_database.sqlite", path="testdata/database")
+
+        _table = Table(name="tester04", sqlite=_sqlite)
+        _table.add_column(name="testid", data_type=Types.integer, primarykey=True)
+        _table.add_column(name="use_test", data_type=Types.bool)
+        _table.add_column(name="testname", data_type=Types.string)
+        _table.add_column(name="path", data_type=Types.string)
+
+        _table.sqlite.prepare()
+        _check1 = _table.check_scheme()
+
+        self.assertFalse(_check1)
+        return
+
+    def test_check_scheme_05(self):
+        _sqlite = get_sqlite(filename="test_database.sqlite", path="testdata/database")
+
+        _table = Table(name="tester04", sqlite=_sqlite)
+
+        _table.sqlite.prepare()
+        _check1 = _table.check_scheme()
+
+        self.assertFalse(_check1)
+        return
+
+    def test_check_scheme_06(self):
+        bbutil.set_log(None)
+        _sqlite = get_sqlite(filename="test_database.sqlite", path="testdata/database")
+
+        _table = Table(name="tester04", sqlite=_sqlite)
+
+        _table.sqlite.prepare()
+        _check1 = _table.check_scheme()
+
+        self.assertFalse(_check1)
+        return
+
+    def test_check_scheme_07(self):
+        _sqlite = get_sqlite(filename="test_database.sqlite", path="testdata/database")
+
+        _table = Table(name="tester01", sqlite=_sqlite)
+        _table.add_column(name="testid", data_type=Types.integer, primarykey=True)
+        _table.add_column(name="use_test", data_type=Types.bool)
+        _table.add_column(name="testname", data_type=Types.string)
+
+        _table.sqlite.prepare()
+        _check1 = _table.check_scheme()
+
         self.assertFalse(_check1)
         return
 

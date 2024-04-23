@@ -51,6 +51,12 @@ class Database(metaclass=ABCMeta):
     def clear_data(self):
         pass
 
+    def get_table(self, name: str) -> Optional[Table]:
+        for _table in self.tables:
+            if _table.name == name:
+                return _table
+        return None
+
     def clear(self):
         for _table in self.tables:
             _table.clear()
@@ -90,5 +96,4 @@ class Database(metaclass=ABCMeta):
             _check = _table.init()
             if _check is False:
                 return False
-
         return True
