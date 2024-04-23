@@ -44,6 +44,14 @@ class TestDatabase(unittest.TestCase):
         if database.sqlite is None:
             return
 
+        _con = None
+
+        if database.sqlite.manager is not None:
+            _con = database.sqlite.manager.connection
+
+        if _con is not None:
+            _con.close()
+
         if os.path.exists(database.sqlite.filename) is True:
             os.remove(database.sqlite.filename)
         return
