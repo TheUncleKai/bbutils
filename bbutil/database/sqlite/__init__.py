@@ -295,7 +295,7 @@ class SQLite(object):
         _connection = self.manager.connection
         c = _connection.cursor()
 
-        command = 'ALTER TABLE "{0:s}" DROP COLUMN "{1:s}";'.format(table_name, column_data)
+        command = 'ALTER TABLE "{0:s}" DROP COLUMN {1:s};'.format(table_name, column_data)
 
         try:
             c.execute(command)
