@@ -268,6 +268,44 @@ class TestTable(unittest.TestCase):
         self._clean(_sqlite)
         return
 
+    def test_upgrade_04(self):
+        _sqlite = copy_sqlite(filename="test_database.sqlite", path="testdata/database")
+
+        _table = Table(name="tester01", sqlite=_sqlite)
+        _table.add_column(name="testid", data_type=Types.integer, primarykey=True)
+        _table.add_column(name="use_test", data_type=Types.bool)
+        _table.add_column(name="testname", data_type=Types.string)
+        _table.add_column(name="path", data_type=Types.string)
+        _table.add_column(name="use_test_id", data_type=Types.integer, primarykey=True)
+
+        _check = _table.init()
+        self.assertTrue(_check)
+
+        _check = _table.upgrade()
+        self.assertFalse(_check)
+
+        self._clean(_sqlite)
+        return
+
+    def test_upgrade_05(self):
+        _sqlite = copy_sqlite(filename="test_database.sqlite", path="testdata/database")
+
+        _table = Table(name="tester01", sqlite=_sqlite)
+        _table.add_column(name="testid", data_type=Types.integer, primarykey=True)
+        _table.add_column(name="use_test", data_type=Types.bool)
+        _table.add_column(name="testname", data_type=Types.string)
+        _table.add_column(name="path", data_type=Types.string)
+        _table.add_column(name="use_test_id", data_type=Types.integer, unique=True)
+
+        _check = _table.init()
+        self.assertTrue(_check)
+
+        _check = _table.upgrade()
+        self.assertFalse(_check)
+
+        self._clean(_sqlite)
+        return
+
     def test_check_scheme_01(self):
         _sqlite = get_sqlite(filename="test_database.sqlite", path="testdata/database")
 

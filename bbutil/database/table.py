@@ -122,34 +122,6 @@ class Table(object):
                 return _column
         return None
 
-    def drop_column(self, name: str) -> bool:
-        _columns: List[Column] = []
-        _names: List[str] = []
-        _drop: Optional[Column] = self.get_column(name)
-
-        if _drop is None:
-            bbutil.log.error("Column {0:s} not found!".format(name))
-            return False
-
-        if _drop.primarykey is True:
-            bbutil.log.error("Unable to drop primary key column!")
-            return False
-
-        if self.keyword == name:
-            self.keyword = ""
-
-        for _column in self.columns:
-            if _column.name == name:
-                self.drop.append(name)
-                continue
-
-            _columns.append(_column)
-            _names.append(_column.name)
-
-        self.columns = _columns
-        self.names = _names
-        return True
-
     def _process_datalist(self, data_list: List[Tuple], verbose: bool = True) -> Optional[List[Data]]:
         if data_list is None:
             if (self.suppress_warnings is False) and (verbose is True):
@@ -291,6 +263,10 @@ class Table(object):
         for column in self.missing_columns:
             if column.primarykey is True:
                 bbutil.log.error("Unable to add new primarykey column: {0:s}".format(column.name))
+                return False
+
+            if column.unique is True:
+                bbutil.log.error("Unable to add new unique column: {0:s}".format(column.name))
                 return False
             _columns.append(column.create)
 
