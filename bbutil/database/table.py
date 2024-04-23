@@ -334,7 +334,8 @@ class Table(object):
             bbutil.log.error("No columns: {0:s}".format(self.name))
             return False
 
-        _scheme = {}
+        _schemes = {}
+        _columns = {}
 
         _data = self.sqlite.get_scheme(self.name)
         if _data is None:
@@ -345,11 +346,20 @@ class Table(object):
         self.invalid_columns.clear()
 
         for item in _data:
-            _scheme[item[0]] = item[1]
+            _schemes[item[0]] = item[1]
+
+        for _col in self.columns:
+            _columns[_col.name] = _col
+
+        for _name in _schemes:
+            try:
+                _col = _columns[_name]
+            except KeyError:
+                self.drop_columns.append(_name)
 
         for _column in self.columns:
             try:
-                _value = _scheme[_column.name]
+                _value = _schemes[_column.name]
             except KeyError:
                 bbutil.log.error("Column {0:s} in {1:s} not found!".format(_column.name, self.name))
                 self.missing_columns.append(_column)
